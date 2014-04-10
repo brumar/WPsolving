@@ -1,95 +1,75 @@
 # -*- coding: cp1252 -*-
-import operations
+import lib.operations as operations
+from lib.schemas import *
+from lib.textRepresentations import *
 
-class Quantity:
-    def __init__(self,obj,value):
-        self.object=obj
-        self.value=value
-
-class Representation:
-    def __init__(self,quantity,weight,phrase="",comment=""):
-        self.quantity=quantity
-        self.weight=weight
-        self.phrase=phrase
-        self.comment=comment       
-        
-class Problem:
+class Problem: #fields : structure, text
    def __init__(self,structure,text):
        self.structure=structure
        self.text=text
 
-class Text:
-    textInformations=[]
-    def __init__(self):
-        pass
-    def addTextInformation(self,textInformation):
-        self.textInformations.append(textInformation)
-    def setGoal(self,goal):
-        self.goal=goal
-
-class TextInformation:
-    alternativeRepresentations=[]
-    def __init__(self,quantity,phrase="",weight=0):
-        self.quantity=quantity
-        self.phrase=phrase
-        self.weight=weight
-    def addAlternativeRepresentation(self,quantity,phrase="",comment="", weight=0):
-        self.alternativeRepresentations.append(Representation(quantity,weight,phrase,comment))
-
-class Goal:
-    alternativeGoals=[]
-    def __init__(self,obj,phrase="",weight=0):
-        self.obj=obj
-        self.phrase=phrase
-        self.weight=weight
-    def addAlternativeGoal(self,obj,phrase="",comment="", weight=0):
-        self.alternativeGoals.append(obj,phrase,comment,weight)                                              
-
-class ProblemStructure:
-    schemas=[]
-    def __init__(self):
-        pass
-    def addSchema(self,schema):
-        self.schemas.append(schema)
-    def addBridgingSchemas(self,schema1,schema2,names=[]):#Create all the schemas and objects related to eventual relations between two schemas
-                                                         #convention : schema1.objects['qf'] > schema2.objects['qf']
-        commonObject=self.detectCommonObject(schema1,schema2)
-        if(not commonObject):
-            for i,position in enumerate(['q1','q2','qf']):
-                self.bridge(schema1,schema2,position,operations.soustractionBridge)
-        else :
-            theCommonObject=commonObject.pop()# to get the only value of the set
-            if(schema1.positions[theCommonObject]==schema2.positions[theCommonObject]):#to bridge two schemas, the commonObject must be at the same position
-                posOfTheCommonObject=schema1.positions[theCommonObject]
-                l=['q1','q2','qf']
-                for i,position in enumerate(l):
-                    if position!=posOfTheCommonObject:
-                        self.bridge(schema1,schema2,position,operations.soustractionBridge)                 
-            else:
-                return
-    def bridge(self,schema1,schema2,position,operationBridge):
-        bridgef=schema1.objects[position]+operationBridge+schema2.objects[position] # create string like T2minusT1
-        self.addSchema(Schema(bridgef,schema1.objects[position],operations.soustraction,schema2.objects[position])) # create T1-T2=T1minusT2 schema and to the structure
-
-    def detectCommonObject(self,schema1,schema2):#todo
-        return schema1.getSetObjects().intersection(schema2.getSetObjects())
-    def updateObjectList(self):
-        objectList=[]
-        for s,schema in enumerate(self.schemas):
-            for o,obj in enumerate(schema.getSetObjects()):
-                objectList.append(obj)
-        self.objectSet=set(objectList)
+class Updater: #fields : problem, problemState
+   def __init__(self,problem):
+      self.problem=problem
+   def startAsUnderstood(self):#initialise all the quantities, goals and representations, as experts do
+      goal=self.problem.text.goal.obj
+      quantitiesDic = dict.fromkeys(self.problem.structure.objectSet,operations.unknown)#get all the objects
+      representations=[]
+      for i,info in enumerate(self.problem.text.textInformations):
+         quantitiesDic[info.quantity.object]=info.quantity.value# bind object to their values
+         representations.append(0)#0 indicate that the first (the good one) interpretation is selected
+      self.problemState=ProblemState(quantitiesDic,goal,representations)
+      
+   def applySchema(self,schema):
+      dic=self.problemState.quantitiesDic
+      print(dic)
+      n,unknow=findTheUnknown(schema,dic)
+      if(schema.positions[unknow]=='qf'):
+         if(schema.operation==operations.addition):
+            self.problemState.quantitiesDic[schema.objects['qf']]=dic[schema.objects['q2']]+dic[schema.objects['q1']]
+         else:
+            self.problemState.quantitiesDic[schema.objects['qf']]=dic[schema.objects['q2']]-dic[schema.objects['q1']]
+      if(schema.positions[unknow]=='q1'):
+         if(schema.operation==operations.addition):
+            self.problemState.quantitiesDic[schema.objects['q1']]=dic[schema.objects['qf']]-dic[schema.objects['q2']]
+         else:
+            self.problemState.quantitiesDic[schema.objects['q1']]=dic[schema.objects['qf']]+dic[schema.objects['q2']]
+      if(schema.positions[unknow]=='q2'):
+         if(schema.operation==operations.addition):
+            self.problemState.quantitiesDic[schema.objects['q2']]=dic[schema.objects['qf']]-dic[schema.objects['q1']]
+         else:
+            self.problemState.quantitiesDic[schema.objects['q2']]=dic[schema.objects['q1']]-dic[schema.objects['qf']]
+      print(self.problemState.quantitiesDic) 
+      
+   def isSchemaAppliable(self,schema):
+      dic=self.problemState.quantitiesDic
+      n,unknow=findTheUnknown(schema,dic)
+      if(n==1):
+         return True
+      else:
+         return False
         
+   #def applySchema(self,schema):
+      
+      
+      
 
-class Schema: #a simple schema is a schema binding 3 values (e.g. a+b=c)
-    def  __init__(self,qf,q1,operation,q2,name=""):#convention : q1 must be bigger than q2
-        self.name=name
-        self.operation=operation
-        self.objects = {'qf': qf, 'q1': q1,  'q2': q2}
-        self.positions = {qf: 'qf', q1: 'q1',  q2: 'q2'}#usefull to get the position (e.g T1 is the qf of this schema)
-    def getSetObjects(self):
-        return set([self.objects['q1'],self.objects['q2'],self.objects['qf']])
-#    def solve()
+class ProblemState:
+   def __init__(self,quantitiesDic,goal,representations):
+      self.quantitiesDic=quantitiesDic
+      self.goal=goal
+      self.representations=representations
+   
+   
+def findTheUnknown (schema,dic):
+   numberOfUnknow=0
+   theLastUnknown=""
+   for o,obj in enumerate(schema.positions.keys()):
+      if(dic[obj]==operations.unknown):
+         theLastUnknown=obj
+         numberOfUnknow+=1
+   return numberOfUnknow,theLastUnknown
+         
     
 schema1=Schema("PoissonEF","PoissonEI",operations.addition,"PoissonGAIN","change")
 schema2=Schema("ViandeEF","ViandeEI",operations.addition,"ViandeGAIN","change")
@@ -98,12 +78,6 @@ struct.addSchema(schema1)
 struct.addSchema(schema2)
 struct.addBridgingSchemas(schema1,schema2)
 struct.updateObjectList()
-print(struc.objectSet)
-##Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.
-##Un kilo de poisson coûte maintenant 12 euros.
-##Au début de l'année, le kilo de viande coûtait le même prix que le kilo de poisson.
-##Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson.
-##Combien coûte le kilo de viande maintenant  ?
 text=Text()
 text.addTextInformation(TextInformation(Quantity("PoissonGAIN",5),'Au supermarché, le kilo de poisson a augmenté de 5 euros cette année'))
 text.addTextInformation(TextInformation(Quantity("PoissonEF",12),'Un kilo de poisson coûte maintenant 12 euros.'))
@@ -111,3 +85,6 @@ text.addTextInformation(TextInformation(Quantity("PoissonEIminusViandeEI",0),'Au
 text.addTextInformation(TextInformation(Quantity("PoissonGAINminusViandeGAIN",3),'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson'))
 text.setGoal(Goal('ViandeEF','Combien coûte le kilo de viande maintenant?'))
 probleme1=Problem(struct,text)
+upD=Updater(probleme1)
+upD.startAsUnderstood()
+upD.applySchema(schema1)
