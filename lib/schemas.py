@@ -35,8 +35,9 @@ class ProblemStructure:#fields : schemas,objectSet
         bridgef=schema1.objects['qf']+operationBridge+schema2.objects['qf']
         self.addSchema(Schema(bridgef , bridge1 , schema1.operation*schema2.operation , bridge2))#schema1.operation*schema2.operation works because operation.addition=1 and operation.soustraction=-1
     
-    def detectCommonObject(self,schema1,schema2):#todo
+    def detectCommonObject(self,schema1,schema2):
         return schema1.getSetObjects().intersection(schema2.getSetObjects())
+    
     def updateObjectList(self):
         objectList=[]
         for s,schema in enumerate(self.schemas):
