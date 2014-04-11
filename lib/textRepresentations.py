@@ -23,9 +23,7 @@ class Text:
 class TextInformation:
     alternativeRepresentations=[]
     def __init__(self,quantity,phrase="",weight=0):
-        self.quantity=quantity
-        self.phrase=phrase
-        self.weight=weight
+        self.expertRepresentation=Representation(quantity,weight,phrase)
     def addAlternativeRepresentation(self,quantity,phrase="",comment="", weight=0):
         self.alternativeRepresentations.append(Representation(quantity,weight,phrase,comment))
 

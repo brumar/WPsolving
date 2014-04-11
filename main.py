@@ -23,7 +23,7 @@ class Solver:
       if (not updater.problemState.isProblemEnded()):
          for s,schem in enumerate(updater.appliableSchemaList):
             newmove=Move(schem) 
-            print(step,s,ml,schem.positions.keys())
+            #print(step,s,ml,schem.positions.keys())
             self.updateTree(step,schem.positions.keys())
             self.recurcive_solve(copy.deepcopy(movelist),newmove,step+1,copy.deepcopy(history))
       else:
@@ -54,11 +54,10 @@ class Updater: #fields : problem, problemState
       
    def startAsUnderstood(self):#initialise all the quantities, goals and representations, as experts do
       goal=self.problem.text.goal
-      quantitiesDic = dict.fromkeys(self.problem.structure.objectSet,operations.unknown)#get all the objects, init with unknon
-                                                                                          #note : maybe one day => necessary to consider multiple values for a single object
+      quantitiesDic = dict.fromkeys(self.problem.structure.objectSet,operations.unknown)#get all the objects, init with unknon                                                                                      #note : maybe one day => necessary to consider multiple values for a single object
       representations=[]
       for i,info in enumerate(self.problem.text.textInformations):
-         quantitiesDic[info.quantity.object]=info.quantity.value# bind object to their values
+         quantitiesDic[info.expertRepresentation.quantity.object]=info.expertRepresentation.quantity.value# update the dic bind object to their values according the representations
          representations.append(0)#0 indicate that the first (the good one) interpretation is selected
       self.problemState=ProblemState(quantitiesDic,goal,representations)
       self.updateAppliableSchemas()
@@ -94,6 +93,9 @@ class Updater: #fields : problem, problemState
                self.problemState.quantitiesDic[schema.objects['q2']]=dic[schema.objects['q1']]-dic[schema.objects['qf']]
       self.updateAppliableSchemas()
                
+   def applyRepresentationMove(self,representation):
+      pass#TODO
+
    def applyRepresentationMove(self,representation):
       pass#TODO
 
@@ -139,6 +141,7 @@ struct.addSchema(schema1)
 struct.addSchema(schema2)
 struct.addBridgingSchemas(schema1,schema2)
 struct.updateObjectList()
+
 text=Text()
 text.addTextInformation(TextInformation(Quantity("PoissonGAIN",5),'Au supermarché, le kilo de poisson a augmenté de 5 euros cette année'))
 text.addTextInformation(TextInformation(Quantity("PoissonEF",12),'Un kilo de poisson coûte maintenant 12 euros.'))
