@@ -12,14 +12,15 @@ class Problem: #fields : structure, text
 
 class ExpertSolver:
 	def __init__(self,problem):
+		self.history=[]
 		self.problem=problem
 		self.treeVIZ=""
 
 	def recurcive_solve(self,movelist=[],newmove="",step=0,history=[],schemeToApply=0):
 		if(step!=0):
 			movelist.append(newmove)
-		updater=Updater(self.problem)
-		updater.applyMoveList(movelist)
+		updater=Updater(self.problem)	#	we create each time a new updater
+		updater.applyMoveList(movelist)	#	and we send the previous move list
 		if (not updater.problemState.isProblemEnded()):
 			for schem in updater.appliableSchemaList:
 				newmove=Move(schem)
@@ -28,7 +29,7 @@ class ExpertSolver:
 				self.recurcive_solve(copy.deepcopy(movelist),newmove,step+1,copy.deepcopy(history))
 		else:
 			#print(history)
-			step=0##problem here
+			step=0
 	def updateTree(self,step,keys):
 		line=step*"\t"+str(keys)+"\r\n"
 		self.treeVIZ+=line
@@ -40,27 +41,33 @@ class Move:
 		if(classname=="Schema"):
 			self.type="schema"
 			self.move=move
-		elif (classname=="Representation"):
-			self.type="representation"
+		elif (classname=="RepresentationMove"):
+			self.type="RepresentationMove"
 			self.move=move
 
+class RepresentationMove:
+	def __init__(self,indexTextInformation, indexSelectedRepresentation):
+		self.indexTextInformation=indexTextInformation
+		self.indexSelectedRepresentation=indexSelectedRepresentation
 
 
-class Updater: #fields : problem, problemState
+
+class Updater: #fields : problem, problemState, representations, quantitiesDic
 
 	def __init__(self,problem):
 		self.problem=problem
 		self.appliableSchemaList=[]
+		self.possibleRepresentationChangeList=[]
+		self.representations=[]
 
 	def startAsUnderstood(self):	#initialise all the quantities, goals and representations, as experts do
 		goal=self.problem.text.goal.expertGoal
 		quantitiesDic = QuantityDic(dict.fromkeys(self.problem.structure.objectSet,operations.unknown),startAsVoid=True)	#get all the objects, init with unknow																												  #note : maybe one day => necessary to consider multiple values for a single object
-		representations=[]
 		for info in self.problem.text.textInformations:
 			quantitiesDic.addValue(info.expertRepresentation.quantity.object, info.expertRepresentation.quantity.value) # update the dic bind object to their values according the representations
-			representations.append(0)	#0 indicate that the first (the good one) interpretation is selected
+			self.representations.append(0)	#0 indicate that the first (the good one) interpretation is selected
 
-		self.problemState=ProblemState(quantitiesDic,goal,representations) # the most important line
+		self.problemState=ProblemState(quantitiesDic,goal,self.representations) # the most important line
 
 		self.updateAppliableSchemas()
 
@@ -70,7 +77,7 @@ class Updater: #fields : problem, problemState
 		for move in movelist:
 			if (move.type=="schema"):
 				self.applySchema(move.move)
-			if (move.type=="representation"):
+			if (move.type=="representationMove"):
 				self.applyRepresentationMove(move.move)
 
 
@@ -95,9 +102,21 @@ class Updater: #fields : problem, problemState
 					dic.addValue(schema.objects['q2'],dic.get(schema.objects['qf'])+dic.get(schema.objects['q1']))
 		self.updateAppliableSchemas()
 
-	def applyRepresentationMove(self,representation):
+	def applyRepresentationMove(self,representationMove):
+		indexInfo=representationMove.indexTextInformation
+		indexSelection=representationMove.indexSelectedRepresentation
+		self.representations.remove(indexInfo)
+		self.representations.insert(indexInfo, indexSelection)
+		rep=self.problem.text.textInformations[indexInfo].representations[indexSelection]
+		quanti=rep.quantity
+		self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
 
-		pass#TODO
+	def updatePossibleRepresentationChange(self):
+		currentReps=self.problemState.representations
+		for t,textInfo in enumerate(self.problem.text.textInformations):
+			for r,representation in enumerate(textInfo.representations):
+				if(currentReps[t]!=r):
+					self.possibleRepresentationChangeList.append(RepresentationMove(t,r))
 
 
 	def updateAppliableSchemas(self):
@@ -121,7 +140,7 @@ class ProblemState:
 	def __init__(self,quantitiesDic,goal,representations):
 		self.quantitiesDic=quantitiesDic
 		self.goal=goal
-		self.representations=representations
+		self.representations=representations #une liste d'index !
 
 	def isProblemEnded(self):
 		return(not self.quantitiesDic.isUnknown(self.goal.obj))
@@ -159,11 +178,10 @@ text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity(
 probleme1=Problem(struct,text)
 upD=Updater(probleme1)
 upD.startAsUnderstood()
+upD.updatePossibleRepresentationChange()
+firstMove=upD.possibleRepresentationChangeList[2]
+moveList=[Move(firstMove)]
 solver=ExpertSolver(probleme1)
-move=Move(schema1)
-solver.recurcive_solve()
+solver.recurcive_solve(moveList)
 print(upD.appliableSchemaList)
 print(solver.treeVIZ)
-upD.applySchema(upD.appliableSchemaList[2])
-upD
-print(upD.appliableSchemaList)
