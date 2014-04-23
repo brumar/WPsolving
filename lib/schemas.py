@@ -6,7 +6,7 @@ class ProblemStructure:#fields : schemas,objectSet
     def addSchema(self,schema):
         self.schemas.append(schema)
     def addBridgingSchemas(self,schema1,schema2,names=[]):#Create all the schemas and objects related to eventual relations between two schemas
-                                                         #convention : schema1.objects['qf'] > schema2.objects['qf']
+                                                            #convention : schema1.objects['qf'] > schema2.objects['qf']
                                                         #4 schemas max is created 3 binding the q1,q2,qf together, and 1 binding the two schemas
         commonObject=self.detectCommonObject(schema1,schema2)
         if(not commonObject):
@@ -24,7 +24,7 @@ class ProblemStructure:#fields : schemas,objectSet
                 if position!=posOfTheCommonObject:
                     self.bridge(schema1,schema2,position,operations.soustractionBridge)
             self.lastbridge(schema1,schema2,operations.soustractionBridge)
-            
+
     def bridge(self,schema1,schema2,position,operationBridge):
         bridge=schema1.objects[position]+operationBridge+schema2.objects[position] # create string like T2minusT1
         self.addSchema(Schema(bridge,schema1.objects[position],operations.soustraction,schema2.objects[position])) # create T1-T2=T1minusT2 schema and to the structure
@@ -34,17 +34,17 @@ class ProblemStructure:#fields : schemas,objectSet
         bridge2=schema1.objects['q2']+operationBridge+schema2.objects['q2']
         bridgef=schema1.objects['qf']+operationBridge+schema2.objects['qf']
         self.addSchema(Schema(bridgef , bridge1 , schema1.operation*schema2.operation , bridge2))#schema1.operation*schema2.operation works because operation.addition=1 and operation.soustraction=-1
-    
+
     def detectCommonObject(self,schema1,schema2):
         return schema1.getSetObjects().intersection(schema2.getSetObjects())
-    
+
     def updateObjectList(self):
         objectList=[]
         for s,schema in enumerate(self.schemas):
             for o,obj in enumerate(schema.getSetObjects()):
                 objectList.append(obj)
         self.objectSet=set(objectList)
-        
+
 
 class Schema: #a simple schema is a schema binding 3 values (e.g. a+b=c)
     def  __init__(self,qf,q1,operation,q2,name=""):#convention : q1 must be bigger than q2
