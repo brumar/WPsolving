@@ -57,18 +57,19 @@ class Text:
         self.goal=goal
 
 class TextInformation:
-    alternativeRepresentations=[]
     def __init__(self,representation):
+        self.representations=[]
         self.expertRepresentation=representation
+        self.representations.append(representation) #by convention the expert representation is also the first element in representations
 
     def addAlternativeRepresentation(self,representation):
-        self.alternativeRepresentations.append(representation)
+        self.representations.append(representation)
 
     def getExpertRepresentation(self):
         return self.expertRepresentation
 
-    def getAlternativeRepresentations(self):
-        return self.alternativeRepresentations
+    def getRepresentations(self):
+        return self.representations
 
 class Goal:
     def __init__(self,obj,phrase="",weight=0):
@@ -77,8 +78,8 @@ class Goal:
         self.weight=weight
 
 class TextGoal:
-    alternativeGoals=[]
     def __init__(self,goal):
+        self.alternativeGoals=[]
         self.expertGoal=goal
 
     def addAlternativeGoal(self,goal):
