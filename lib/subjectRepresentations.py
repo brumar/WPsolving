@@ -80,11 +80,13 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         if(startAsUnderstood):
             self.startAsUnderstood()
         for move in movelist:
-            if (move.type=="schema"):
-                self.applySchema(move.move)
-            if (move.type=="representationMove"):
-                self.applyRepresentationMove(move.move)
+            self.applyMove(move)
 
+    def applyMove(self,move):
+        if (move.type=="schema"):
+            return self.applySchema(move.move)
+        if (move.type=="representationMove"):
+            return self.applyRepresentationMove(move.move)
 
     def applySchema(self,schema):
         if(self.isSchemaAppliable(schema)):
@@ -106,6 +108,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                 else:
                     dic.addValue(schema.objects['q2'],dic.find(schema.objects['qf'])+dic.find(schema.objects['q1']))
         self.updateAppliableSchemas()
+        infos=unknow+" have been found with magic"
+        return infos
 
     def applyRepresentationMove(self,representationMove):
         indexInfo=representationMove.indexTextInformation
@@ -115,6 +119,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         rep=self.problem.text.textInformations[indexInfo].representations[indexSelection]
         quanti=rep.quantity
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
+        infos=quanti.object+" is now equal to "+quanti.value
+        return infos
 
     def updatePossibleRepresentationChange(self):
         currentReps=self.problemState.representations
