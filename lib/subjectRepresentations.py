@@ -98,6 +98,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             operation=schema.operation
             if(positionTofind!='qf'):
                 operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
+            if(positionTofind=='q2'):   #if q2 is the quantity to find then the operation needed is always a substraction
+                operation=operations.soustraction
             valueList=[]
             for position in positionList:
                 valueList.append(qdic.find(schema.objects[position]))
