@@ -95,16 +95,20 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             positionTofind=schema.positions[unknow]
             positionList=['qf','q1','q2']
             positionList.remove(positionTofind)
-            operation=1
+            operation=schema.operation
             if(positionTofind!='qf'):
-                operation=-1
+                operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
             valueList=[]
             for position in positionList:
                 valueList.append(qdic.find(schema.objects[position]))
-            valueToFind=max(valueList)+min(valueList)*(schema.operation*operation)
+            valueToFind=max(valueList)+min(valueList)*(operation)
             qdic.addValue(unknow,valueToFind)
         self.updateAppliableSchemas()
-        infos=unknow+" have been found with magic"
+
+        stringOperation='-'
+        if(operation==1):
+            stringOperation='+'
+        infos=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
         return infos
 
     def applyRepresentationMove(self,representationMove):
