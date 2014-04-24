@@ -32,17 +32,16 @@ class TreePaths:
 	def getStep(self,sId):
 		return (self.steps[self.dicStep[sId]])
 
-	def printAsTree(self,sId=0,step=0): # to be use
+	def printAsTree(self,sId=0,level=0): # to be use
 		if sId==0:
 			sId=self.nullMoveId
 		firstStep=self.getStep(sId)
 		childrenIds=firstStep.childrenIds
 		for childrenId in childrenIds:
 			infos=self.getStep(childrenId).infos
-			line=step*"\t"+infos+"\r\n"
+			line=level*"\t"+infos+"\r\n"
 			self.treeOutput+=line
-			step+=1
-			self.printAsTree(childrenId,step)
+			self.printAsTree(childrenId,level+1)
 
 
 
@@ -81,13 +80,8 @@ class Solver:
 			for schem in updater.appliableSchemaList:
 				newstep=Step(Move(schem),currentStepId)
 				#print(step,s,ml,schem.positions.keys())
-				self.updateTree(level,schem.positions.keys())
-
 				self.recurciveBlindForwardSolve(newstep,copy.deepcopy(updater),level+1)
 
-	def updateTree(self,step,keys):
-		line=step*"\t"+str(keys)+"\r\n"
-		self.treeVIZ+=line
 
 
 
@@ -100,15 +94,15 @@ struct.addBridgingSchemas(schema1,schema2)
 struct.updateObjectList()
 
 text=Text()
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAIN",5),'Au supermarch√©, le kilo de poisson a augment√© de 5 euros cette ann√©e')))
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonEF",12),'Un kilo de poisson co√ªte maintenant 12 euros.')))
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusViandeEI",0),'Au d√©but de l\'ann√©e, le kilo de viande co√ªtait le m√™me prix que le kilo de poisson.')))
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN",3),'Le kilo de viande a augment√© de 3 euros de moins que le kilo de poisson')))
-text.setGoal(TextGoal(Goal('ViandeEF','Combien co√ªte le kilo de viande maintenant?')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAIN",5),'Au supermarchÈ, le kilo de poisson a augmentÈ de 5 euros cette annÈe')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonEF",12),'Un kilo de poisson cooute maintenant 12 euros.')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusViandeEI",0),'Au dÈbut de l\'annÈe, le kilo de viande cooutait le mÍme prix que le kilo de poisson.')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN",3),'Le kilo de viande a augmentÈ de 3 euros de moins que le kilo de poisson')))
+text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenant?')))
 
-text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI",5),'Au supermarch√©, le kilo de poisson √©tait de 5 euros'))
-text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEF",5),'Au supermarch√©, le kilo de poisson coute 5 euros'))
-text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN",3),'Le kilo de viande a augment√© de 3 euros'))
+text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI",5),'Au supermarchÈ, le kilo de poisson Ètait de 5 euros'))
+text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEF",5),'Au supermarchÈ, le kilo de poisson coute 5 euros'))
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN",3),'Le kilo de viande a augmentÈ de 3 euros'))
 
 
 probleme1=Problem(struct,text)
@@ -117,7 +111,8 @@ upD.startAsUnderstood()
 upD.updatePossibleRepresentationChange()
 solver=Solver(probleme1)
 moveList=[Move(upD.possibleRepresentationChangeList[0])]
-solver.recurciveBlindForwardSolve(moveList)
+#solver.recurciveBlindForwardSolve(moveList)
+solver.recurciveBlindForwardSolve()
 print(solver.treeVIZ)
 solver.TreePaths.printAsTree()
 print(solver.TreePaths.treeOutput)
