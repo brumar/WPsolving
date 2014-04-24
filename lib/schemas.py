@@ -6,7 +6,7 @@ class ProblemStructure:#fields : schemas,objectSet
     def addSchema(self,schema):
         self.schemas.append(schema)
     def addBridgingSchemas(self,schema1,schema2,names=[]):#Create all the schemas and objects related to eventual relations between two schemas
-                                                        #convention : schema1.objects['qf'] > schema2.objects['qf']
+                                                        # important convention : schema1.objects['qf'] > schema2.objects['qf']
                                                         #4 schemas max is created 3 binding the q1,q2,qf together, and 1 binding the two schemas
         commonObject=self.detectCommonObject(schema1,schema2)
         if(not commonObject):
