@@ -9,18 +9,22 @@ import uuid
 
 class TreePaths:
 	def __init__(self,updater):
-		self.dicStep={}	# id to index
-		self.steps=[]
+
+		stepZero=Step(Move(RepresentationMove(0,0)))# by convention the initial state is the NULL move
+		self.dicStep={stepZero.sId:0}	# id to index
+		self.steps=[stepZero]
 		self.initialState=updater
-		self.threeOutput=""
+		self.treeOutput=""
+		self.nullMoveId=self.steps[0].sId
 
 	def addStep(self, step):
 		self.steps.append(step)
-		self.dicStep[step.id]=len(self.steps)
-		if (step.parentId!=0): # if it is not the first step in the three
-			self.addChild(self.parentId,self.id)
+		self.dicStep[step.sId]=len(self.steps)-1
+		self.addChild(step.parentId,step.sId)
 
 	def addChild(self,parentId,childId):
+		if(parentId==0): # if parentId = 0 then it is a 1rst level node
+			parentId=self.nullMoveId  # then the parent Id is set to the id of the nullMove which is by convention the initial state
 		indexOfStep=self.dicStep[parentId]
 		parentStep=self.steps[indexOfStep]
 		parentStep.childrenIds.append(childId)
@@ -28,24 +32,30 @@ class TreePaths:
 	def getStep(self,sId):
 		return (self.steps[self.dicStep[sId]])
 
-	def printAsThree(self,sId=0,step=0): # to be use
-		firstStepId=self.dicStep[sId]
-		firstStep=self.getStep(firstStepId)
+	def printAsTree(self,sId=0,step=0): # to be use
+		if sId==0:
+			sId=self.nullMoveId
+		firstStep=self.getStep(sId)
 		childrenIds=firstStep.childrenIds
 		for childrenId in childrenIds:
-			line=step*"\t"+str(childrenId)+"\r\n"
-			self.threeOutput+=line
+			infos=self.getStep(childrenId).infos
+			line=step*"\t"+infos+"\r\n"
+			self.treeOutput+=line
 			step+=1
-			self.printAsThree(childrenId,step)
+			self.printAsTree(childrenId,step)
 
 
 
 class Step:
-	def __init__(self,move,parentId=0):
+	def __init__(self,move,parentId=0,infos=""):
 		self.childrenIds=[]
 		self.move=move
 		self.parentId=parentId
 		self.sId=uuid.uuid4()
+		self.infos=infos
+
+	def addInfos(self,infos):
+		self.infos=infos
 
 
 
@@ -56,20 +66,25 @@ class Solver:
 		self.treeVIZ=""
 		self.TreePaths=TreePaths(Updater(self.problem))
 
-	def recurciveBlindForwardSolve(self,movelist=[],newmove="",step=0,history=[],schemeToApply=0):
-		if(step!=0):
-			movelist.append(newmove)
-		updater=Updater(self.problem)
-		updater.applyMoveList(movelist)
+	def recurciveBlindForwardSolve(self,currentStep="",updater="",level=0):
+		currentStepId=0
+		infos=""
+		if(level!=0):
+			currentStepId=currentStep.sId
+			infos=updater.applyMove(currentStep.move)
+			currentStep.addInfos(infos)
+			self.TreePaths.addStep(currentStep)
+		else:
+			updater=Updater(self.problem)
+			updater.startAsUnderstood()
 		if (not updater.problemState.isProblemEnded()):
 			for schem in updater.appliableSchemaList:
-				newmove=Move(schem)
+				newstep=Step(Move(schem),currentStepId)
 				#print(step,s,ml,schem.positions.keys())
-				self.updateTree(step,schem.positions.keys())
-				self.recurciveBlindForwardSolve(copy.deepcopy(movelist),newmove,step+1,copy.deepcopy(history))
-		else:
-			#print(history)
-			step=0
+				self.updateTree(level,schem.positions.keys())
+
+				self.recurciveBlindForwardSolve(newstep,copy.deepcopy(updater),level+1)
+
 	def updateTree(self,step,keys):
 		line=step*"\t"+str(keys)+"\r\n"
 		self.treeVIZ+=line
@@ -104,3 +119,5 @@ solver=Solver(probleme1)
 moveList=[Move(upD.possibleRepresentationChangeList[0])]
 solver.recurciveBlindForwardSolve(moveList)
 print(solver.treeVIZ)
+solver.TreePaths.printAsTree()
+print(solver.TreePaths.treeOutput)
