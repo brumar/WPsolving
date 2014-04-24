@@ -90,23 +90,19 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
 
     def applySchema(self,schema):
         if(self.isSchemaAppliable(schema)):
-            dic=self.problemState.quantitiesDic
-            n,unknow=findTheUnknown(schema,dic)
-            if(schema.positions[unknow]=='qf'):
-                if(schema.operation==operations.addition):
-                    dic.addValue(schema.objects['qf'],dic.find(schema.objects['q2'])+dic.find(schema.objects['q1']))
-                else:
-                    dic.addValue(schema.objects['qf'],dic.find(schema.objects['q2'])-dic.find(schema.objects['q1']))
-            if(schema.positions[unknow]=='q1'):
-                if(schema.operation==operations.addition):
-                    dic.addValue(schema.objects['q1'],dic.find(schema.objects['qf'])-dic.find(schema.objects['q2']))
-                else:
-                    dic.addValue(schema.objects['q1'],dic.find(schema.objects['qf'])+dic.find(schema.objects['q2']))
-            if(schema.positions[unknow]=='q2'):
-                if(schema.operation==operations.addition):
-                    dic.addValue(schema.objects['q2'],dic.find(schema.objects['qf'])-dic.find(schema.objects['q1']))
-                else:
-                    dic.addValue(schema.objects['q2'],dic.find(schema.objects['qf'])+dic.find(schema.objects['q1']))
+            qdic=self.problemState.quantitiesDic
+            n,unknow=findTheUnknown(schema,qdic)
+            positionTofind=schema.positions[unknow]
+            positionList=['qf','q1','q2']
+            positionList.remove(positionTofind)
+            operation=1
+            if(positionTofind!='qf'):
+                operation=-1
+            valueList=[]
+            for position in positionList:
+                valueList.append(qdic.find(schema.objects[position]))
+            valueToFind=max(valueList)+min(valueList)*(schema.operation*operation)
+            qdic.addValue(unknow,valueToFind)
         self.updateAppliableSchemas()
         infos=unknow+" have been found with magic"
         return infos
