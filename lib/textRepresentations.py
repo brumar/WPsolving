@@ -1,39 +1,5 @@
 import operations
 
-class QuantityDic:
-
-    def __init__(self, realDic,startAsVoid=False):
-        self.dic={}
-        for key in realDic.keys():
-            self.dic[key]=[]
-            self.dic[key].append(realDic[key])
-            if startAsVoid:
-                self.erase(key);
-
-
-    def isMultiple(self, key):
-        return (len(self.dic[key])>0)
-
-    def get(self,key,multiple=False):
-        if multiple:
-            return self.dic[key]
-        else:
-            return self.dic[key].pop(0) # if an element has a priority, it's at the first position
-
-    def addValue(self,key,value,erase=False,priority=False):
-        if erase:
-            self.erase(key)
-        insertPosition=0
-        if not priority:
-            insertPosition=len(self.dic[key])
-        self.dic[key].insert(insertPosition,value)
-
-    def isUnknown(self, key):
-        return not self.dic[key] #simplest way to check if the list is empty
-
-    def erase (self,key):
-        self.dic[key]=[]
-
 class Quantity:
     def __init__(self,obj,value):
         self.object=obj
