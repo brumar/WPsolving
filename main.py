@@ -60,9 +60,7 @@ class Step:
 
 class Solver:
 	def __init__(self,problem):
-		self.history=[]
 		self.problem=problem
-		self.treeVIZ=""
 		self.TreePaths=TreePaths(Updater(self.problem))
 
 	def recurciveBlindForwardSolve(self,currentStep="",updater="",level=0):
@@ -95,8 +93,8 @@ struct.updateObjectList()
 
 text=Text()
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAIN",5),'Au supermarché, le kilo de poisson a augmenté de 5 euros cette année')))
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonEF",12),'Un kilo de poisson cooute maintenant 12 euros.')))
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusViandeEI",0),'Au début de l\'année, le kilo de viande cooutait le même prix que le kilo de poisson.')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonEF",12),'Un kilo de poisson coute maintenant 12 euros.')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusViandeEI",0),'Au début de l\'année, le kilo de viande coutait le même prix que le kilo de poisson.')))
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN",3),'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson')))
 text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenant?')))
 
