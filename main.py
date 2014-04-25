@@ -59,9 +59,9 @@ class Step:
 
 
 class Solver:
-	def __init__(self,problem):
-		self.problem=problem
-		self.TreePaths=TreePaths(Updater(self.problem))
+	def __init__(self,updater):
+		self.updater=updater
+		self.TreePaths=TreePaths(updater) # store all the paths taken by solver
 
 	def recurciveBlindForwardSolve(self,currentStep="",updater="",level=0):
 		currentStepId=0
@@ -72,8 +72,7 @@ class Solver:
 			currentStep.addInfos(infos)
 			self.TreePaths.addStep(currentStep)
 		else:
-			updater=Updater(self.problem)
-			updater.startAsUnderstood()
+			updater=copy.deepcopy(self.updater) # we init the updater
 		if (not updater.problemState.isProblemEnded()):
 			for schem in updater.appliableSchemaList:
 				newstep=Step(Move(schem),currentStepId)
@@ -107,10 +106,9 @@ probleme1=Problem(struct,text)
 upD=Updater(probleme1)
 upD.startAsUnderstood()
 upD.updatePossibleRepresentationChange()
-solver=Solver(probleme1)
+solver=Solver(upD)
 moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
 solver.recurciveBlindForwardSolve()
-print(solver.treeVIZ)
 solver.TreePaths.printAsTree()
 print(solver.TreePaths.treeOutput)
