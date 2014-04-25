@@ -99,15 +99,20 @@ text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenan
 
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI",5),'Au supermarché, le kilo de poisson était de 5 euros'))
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEF",5),'Au supermarché, le kilo de poisson coute 5 euros'))
+text.getTextInformation(1).addAlternativeRepresentation(Representation(Quantity("PoissonEI",12),'Un kilo de poisson était de 12 euros.'))
+text.getTextInformation(2).addAlternativeReprensetation(Representation(Quantity("PoissonEFminusViandeEF",0),'Au la fin de l\'année, le kilo de viande coute le même prix que le kilo de poisson.'))
+text.getTextInformation(2).addAlternativeReprensetation(Representation(Quantity("PoissonGAINminusViandeGAIN",0),'Le kilo de viande a augmenté du même prix que le kilo de poisson.'))
 text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN",3),'Le kilo de viande a augmenté de 3 euros'))
-
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN",-3),'Le kilo de viande a diminué de 3 euros'))
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonEFminusViandeEF",3),'Le kilo de viande a augmenté de 3 euros'))
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("ViandeEF",3),'Le kilo coute 3 euros à la fin'))
 
 probleme1=Problem(struct,text)
 upD=Updater(probleme1)
 upD.startAsUnderstood()
 upD.updatePossibleRepresentationChange()
 solver=Solver(upD)
-moveList=[Move(upD.possibleRepresentationChangeList[0])]
+#moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
 solver.recurciveBlindForwardSolve()
 solver.TreePaths.printAsTree()
