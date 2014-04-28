@@ -52,7 +52,8 @@ class QuantityDic:
         self.dic[key].insert(insertPosition,value)
 
     def removeValue(self,key,value):
-        pass
+        if(value in self.dic[key]):
+            self.dic[key].remove(value)
 
     def isUnknown(self, key):
         return not self.dic[key] #simplest way to check if the list is empty
