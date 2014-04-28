@@ -124,7 +124,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         infos=quanti.object+" is now equal to "+str(quanti.value)
         return infos
 
-    def updatePossibleRepresentationChange(self):
+    def updatePossibleRepresentationChange(self,constraints=[]):
+        self.possibleRepresentationChangeList=[]
         currentReps=self.problemState.representations
         for t,textInfo in enumerate(self.problem.text.textInformations):
             for r,representation in enumerate(textInfo.representations):
@@ -132,20 +133,23 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                     self.possibleRepresentationChangeList.append(RepresentationMove(t,r))
 
 
-    def updateAppliableSchemas(self):
+    def updateAppliableSchemas(self,constraints=[]):
         self.appliableSchemaList=[]
         schemasList=self.problem.structure.schemas
         for schema in schemasList:
-            if(self.isSchemaAppliable(schema)):
+            if(self.isSchemaAppliable(schema,constraints)):
                 self.appliableSchemaList.append(schema)
 
-    def isSchemaAppliable(self,schema):
+    def isSchemaAppliable(self,schema,constraints=[]):
         dic=self.problemState.quantitiesDic
         n,unknow=findTheUnknown(schema,dic)
-        if(n==1):
-            return True
-        else:
+        if(n!=1):
             return False
+        else:
+            return self.isConstraintsRespectedBySchema(constraints)
+
+    def isConstraintsRespectedBySchema(self,constraints=[]):
+        return True
 
     #def applySchema(self,schema):
 
