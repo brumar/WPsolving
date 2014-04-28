@@ -43,13 +43,16 @@ class QuantityDic:
             self.dic[key].insert(0,e)
             return e # if an element has a priority, it's at the first position
 
-    def addValue(self,key,value,erase=True,priority=False):
+    def addValue(self,key,value,erase=True,priority=True):
         if erase:
             self.erase(key)
         insertPosition=0
         if not priority:
             insertPosition=len(self.dic[key])
         self.dic[key].insert(insertPosition,value)
+
+    def removeValue(self,key,value):
+        pass
 
     def isUnknown(self, key):
         return not self.dic[key] #simplest way to check if the list is empty
@@ -88,7 +91,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         if (move.type=="RepresentationMove"):
             return self.applyRepresentationMove(move.move)
 
-    def applySchema(self,schema):
+    def applySchema(self,schema,trial=False): # when trial is True, the unknown is computed without any change in the problemState
         infos="bug" #if non appliable
         if(self.isSchemaAppliable(schema)):
             qdic=self.problemState.quantitiesDic
@@ -105,19 +108,27 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             for position in positionList:
                 valueList.append(qdic.find(schema.objects[position]))
             valueToFind=max(valueList)+min(valueList)*(operation)
-            qdic.addValue(unknow,valueToFind)
-            stringOperation='-'
-            if(operation==1):
-                stringOperation='+'
-            infos=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
-        self.updateAppliableSchemas()
+
+            if not trial: # when trial is True, the unknown is computed without any change in the problemState
+                qdic.addValue(unknow,valueToFind)
+                stringOperation='-'
+                if(operation==1):
+                    stringOperation='+'
+                infos=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
+                self.updateAppliableSchemas()
+            else :
+                infos=unknow,valueToFind
         return infos
 
-    def applyRepresentationMove(self,representationMove):
+    def applyRepresentationMove(self,representationMove,breakTheOldOne=True):
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
-        self.representations.pop(indexInfo)
-        self.representations.insert(indexInfo, indexSelection)
+        oldSelection=self.representations.pop(indexInfo)
+        if(breakTheOldOne):
+            oldRep=self.problem.text.textInformations[indexInfo].representations[oldSelection] # TODO
+            oldQuanti=oldRep.quantity
+            self.problemState.quantitiesDic.removeValue(oldQuanti.object, oldQuanti.value)
+        self.representations.insert(indexInfo, indexSelection)#pop and insert in order to avoid loosing the value
         rep=self.problem.text.textInformations[indexInfo].representations[indexSelection]
         quanti=rep.quantity
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
@@ -146,10 +157,29 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         if(n!=1):
             return False
         else:
-            return self.isConstraintsRespectedBySchema(constraints)
+            return self.isConstraintsRespectedBySchema(schema,constraints)
 
-    def isConstraintsRespectedBySchema(self,constraints=[]):
+    def isConstraintsRespectedBySchema(self,schema,constraints=[]):
+        isAllConstraintsRespectedBySchema=True
+        for constraint in constraints:
+            if not (self.isConstraintRespectedBySchema(schema,constraint)):
+                isAllConstraintsRespectedBySchema=False
+        return isAllConstraintsRespectedBySchema
+
+    def isConstraintRespectedBySchema(self,schema,constraint):
+        classname=constraint.__class__.__name__
+        if(classname=="IntervalConstraint"):
+            return self.checkIntervall(schema,constraint)
+
+    def checkIntervall(self,schema,constraint): #listOfObjects, condition
+        objectComputed,valueComputed=self.applySchema(schema,trial=True)
+        for objectToCheck in constraint.listOfObjects:
+            if(objectToCheck in objectComputed) and (constraint.condition==operations.superiorOrEqualTo0) and (valueComputed<=0): # e.g if 'EI' is in poissonEI and poissonEI<0
+                #TODO: new function(condition,value)
+                return False
         return True
+
+
 
     #def applySchema(self,schema):
 
