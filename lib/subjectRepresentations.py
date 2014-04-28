@@ -1,5 +1,8 @@
 import operations
 
+BREAKTHEOLDONE=True
+ERASE=True
+
 class Problem: #fields : structure, text
     def __init__(self,structure,text):
         self.structure=structure
@@ -43,7 +46,7 @@ class QuantityDic:
             self.dic[key].insert(0,e)
             return e # if an element has a priority, it's at the first position
 
-    def addValue(self,key,value,erase=True,priority=True):
+    def addValue(self,key,value,erase=ERASE,priority=True):
         if erase:
             self.erase(key)
         insertPosition=0
@@ -121,7 +124,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                 infos=unknow,valueToFind
         return infos
 
-    def applyRepresentationMove(self,representationMove,breakTheOldOne=True):
+    def applyRepresentationMove(self,representationMove,breakTheOldOne=BREAKTHEOLDONE):
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
         oldSelection=self.representations.pop(indexInfo)
