@@ -10,7 +10,7 @@ class ProblemStructure:#fields : schemas,objectSet
                                                         #4 schemas max is created 3 binding the q1,q2,qf together, and 1 binding the two schemas
         commonObject=self.detectCommonObject(schema1,schema2)
         if(not commonObject):
-            for i,position in enumerate(['q1','q2','qf']):
+            for position in ['q1','q2','qf']:
                 self.bridge(schema1,schema2,position,operations.soustractionBridge)
             self.lastbridge(schema1,schema2,operations.soustractionBridge)
         else :
@@ -20,7 +20,7 @@ class ProblemStructure:#fields : schemas,objectSet
             else :
                 posOfTheCommonObject=-1 # else we ignore that schemas share a common element
             l=['q1','q2','qf']
-            for i,position in enumerate(l):
+            for position in l:
                 if position!=posOfTheCommonObject:
                     self.bridge(schema1,schema2,position,operations.soustractionBridge)
             self.lastbridge(schema1,schema2,operations.soustractionBridge)
@@ -40,8 +40,8 @@ class ProblemStructure:#fields : schemas,objectSet
 
     def updateObjectList(self):
         objectList=[]
-        for s,schema in enumerate(self.schemas):
-            for o,obj in enumerate(schema.getSetObjects()):
+        for schema in self.schemas:
+            for obj in schema.getSetObjects():
                 objectList.append(obj)
         self.objectSet=set(objectList)
 

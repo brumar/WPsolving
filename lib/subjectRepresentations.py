@@ -116,15 +116,24 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                 operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
             if(positionTofind=='q2'):   #if q2 is the quantity to find then the operation needed is always a substraction
                 operation=operations.soustraction
-            valueList=[]
-            for position in positionList:
-                valueList.append(qdic.find(schema.objects[position]))
-            valueToFind=max(valueList)+min(valueList)*(operation)
+
+            objectA=schema.objects[positionList[0]]
+            valueA=qdic.find(objectA)
+            objectB=schema.objects[positionList[1]]
+            valueB=qdic.find(objectB)
+
+            if (valueB>valueA):
+                valueA, valueB = valueB, valueA #invert the values
+                objectA, objectB = objectB, objectA #invert the object
+
+            valueToFind=valueA+valueB*(operation)
+
             stringOperation='-'
             if(operation==1):
                 stringOperation='+'
 
-            infos.shortInfo=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
+            infos.shortInfo=str(valueA)+stringOperation+str(valueB)+'='+str(valueToFind)+' ('+unknow+')' #12-3=9 (ViandeEF)
+            infos.objectsFormula=objectA+stringOperation+objectB+'='+unknow #PoissonEF-PoissonEFminusViandeEF=ViandeEF
             infos.unknow=unknow
             infos.valueToFind=valueToFind
             infos.type="SchemaApplied"
