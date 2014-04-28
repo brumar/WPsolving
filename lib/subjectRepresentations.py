@@ -43,7 +43,7 @@ class QuantityDic:
             self.dic[key].insert(0,e)
             return e # if an element has a priority, it's at the first position
 
-    def addValue(self,key,value,erase=False,priority=False):
+    def addValue(self,key,value,erase=True,priority=False):
         if erase:
             self.erase(key)
         insertPosition=0
@@ -85,10 +85,11 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
     def applyMove(self,move):
         if (move.type=="schema"):
             return self.applySchema(move.move)
-        if (move.type=="representationMove"):
+        if (move.type=="RepresentationMove"):
             return self.applyRepresentationMove(move.move)
 
     def applySchema(self,schema):
+        infos="bug" #if non appliable
         if(self.isSchemaAppliable(schema)):
             qdic=self.problemState.quantitiesDic
             n,unknow=findTheUnknown(schema,qdic)
@@ -105,23 +106,22 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                 valueList.append(qdic.find(schema.objects[position]))
             valueToFind=max(valueList)+min(valueList)*(operation)
             qdic.addValue(unknow,valueToFind)
+            stringOperation='-'
+            if(operation==1):
+                stringOperation='+'
+            infos=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
         self.updateAppliableSchemas()
-
-        stringOperation='-'
-        if(operation==1):
-            stringOperation='+'
-        infos=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
         return infos
 
     def applyRepresentationMove(self,representationMove):
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
-        self.representations.remove(indexInfo)
+        self.representations.pop(indexInfo)
         self.representations.insert(indexInfo, indexSelection)
         rep=self.problem.text.textInformations[indexInfo].representations[indexSelection]
         quanti=rep.quantity
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
-        infos=quanti.object+" is now equal to "+quanti.value
+        infos=quanti.object+" is now equal to "+str(quanti.value)
         return infos
 
     def updatePossibleRepresentationChange(self):
