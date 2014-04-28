@@ -41,7 +41,7 @@ class TreePaths:
 		if not childrenIds:
 			self.pathsCount+=1
 		for childrenId in childrenIds:
-			infos=self.getStep(childrenId).infos
+			infos=self.getStep(childrenId).infos.shortInfo
 			line=level*"\t"+infos+"\r\n"
 			self.treeOutput+=line
 			self.printAsTree(childrenId,level+1)
@@ -133,7 +133,7 @@ solver=Solver(upD)
 solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
-solver.reInterpretationStep(interpSteps=2)
+solver.reInterpretationStep(interpSteps=1)
 solver.TreePaths.printAsTree()
 print(solver.TreePaths.treeOutput)
 print(solver.TreePaths.pathsCount)

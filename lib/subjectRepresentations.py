@@ -3,6 +3,14 @@ import operations
 BREAKTHEOLDONE=True
 ERASE=True
 
+class InfoStep:
+    def __init__(self,shortInfo=""):
+        self.shortInfo=shortInfo
+        self.objectsFormula=""
+        self.unknow=""
+        self.valueToFind=""
+        self.type=""
+
 class Problem: #fields : structure, text
     def __init__(self,structure,text):
         self.structure=structure
@@ -96,7 +104,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             return self.applyRepresentationMove(move.move)
 
     def applySchema(self,schema,trial=False): # when trial is True, the unknown is computed without any change in the problemState
-        infos="bug" #if non appliable
+        infos=InfoStep() #if non appliable
         if(self.isSchemaAppliable(schema)):
             qdic=self.problemState.quantitiesDic
             n,unknow=findTheUnknown(schema,qdic)
@@ -112,16 +120,18 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             for position in positionList:
                 valueList.append(qdic.find(schema.objects[position]))
             valueToFind=max(valueList)+min(valueList)*(operation)
+            stringOperation='-'
+            if(operation==1):
+                stringOperation='+'
+
+            infos.shortInfo=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
+            infos.unknow=unknow
+            infos.valueToFind=valueToFind
+            infos.type="SchemaApplied"
 
             if not trial: # when trial is True, the unknown is computed without any change in the problemState
                 qdic.addValue(unknow,valueToFind)
-                stringOperation='-'
-                if(operation==1):
-                    stringOperation='+'
-                infos=str(max(valueList))+stringOperation+str(min(valueList))+'='+str(valueToFind)+' ('+unknow+')'
                 self.updateAppliableSchemas()
-            else :
-                infos=unknow,valueToFind
         return infos
 
     def applyRepresentationMove(self,representationMove,breakTheOldOne=BREAKTHEOLDONE):
@@ -136,7 +146,9 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         rep=self.problem.text.textInformations[indexInfo].representations[indexSelection]
         quanti=rep.quantity
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
-        infos=quanti.object+" is now equal to "+str(quanti.value)
+        infos=InfoStep()
+        infos.type="RepresentationMove"
+        infos.shortInfo=quanti.object+" is now equal to "+str(quanti.value)
         return infos
 
     def updatePossibleRepresentationChange(self,constraints=[]):
@@ -176,7 +188,9 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             return self.checkIntervall(schema,constraint)
 
     def checkIntervall(self,schema,constraint): #listOfObjects, condition
-        objectComputed,valueComputed=self.applySchema(schema,trial=True)
+        infos=self.applySchema(schema,trial=True)
+        objectComputed=infos.unknow
+        valueComputed=infos.valueToFind
         for objectToCheck in constraint.listOfObjects:
             if(objectToCheck in objectComputed) and (constraint.condition==operations.superiorOrEqualTo0) and (valueComputed<=0): # e.g if 'EI' is in poissonEI and poissonEI<0
                 #TODO: new function(condition,value)
