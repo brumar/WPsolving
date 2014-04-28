@@ -63,12 +63,22 @@ class Solver:
 		self.updater=updater
 		self.TreePaths=TreePaths(updater) # store all the paths taken by solver
 
+	def reInterpretationStep(self):
+		self.updater.updatePossibleRepresentationChange()
+		moveList=self.updater.possibleRepresentationChangeList
+		updater=copy.deepcopy(self.updater)
+		for repMove in moveList:
+			currentStep=Step(Move(repMove))
+			self.recurciveBlindForwardSolve(currentStep, copy.deepcopy(updater), level=1)
+
+
 	def recurciveBlindForwardSolve(self,currentStep="",updater="",level=0):
 		currentStepId=0
 		infos=""
 		if(level!=0):
 			currentStepId=currentStep.sId
 			infos=updater.applyMove(currentStep.move)
+			updater.updateAppliableSchemas()
 			currentStep.addInfos(infos)
 			self.TreePaths.addStep(currentStep)
 		else:
@@ -100,8 +110,8 @@ text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenan
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI",5),'Au supermarché, le kilo de poisson était de 5 euros'))
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEF",5),'Au supermarché, le kilo de poisson coute 5 euros'))
 text.getTextInformation(1).addAlternativeRepresentation(Representation(Quantity("PoissonEI",12),'Un kilo de poisson était de 12 euros.'))
-text.getTextInformation(2).addAlternativeReprensetation(Representation(Quantity("PoissonEFminusViandeEF",0),'Au la fin de l\'année, le kilo de viande coute le même prix que le kilo de poisson.'))
-text.getTextInformation(2).addAlternativeReprensetation(Representation(Quantity("PoissonGAINminusViandeGAIN",0),'Le kilo de viande a augmenté du même prix que le kilo de poisson.'))
+text.getTextInformation(2).addAlternativeRepresentation(Representation(Quantity("PoissonEFminusViandeEF",0),'Au la fin de l\'année, le kilo de viande coute le même prix que le kilo de poisson.'))
+text.getTextInformation(2).addAlternativeRepresentation(Representation(Quantity("PoissonGAINminusViandeGAIN",0),'Le kilo de viande a augmenté du même prix que le kilo de poisson.'))
 text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN",3),'Le kilo de viande a augmenté de 3 euros'))
 text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN",-3),'Le kilo de viande a diminué de 3 euros'))
 text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonEFminusViandeEF",3),'Le kilo de viande a augmenté de 3 euros'))
@@ -111,9 +121,10 @@ probleme1=Problem(struct,text)
 upD=Updater(probleme1)
 upD.startAsUnderstood()
 upD.updatePossibleRepresentationChange()
+print(len(upD.possibleRepresentationChangeList))
 solver=Solver(upD)
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
-solver.recurciveBlindForwardSolve()
+solver.reInterpretationStep()
 solver.TreePaths.printAsTree()
 print(solver.TreePaths.treeOutput)
