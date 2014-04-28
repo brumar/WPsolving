@@ -1,5 +1,11 @@
 import operations
 
+
+class IntervalConstraint:
+    def __init__(self,listOfObjects,condition):
+        self.listOfObjects=listOfObjects
+        self.condition=condition
+
 class Quantity:
     def __init__(self,obj,value):
         self.object=obj

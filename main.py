@@ -59,9 +59,13 @@ class Step:
 
 
 class Solver:
-	def __init__(self,updater):
+	def __init__(self,updater,constraints=[]):
 		self.updater=updater
 		self.TreePaths=TreePaths(updater) # store all the paths taken by solver
+		self.constraints=constraints
+
+	def addConstraint(self,constraint):
+		self.constraints.append(constraint)
 
 	def reInterpretationStep(self):
 		self.updater.updatePossibleRepresentationChange()
@@ -107,6 +111,7 @@ text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusV
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN",3),'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson')))
 text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenant?')))
 
+
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI",5),'Au supermarché, le kilo de poisson était de 5 euros'))
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEF",5),'Au supermarché, le kilo de poisson coute 5 euros'))
 text.getTextInformation(1).addAlternativeRepresentation(Representation(Quantity("PoissonEI",12),'Un kilo de poisson était de 12 euros.'))
@@ -123,6 +128,7 @@ upD.startAsUnderstood()
 upD.updatePossibleRepresentationChange()
 print(len(upD.possibleRepresentationChangeList))
 solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
 solver.reInterpretationStep()
