@@ -16,6 +16,7 @@ class TreePaths:
 		self.initialState=updater
 		self.treeOutput=""
 		self.nullMoveId=self.steps[0].sId
+		self.pathsCount=0
 
 	def addStep(self, step):
 		self.steps.append(step)
@@ -37,6 +38,8 @@ class TreePaths:
 			sId=self.nullMoveId
 		firstStep=self.getStep(sId)
 		childrenIds=firstStep.childrenIds
+		if not childrenIds:
+			self.pathsCount+=1
 		for childrenId in childrenIds:
 			infos=self.getStep(childrenId).infos
 			line=level*"\t"+infos+"\r\n"
@@ -68,8 +71,9 @@ class Solver:
 		self.constraints.append(constraint)
 
 	def reInterpretationStep(self):
-		self.updater.updatePossibleRepresentationChange()
+		self.updater.updatePossibleRepresentationChange(self.constraints)
 		moveList=self.updater.possibleRepresentationChangeList
+		print(len(moveList))
 		updater=copy.deepcopy(self.updater)
 		for repMove in moveList:
 			currentStep=Step(Move(repMove))
@@ -82,7 +86,7 @@ class Solver:
 		if(level!=0):
 			currentStepId=currentStep.sId
 			infos=updater.applyMove(currentStep.move)
-			updater.updateAppliableSchemas()
+			updater.updateAppliableSchemas(self.constraints)
 			currentStep.addInfos(infos)
 			self.TreePaths.addStep(currentStep)
 		else:
@@ -92,6 +96,7 @@ class Solver:
 				newstep=Step(Move(schem),currentStepId)
 				#print(step,s,ml,schem.positions.keys())
 				self.recurciveBlindForwardSolve(newstep,copy.deepcopy(updater),level+1)
+
 
 
 
@@ -125,8 +130,6 @@ text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity(
 probleme1=Problem(struct,text)
 upD=Updater(probleme1)
 upD.startAsUnderstood()
-upD.updatePossibleRepresentationChange()
-print(len(upD.possibleRepresentationChangeList))
 solver=Solver(upD)
 solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
@@ -134,3 +137,4 @@ solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo
 solver.reInterpretationStep()
 solver.TreePaths.printAsTree()
 print(solver.TreePaths.treeOutput)
+print(solver.TreePaths.pathsCount)
