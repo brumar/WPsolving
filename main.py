@@ -70,14 +70,17 @@ class Solver:
 	def addConstraint(self,constraint):
 		self.constraints.append(constraint)
 
-	def reInterpretationStep(self):
+	def reInterpretationStep(self,interpSteps=1,level=0,currentStep=None):
 		self.updater.updatePossibleRepresentationChange(self.constraints)
 		moveList=self.updater.possibleRepresentationChangeList
 		print(len(moveList))
 		updater=copy.deepcopy(self.updater)
 		for repMove in moveList:
 			currentStep=Step(Move(repMove))
-			self.recurciveBlindForwardSolve(currentStep, copy.deepcopy(updater), level=1)
+			if(interpSteps==1):
+				self.recurciveBlindForwardSolve(currentStep, copy.deepcopy(updater), level+1)
+			else:
+				self.reInterpretationStep(interpSteps-1, level+1,currentStep)
 
 
 	def recurciveBlindForwardSolve(self,currentStep="",updater="",level=0):
@@ -96,10 +99,6 @@ class Solver:
 				newstep=Step(Move(schem),currentStepId)
 				#print(step,s,ml,schem.positions.keys())
 				self.recurciveBlindForwardSolve(newstep,copy.deepcopy(updater),level+1)
-
-
-
-
 
 schema1=Schema("PoissonEF","PoissonEI",operations.addition,"PoissonGAIN","change")
 schema2=Schema("ViandeEF","ViandeEI",operations.addition,"ViandeGAIN","change")
@@ -134,7 +133,7 @@ solver=Solver(upD)
 solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
-solver.reInterpretationStep()
+solver.reInterpretationStep(interpSteps=2)
 solver.TreePaths.printAsTree()
 print(solver.TreePaths.treeOutput)
 print(solver.TreePaths.pathsCount)
