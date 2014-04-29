@@ -21,18 +21,27 @@ class Representation:
 class Text:
     def __init__(self):
         self.textInformations=[]
+
     def getTextInformation(self,index):
         return(self.textInformations[index])
+
     def addTextInformation(self,textInformation):
         self.textInformations.append(textInformation)
+
+    def setValues(self,dic):
+        for tInfo in self.textInformations:
+            for rep in tInfo.representations:
+                oldValue=rep.quantity.value
+                rep.quantity.value=dic[oldValue]
+
     def setGoal(self,goal):
         self.goal=goal
 
 class TextInformation:
     def __init__(self,representation):
         self.representations=[]
-        self.expertRepresentation=representation
         self.representations.append(representation) #by convention the expert representation is also the first element in representations
+        self.expertRepresentation=representation #should be deleted
 
     def addAlternativeRepresentation(self,representation):
         self.representations.append(representation)
