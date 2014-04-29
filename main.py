@@ -66,7 +66,8 @@ class TreePaths:
 					notroot=False
 			else :
 				infos=self.getStep(IdCursor).infos  # if the schema allowed to find a recquired operand
-				operands=infos.operands # then we continue the search on its own operands
+				operands.remove(unknow)#we stop looking for the operand which have been found (but we keep the second one)
+				operands.append(infos.operands) # and we continue the search on its own operands
 				formula=formula.replace(" "+unknow+" ","( "+infos.objectsFormulaFirstPart+" )")
 		return formula
 
@@ -154,7 +155,7 @@ probleme1=Problem(struct,text)
 upD=Updater(probleme1)
 upD.startAsUnderstood()
 solver=Solver(upD)
-solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
 solver.reInterpretationStep(interpSteps=1)

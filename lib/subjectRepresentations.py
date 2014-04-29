@@ -140,7 +140,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             infos.unknow=unknow
             infos.valueToFind=valueToFind
             infos.type="schema"
-            infos.operands=(objectA,objectB)
+            infos.operands=[objectA,objectB]
 
             if not trial: # when trial is True, the unknown is computed without any change in the problemState
                 qdic.addValue(unknow,valueToFind)
