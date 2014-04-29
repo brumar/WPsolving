@@ -21,11 +21,12 @@ class TreePaths:
 	def addStep(self, step):
 		self.steps.append(step)
 		self.dicStep[step.sId]=len(self.steps)-1
+		if(step.parentId==0): # if parentId = 0 then it is a 1rst level node
+			step.parentId=self.nullMoveId  # then the parent Id is set to the id of the nullMove which is by convention the initial state
 		self.addChild(step.parentId,step.sId)
 
+
 	def addChild(self,parentId,childId):
-		if(parentId==0): # if parentId = 0 then it is a 1rst level node
-			parentId=self.nullMoveId  # then the parent Id is set to the id of the nullMove which is by convention the initial state
 		indexOfStep=self.dicStep[parentId]
 		parentStep=self.steps[indexOfStep]
 		parentStep.childrenIds.append(childId)
@@ -33,18 +34,41 @@ class TreePaths:
 	def getStep(self,sId):
 		return (self.steps[self.dicStep[sId]])
 
-	def printAsTree(self,sId=0,level=0): # to be use
+	def printAsTree(self,sId=0,level=0,addFormula=True): # to be use
 		if sId==0:
 			sId=self.nullMoveId
 		firstStep=self.getStep(sId)
 		childrenIds=firstStep.childrenIds
 		if not childrenIds:
 			self.pathsCount+=1
+			if(addFormula):
+				formulaLine=level*"\t"+self.createFormula(sId)+"\r\n"
+				self.treeOutput+=formulaLine
 		for childrenId in childrenIds:
 			infos=self.getStep(childrenId).infos.shortInfo
 			line=level*"\t"+infos+"\r\n"
 			self.treeOutput+=line
 			self.printAsTree(childrenId,level+1)
+
+	def createFormula(self,leafId):
+		infos=self.getStep(leafId).infos
+		operands=infos.operands
+		formula=infos.objectsFormula
+		unknow=""
+		IdCursor=leafId
+		notroot=True
+		while (notroot):
+			if(unknow=="")or(unknow not in operands): # if the schema did not allow to find the needed operand
+				IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
+				if(IdCursor!=self.nullMoveId):
+					unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
+				else:
+					notroot=False
+			else :
+				infos=self.getStep(IdCursor).infos  # if the schema allowed to find a recquired operand
+				operands=infos.operands # then we continue the search on its own operands
+				formula=formula.replace(" "+unknow+" ","( "+infos.objectsFormulaFirstPart+" )")
+		return formula
 
 
 
@@ -114,7 +138,6 @@ text.addTextInformation(TextInformation(Representation(Quantity("PoissonEF",12),
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusViandeEI",0),'Au début de l\'année, le kilo de viande coutait le même prix que le kilo de poisson.')))
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN",3),'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson')))
 text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenant?')))
-
 
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI",5),'Au supermarché, le kilo de poisson était de 5 euros'))
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEF",5),'Au supermarché, le kilo de poisson coute 5 euros'))
