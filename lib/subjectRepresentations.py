@@ -7,9 +7,11 @@ class InfoStep:
     def __init__(self,shortInfo=""):
         self.shortInfo=shortInfo
         self.objectsFormula=""
+        self.objectsFormulaFirstPart=""
         self.unknow=""
         self.valueToFind=""
         self.type=""
+        self.operands="no"
 
 class Problem: #fields : structure, text
     def __init__(self,structure,text):
@@ -132,11 +134,13 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             if(operation==1):
                 stringOperation='+'
 
-            infos.shortInfo=str(valueA)+stringOperation+str(valueB)+'='+str(valueToFind)+' ('+unknow+')' #12-3=9 (ViandeEF)
-            infos.objectsFormula=objectA+stringOperation+objectB+'='+unknow #PoissonEF-PoissonEFminusViandeEF=ViandeEF
+            infos.shortInfo=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" "+'='+" "+str(valueToFind)+" "+' ('+unknow+')' #12-3=9 (ViandeEF)
+            infos.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
+            infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" " #PoissonEF-PoissonEFminusViandeEF=ViandeEF
             infos.unknow=unknow
             infos.valueToFind=valueToFind
-            infos.type="SchemaApplied"
+            infos.type="schema"
+            infos.operands=(objectA,objectB)
 
             if not trial: # when trial is True, the unknown is computed without any change in the problemState
                 qdic.addValue(unknow,valueToFind)
