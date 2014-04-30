@@ -28,12 +28,6 @@ class Text:
     def addTextInformation(self,textInformation):
         self.textInformations.append(textInformation)
 
-    def setValues(self,dic):
-        for tInfo in self.textInformations:
-            for rep in tInfo.representations:
-                oldValue=rep.quantity.value
-                rep.quantity.value=dic[oldValue]
-
     def setGoal(self,goal):
         self.goal=goal
 

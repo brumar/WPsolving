@@ -1,6 +1,6 @@
 import operations
 
-BREAKTHEOLDONE=True
+BREAKTHEOLDONE=False
 ERASE=True
 
 class InfoStep:
@@ -8,16 +8,25 @@ class InfoStep:
         self.shortInfo=shortInfo
         self.objectsFormula=""
         self.objectsFormulaFirstPart=""
+        self.formulaFirstPart=""
         self.unknow=""
         self.valueToFind=""
         self.type=""
         self.operands="no"
 
+
 class Problem: #fields : structure, text
     def __init__(self,structure,text):
         self.structure=structure
         self.text=text
+        self.problemInitialStaticValues={} #link T1,P1,etc.. to its values
 
+    def setInitialValues(self,dic):
+        self.problemInitialStaticValues=dic
+        for tInfo in self.text.textInformations:
+            for rep in tInfo.representations:
+                oldValue=rep.quantity.value
+                rep.quantity.value=dic[oldValue]
 
 class Move:
     def __init__(self,move):
@@ -133,8 +142,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             stringOperation='-'
             if(operation==1):
                 stringOperation='+'
-
-            infos.shortInfo=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" "+'='+" "+str(valueToFind)+" "+' ('+unknow+')' #12-3=9 (ViandeEF)
+            infos.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" "
+            infos.shortInfo=infos.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')' #12-3=9 (ViandeEF)
             infos.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
             infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" " #PoissonEF-PoissonEFminusViandeEF=ViandeEF
             infos.unknow=unknow
