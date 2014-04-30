@@ -5,9 +5,17 @@ from lib.subjectRepresentations import *
 from lib.textRepresentations import *
 import copy
 import uuid
+import csv
+
+KEEPZEROS=False #when writing the formula with true values, the operation containing 0 are dropped
+REPLACEBYGENERICVALUES=True
+
+class SimulationsDatas: # gathering and printing informations accross the different solving models
+	def __init__(self):
+		pass
 
 
-class TreePaths:
+class TreePaths: # contains all valuable informations on the different paths followed by the solver
 	def __init__(self,updater):
 
 		stepZero=Step(Move(RepresentationMove(0,0)))# by convention the initial state is the NULL move
@@ -17,6 +25,8 @@ class TreePaths:
 		self.treeOutput=""
 		self.nullMoveId=self.steps[0].sId
 		self.pathsCount=0
+		self.initialValuesDic=updater.problem.problemInitialStaticValues
+		self.pathList=[]
 
 	def addStep(self, step):
 		self.steps.append(step)
@@ -34,15 +44,16 @@ class TreePaths:
 	def getStep(self,sId):
 		return (self.steps[self.dicStep[sId]])
 
-	def printAsTree(self,sId=0,level=0,addFormula=True): # to be use
+	def scanTree(self,sId=0,level=0,addFormula=True): # to be use
 		if sId==0:
 			sId=self.nullMoveId
 		firstStep=self.getStep(sId)
 		childrenIds=firstStep.childrenIds
 		if not childrenIds:
 			self.pathsCount+=1
+			formula=self.createFormula(sId)
 			if(addFormula):
-				formulaLine=level*"\t"+self.createFormula(sId)+"\r\n"
+				formulaLine=level*"\t"+formula+"\r\n"
 				self.treeOutput+=formulaLine
 		for childrenId in childrenIds:
 			infos=self.getStep(childrenId).infos.shortInfo
@@ -50,10 +61,14 @@ class TreePaths:
 			self.treeOutput+=line
 			self.printAsTree(childrenId,level+1)
 
-	def createFormula(self,leafId):
+	def createFormula(self,leafId,keepzeros=KEEPZEROS,replaceByGenericValues=REPLACEBYGENERICVALUES):
 		infos=self.getStep(leafId).infos
 		operands=infos.operands
 		formula=infos.objectsFormula
+		if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)): #TODO: DRY not respected here (and below)
+			computedFormula=infos.formulaFirstPart
+		else:
+			computedFormula=str(infos.valueToFind)
 		unknow=""
 		IdCursor=leafId
 		notroot=True
@@ -67,11 +82,27 @@ class TreePaths:
 			else :
 				infos=self.getStep(IdCursor).infos  # if the schema allowed to find a recquired operand
 				operands.remove(unknow)#we stop looking for the operand which have been found (but we keep the second one)
-				operands.append(infos.operands) # and we continue the search on its own operands
+				operands=operands+infos.operands # and we continue the search on its own operands
 				formula=formula.replace(" "+unknow+" ","( "+infos.objectsFormulaFirstPart+" )")
-		return formula
+				if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)):
+					computedFormula=computedFormula.replace(" "+str(infos.valueToFind)+" ","( "+infos.formulaFirstPart+" )")
+			if(replaceByGenericValues):
+				computedFormula=self.replaceByGenerVal(computedFormula)
+		computedFormula=computedFormula.replace(" ","")
+		return computedFormula+" : interpretation -> "+formula
+
+	def replaceByGenerVal(self,computedFormula):
+		for generVal in self.initialValuesDic.keys() :
+			if not("-" in generVal):	# we wish to avoid -d
+				val=str(self.initialValuesDic[generVal])
+				if (val in computedFormula):
+					computedFormula=computedFormula.replace(val,generVal)
+		return computedFormula
 
 
+class Path:
+	def __init__(self):
+		pass
 
 class Step:
 	def __init__(self,move,parentId=0,infos=""):
@@ -137,7 +168,7 @@ text=Text()
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAIN","P1"),'Au supermarché, le kilo de poisson a augmenté de 5 euros cette année')))
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonEF","T1"),'Un kilo de poisson coute maintenant 12 euros.')))
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonEIminusViandeEI","dEI"),'Au début de l\'année, le kilo de viande coutait le même prix que le kilo de poisson.')))
-text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN","dGAIN"),'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson')))
+text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAINminusViandeGAIN","d"),'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson')))
 text.setGoal(TextGoal(Goal('ViandeEF','Combien coute le kilo de viande maintenant?')))
 
 text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("PoissonEI","P1"),'Au supermarché, le kilo de poisson était de 5 euros'))
@@ -145,13 +176,13 @@ text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity(
 text.getTextInformation(1).addAlternativeRepresentation(Representation(Quantity("PoissonEI","T1"),'Un kilo de poisson était de 12 euros.'))
 text.getTextInformation(2).addAlternativeRepresentation(Representation(Quantity("PoissonEFminusViandeEF","dEI"),'Au la fin de l\'année, le kilo de viande coute le même prix que le kilo de poisson.'))
 text.getTextInformation(2).addAlternativeRepresentation(Representation(Quantity("PoissonGAINminusViandeGAIN","dEI"),'Le kilo de viande a augmenté du même prix que le kilo de poisson.'))
-text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN","dGAIN"),'Le kilo de viande a augmenté de 3 euros'))
-text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN","-dGAIN"),'Le kilo de viande a diminué de 3 euros'))
-text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonEFminusViandeEF","dGAIN"),'Le kilo de viande a augmenté de 3 euros'))
-text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("ViandeEF","dGAIN"),'Le kilo coute 3 euros à la fin'))
-text.setValues({"P1":5,"T1":12,"dEI":0,"dGAIN":3,"-dGAIN":-3})
-
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN","d"),'Le kilo de viande a augmenté de 3 euros'))
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonGAIN","-d"),'Le kilo de viande a diminué de 3 euros'))
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("PoissonEFminusViandeEF","d"),'Le kilo de viande a augmenté de 3 euros'))
+text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("ViandeEF","d"),'Le kilo coute 3 euros à la fin'))
 probleme1=Problem(struct,text)
+probleme1.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+
 upD=Updater(probleme1)
 upD.startAsUnderstood()
 solver=Solver(upD)
@@ -159,6 +190,9 @@ solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
 solver.reInterpretationStep(interpSteps=1)
-solver.TreePaths.printAsTree()
+solver.TreePaths.scanTree()
+SimulationsDatas=SimulationsDatas()
+
+
 print(solver.TreePaths.treeOutput)
 print(solver.TreePaths.pathsCount)
