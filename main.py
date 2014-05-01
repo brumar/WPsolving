@@ -10,9 +10,18 @@ import csv
 KEEPZEROS=False #when writing the formula with true values, the operation containing 0 are dropped
 REPLACEBYGENERICVALUES=True
 
-class SimulationsDatas: # gathering and printing informations accross the different solving models
+class SimulatedDatas: # gathering and printing informations accross the different solving models
 	def __init__(self):
-		pass
+		self.formulaDic={}
+
+	def addDataSet(self,pathList,context=""):
+		for path in pathList:
+			if path.formula not in self.formulaDic.keys():
+				self.formulaDic[path.formula]=[path.valueFound,context]
+			else : #TODO: If different
+				self.formulaDic[path.formula]=self.formulaDic[path.formula]+[path.valueFound,context]
+
+
 
 
 class TreePaths: # contains all valuable informations on the different paths followed by the solver
@@ -49,9 +58,9 @@ class TreePaths: # contains all valuable informations on the different paths fol
 			sId=self.nullMoveId
 		firstStep=self.getStep(sId)
 		childrenIds=firstStep.childrenIds
-		if not childrenIds:
+		if not childrenIds: # the tree is at its last step, we can now track back the path
 			self.pathsCount+=1
-			formula=self.createFormula(sId)
+			formula=self.trackBack(sId)
 			if(addFormula):
 				formulaLine=level*"\t"+formula+"\r\n"
 				self.treeOutput+=formulaLine
@@ -59,16 +68,17 @@ class TreePaths: # contains all valuable informations on the different paths fol
 			infos=self.getStep(childrenId).infos.shortInfo
 			line=level*"\t"+infos+"\r\n"
 			self.treeOutput+=line
-			self.printAsTree(childrenId,level+1)
+			self.scanTree(childrenId,level+1)
 
-	def createFormula(self,leafId,keepzeros=KEEPZEROS,replaceByGenericValues=REPLACEBYGENERICVALUES):
+	def trackBack(self,leafId,keepzeros=KEEPZEROS,replaceByGenericValues=REPLACEBYGENERICVALUES):
 		infos=self.getStep(leafId).infos
+		finalValue=infos.valueToFind
 		operands=infos.operands
 		formula=infos.objectsFormula
 		if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)): #TODO: DRY not respected here (and below)
 			computedFormula=infos.formulaFirstPart
 		else:
-			computedFormula=str(infos.valueToFind)
+			computedFormula=" "+str(infos.valueToFind)+" "
 		unknow=""
 		IdCursor=leafId
 		notroot=True
@@ -86,23 +96,26 @@ class TreePaths: # contains all valuable informations on the different paths fol
 				formula=formula.replace(" "+unknow+" ","( "+infos.objectsFormulaFirstPart+" )")
 				if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)):
 					computedFormula=computedFormula.replace(" "+str(infos.valueToFind)+" ","( "+infos.formulaFirstPart+" )")
-			if(replaceByGenericValues):
-				computedFormula=self.replaceByGenerVal(computedFormula)
+		if(replaceByGenericValues):
+			computedFormula=self.replaceByGenerVal(computedFormula)
 		computedFormula=computedFormula.replace(" ","")
+		computedFormula=computedFormula.replace("--","+") #TODO: Mention this somewhere
+		self.pathList.append(Path(computedFormula,finalValue))#TODO: interpSteps, also avoid extern parenthesis like (T1-d) instead T1-d
 		return computedFormula+" : interpretation -> "+formula
 
 	def replaceByGenerVal(self,computedFormula):
 		for generVal in self.initialValuesDic.keys() :
 			if not("-" in generVal):	# we wish to avoid -d
 				val=str(self.initialValuesDic[generVal])
-				if (val in computedFormula):
+				if ( val in computedFormula):
 					computedFormula=computedFormula.replace(val,generVal)
 		return computedFormula
 
 
 class Path:
-	def __init__(self):
-		pass
+	def __init__(self,formula,valueFound):
+		self.formula=formula
+		self.valueFound=valueFound
 
 class Step:
 	def __init__(self,move,parentId=0,infos=""):
@@ -191,8 +204,10 @@ solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo
 #solver.recurciveBlindForwardSolve(moveList)
 solver.reInterpretationStep(interpSteps=1)
 solver.TreePaths.scanTree()
-SimulationsDatas=SimulationsDatas()
+simulatedDatas=SimulatedDatas()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"firstModel")
 
 
 print(solver.TreePaths.treeOutput)
 print(solver.TreePaths.pathsCount)
+print(simulatedDatas.formulaDic.keys())
