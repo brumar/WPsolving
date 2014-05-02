@@ -108,13 +108,13 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         for move in movelist:
             self.applyMove(move)
 
-    def applyMove(self,move):
+    def applyMove(self,move,constraints=[]):
         if (move.type=="schema"):
-            return self.applySchema(move.move)
+            return self.applySchema(move.move,constraints)
         if (move.type=="RepresentationMove"):
-            return self.applyRepresentationMove(move.move)
+            return self.applyRepresentationMove(move.move,constraints)
 
-    def applySchema(self,schema,trial=False): # when trial is True, the unknown is computed without any change in the problemState
+    def applySchema(self,schema,constraints=[],trial=False): # when trial is True, the unknown is computed without any change in the problemState
         infos=InfoStep() #if non appliable
         if(self.isSchemaAppliable(schema)):
             qdic=self.problemState.quantitiesDic
@@ -156,10 +156,11 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                 self.updateAppliableSchemas()
         return infos
 
-    def applyRepresentationMove(self,representationMove,breakTheOldOne=BREAKTHEOLDONE):
+    def applyRepresentationMove(self,representationMove,constraints=[],):
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
         oldSelection=self.representations.pop(indexInfo)
+        breakTheOldOne=self.doIBreakTheOldOne(constraints)
         if(breakTheOldOne):
             oldRep=self.problem.text.textInformations[indexInfo].representations[oldSelection] # TODO
             oldQuanti=oldRep.quantity
@@ -172,6 +173,14 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         infos.type="RepresentationMove"
         infos.shortInfo=quanti.object+" is now equal to "+str(quanti.value)
         return infos
+
+    def doIBreakTheOldOne(self, constraints):
+        for constraint in constraints:
+            classname=constraint.__class__.__name__
+            if(classname=="BehavioralConstraint"):
+                return constraint.breakTheOldOne
+        return BREAKTHEOLDONE #default value
+
 
     def updatePossibleRepresentationChange(self,constraints=[]):
         self.possibleRepresentationChangeList=[]
@@ -208,6 +217,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         classname=constraint.__class__.__name__
         if(classname=="IntervalConstraint"):
             return self.checkIntervall(schema,constraint)
+        else:
+            return True
 
     def checkIntervall(self,schema,constraint): #listOfObjects, condition
         infos=self.applySchema(schema,trial=True)

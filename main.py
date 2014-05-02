@@ -98,10 +98,16 @@ class TreePaths: # contains all valuable informations on the different paths fol
 					computedFormula=computedFormula.replace(" "+str(infos.valueToFind)+" ","( "+infos.formulaFirstPart+" )")
 		if(replaceByGenericValues):
 			computedFormula=self.replaceByGenerVal(computedFormula)
-		computedFormula=computedFormula.replace(" ","")
-		computedFormula=computedFormula.replace("--","+") #TODO: Mention this somewhere
+		computedFormula=self.sanitizeFormula(computedFormula)
 		self.pathList.append(Path(computedFormula,finalValue))#TODO: interpSteps, also avoid extern parenthesis like (T1-d) instead T1-d
 		return computedFormula+" : interpretation -> "+formula
+
+	def sanitizeFormula(self,computedFormula):
+		computedFormula=computedFormula.replace(" ","")
+		computedFormula=computedFormula.replace("--","+") #TODO: Mention this somewhere
+		if(computedFormula.count("(")==1)and(computedFormula[0]=="(")and(computedFormula[-1]==")"):# we want to drop parenthesis for single expression like (T1-P1)
+			computedFormula=computedFormula[1:-1]
+		return computedFormula
 
 	def replaceByGenerVal(self,computedFormula):
 		for generVal in self.initialValuesDic.keys() :
@@ -157,7 +163,7 @@ class Solver:
 		infos=""
 		if(level!=0):
 			currentStepId=currentStep.sId
-			infos=updater.applyMove(currentStep.move)
+			infos=updater.applyMove(currentStep.move,self.constraints)
 			updater.updateAppliableSchemas(self.constraints)
 			currentStep.addInfos(infos)
 			self.TreePaths.addStep(currentStep)
@@ -200,6 +206,7 @@ upD=Updater(probleme1)
 upD.startAsUnderstood()
 solver=Solver(upD)
 solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
 #moveList=[Move(upD.possibleRepresentationChangeList[0])]
 #solver.recurciveBlindForwardSolve(moveList)
 solver.reInterpretationStep(interpSteps=1)

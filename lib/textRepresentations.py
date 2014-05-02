@@ -6,6 +6,10 @@ class IntervalConstraint:
         self.listOfObjects=listOfObjects
         self.condition=condition
 
+class BehavioralConstraint:
+    def __init__(self,breakTheOldOne):
+        self.breakTheOldOne=breakTheOldOne
+
 class Quantity:
     def __init__(self,obj,value):
         self.object=obj
