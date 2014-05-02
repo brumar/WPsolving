@@ -12,15 +12,36 @@ REPLACEBYGENERICVALUES=True
 
 class SimulatedDatas: # gathering and printing informations accross the different solving models
 	def __init__(self):
-		self.formulaDic={}
+		self.datas={}
 
-	def addDataSet(self,pathList,context=""):
+	def addDataSet(self,pathList,problemName,solvingModel):
+		formulaDic=self.createFormulaDic(pathList)
+		self.createDataSet(formulaDic,problemName,solvingModel)
+
+	def createFormulaDic(self,pathList):
+		formulaDic={}
 		for path in pathList:
-			if path.formula not in self.formulaDic.keys():
-				self.formulaDic[path.formula]=[path.valueFound,context]
-			else : #TODO: If different
-				self.formulaDic[path.formula]=self.formulaDic[path.formula]+[path.valueFound,context]
+			if path.formula not in formulaDic.keys():
+				formulaDic[path.formula]=[path]
+			else :
+				formulaDic[path.formula].append(path)
+		return formulaDic
 
+	def createDataSet(self,formulaDic,problem,model):
+		self.datas[problem,model]=[]
+		for key in formulaDic:
+			for path in formulaDic[key]:
+				line=[key,path.objectFormula,path.interpretationsSummary]
+				if line not in self.datas[problem,model]:
+					self.datas[problem,model].append(line)
+					print(line)
+
+	def printCSV(self):
+		with open('datas.csv', 'wb') as csvfile:
+			writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+			for problem,solvingModel in self.datas:
+				for line in self.datas[problem,solvingModel]:
+					writer.writerow([problem]+[solvingModel]+line)
 
 
 
@@ -75,6 +96,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
 		finalValue=infos.valueToFind
 		operands=infos.operands
 		formula=infos.objectsFormula
+		summaryRepresentation=""
 		if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)): #TODO: DRY not respected here (and below)
 			computedFormula=infos.formulaFirstPart
 		else:
@@ -87,6 +109,8 @@ class TreePaths: # contains all valuable informations on the different paths fol
 				IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
 				if(IdCursor!=self.nullMoveId):
 					unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
+					if(self.getStep(IdCursor).move.type=="RepresentationMove"):
+						summaryRepresentation=summaryRepresentation+"## At step "+str(self.getStep(IdCursor).level)+" : "+self.getStep(IdCursor).infos.shortInfo
 				else:
 					notroot=False
 			else :
@@ -99,7 +123,8 @@ class TreePaths: # contains all valuable informations on the different paths fol
 		if(replaceByGenericValues):
 			computedFormula=self.replaceByGenerVal(computedFormula)
 		computedFormula=self.sanitizeFormula(computedFormula)
-		self.pathList.append(Path(computedFormula,finalValue))#TODO: interpSteps, also avoid extern parenthesis like (T1-d) instead T1-d
+		formula=self.sanitizeFormula(formula)
+		self.pathList.append(Path(computedFormula,formula,summaryRepresentation,finalValue))#TODO: interpSteps, also avoid extern parenthesis like (T1-d) instead T1-d
 		return computedFormula+" : interpretation -> "+formula
 
 	def sanitizeFormula(self,computedFormula):
@@ -119,46 +144,34 @@ class TreePaths: # contains all valuable informations on the different paths fol
 
 
 class Path:
-	def __init__(self,formula,valueFound):
+	def __init__(self,formula,objectFormula,interpretationsSummary,valueFound):
 		self.formula=formula
+		self.objectFormula=objectFormula
+		self.interpretationsSummary=interpretationsSummary
 		self.valueFound=valueFound
 
 class Step:
-	def __init__(self,move,parentId=0,infos=""):
+	def __init__(self,move,parentId=0,infos="",level=0):
 		self.childrenIds=[]
 		self.move=move
 		self.parentId=parentId
 		self.sId=uuid.uuid4()
 		self.infos=infos
+		self.level=level
 
 	def addInfos(self,infos):
 		self.infos=infos
 
-
-
 class Solver:
+	INTERP=1
+	SCHEMA=2
+	SOLVER=3
 	def __init__(self,updater,constraints=[]):
 		self.updater=updater
 		self.TreePaths=TreePaths(updater) # store all the paths taken by solver
 		self.constraints=constraints
 
-	def addConstraint(self,constraint):
-		self.constraints.append(constraint)
-
-	def reInterpretationStep(self,interpSteps=1,level=0,currentStep=None):
-		self.updater.updatePossibleRepresentationChange(self.constraints)
-		moveList=self.updater.possibleRepresentationChangeList
-		print(len(moveList))
-		updater=copy.deepcopy(self.updater)
-		for repMove in moveList:
-			currentStep=Step(Move(repMove))
-			if(interpSteps==1):
-				self.recurciveBlindForwardSolve(currentStep, copy.deepcopy(updater), level+1)
-			else:
-				self.reInterpretationStep(interpSteps-1, level+1,currentStep)
-
-
-	def recurciveBlindForwardSolve(self,currentStep="",updater="",level=0):
+	def generalSequentialSolver(self,currentStep="",updater="",level=0,listOfActions=[SOLVER]):
 		currentStepId=0
 		infos=""
 		if(level!=0):
@@ -170,10 +183,33 @@ class Solver:
 		else:
 			updater=copy.deepcopy(self.updater) # we init the updater
 		if (not updater.problemState.isProblemEnded()):
-			for schem in updater.appliableSchemaList:
-				newstep=Step(Move(schem),currentStepId)
-				#print(step,s,ml,schem.positions.keys())
-				self.recurciveBlindForwardSolve(newstep,copy.deepcopy(updater),level+1)
+			action=listOfActions.pop(0)
+			if(action==self.SOLVER):
+				listOfActions=[self.SOLVER]# when solver is found, we keep applying schemas until the end of the possibilities
+
+			if (action==self.INTERP):
+				self.interpretationSteps(updater,level,listOfActions,currentStepId)
+
+			if(action==self.SCHEMA)or(action==self.SOLVER):
+				self.schemaSteps(updater,level,listOfActions,currentStepId)
+
+	def schemaSteps(self,updater,level,listOfActions,currentStepId):
+		updater.updateAppliableSchemas(self.constraints)
+		for schem in updater.appliableSchemaList:
+			newstep=Step(Move(schem),currentStepId,level=level)
+			self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))
+
+
+	def interpretationSteps(self,updater,level,listOfActions,currentStepId):
+		self.updater.updatePossibleRepresentationChange(self.constraints)
+		moveList=self.updater.possibleRepresentationChangeList
+		for repMove in moveList:
+			newstep=Step(Move(repMove),currentStepId,level=level)
+			self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))
+
+	def addConstraint(self,constraint):
+		self.constraints.append(constraint)
+
 
 schema1=Schema("PoissonEF","PoissonEI",operations.addition,"PoissonGAIN","change")
 schema2=Schema("ViandeEF","ViandeEI",operations.addition,"ViandeGAIN","change")
@@ -202,19 +238,28 @@ text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity(
 probleme1=Problem(struct,text)
 probleme1.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 
+
+simulatedDatas=SimulatedDatas()
+
 upD=Updater(probleme1)
 upD.startAsUnderstood()
 solver=Solver(upD)
 solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
 solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
-#moveList=[Move(upD.possibleRepresentationChangeList[0])]
-#solver.recurciveBlindForwardSolve(moveList)
-solver.reInterpretationStep(interpSteps=1)
+solver.generalSequentialSolver(listOfActions=[solver.INTERP, solver.SOLVER])
 solver.TreePaths.scanTree()
-simulatedDatas=SimulatedDatas()
-simulatedDatas.addDataSet(solver.TreePaths.pathList,"firstModel")
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int_Solve")
 
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
+solver.generalSequentialSolver(listOfActions=[solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Solve")
+
+simulatedDatas.printCSV()
 
 print(solver.TreePaths.treeOutput)
 print(solver.TreePaths.pathsCount)
-print(simulatedDatas.formulaDic.keys())
+
+

@@ -1,0 +1,16 @@
+Tc4p;Solve;T1-d;PoissonEF-(PoissonGAINminusViandeGAIN+PoissonEIminusViandeEI)=ViandeEF;
+Tc4p;Solve;(T1-P1)+(P1-d);((PoissonEF-PoissonGAIN)-PoissonEIminusViandeEI)+(PoissonGAIN-PoissonGAINminusViandeGAIN)=ViandeEF;
+Tc4p;Int_Solve;(T1+P1)-d;(PoissonEI+PoissonGAIN)-(PoissonGAINminusViandeGAIN+PoissonEIminusViandeEI)=ViandeEF;## At step 0 : PoissonEI is now equal to 12
+Tc4p;Int_Solve;;;
+Tc4p;Int_Solve;P1;PoissonGAIN-PoissonGAINminusViandeGAIN=ViandeGAIN;## At step 0 : PoissonGAINminusViandeGAIN is now equal to 0
+Tc4p;Int_Solve;T1+d;(PoissonEF-PoissonGAIN)-PoissonEIminusViandeEI=ViandeEI;## At step 0 : PoissonGAIN is now equal to -3
+Tc4p;Int_Solve;P1-d;PoissonEF-(PoissonGAINminusViandeGAIN+PoissonEIminusViandeEI)=ViandeEF;## At step 0 : PoissonEF is now equal to 5
+Tc4p;Int_Solve;T1-P1;PoissonEF-PoissonGAIN=PoissonEI;## At step 0 : PoissonGAINminusViandeGAIN is now equal to 0
+Tc4p;Int_Solve;T1+(P1-d);(PoissonEI-PoissonEIminusViandeEI)+(PoissonGAIN-PoissonGAINminusViandeGAIN)=ViandeEF;## At step 0 : PoissonEI is now equal to 12
+Tc4p;Int_Solve;T1;PoissonEF-PoissonEFminusViandeEF=ViandeEF;## At step 0 : PoissonEFminusViandeEF is now equal to 0
+Tc4p;Int_Solve;P1+((T1-P1)-d);(PoissonEI-PoissonEIminusViandeEI)+((PoissonEF-PoissonEI)-PoissonGAINminusViandeGAIN)=ViandeEF;## At step 0 : PoissonEI is now equal to 5
+Tc4p;Int_Solve;(T1-P1)+(P1-d);((PoissonEF-PoissonGAIN)-PoissonEIminusViandeEI)+(PoissonGAIN-(PoissonEFminusViandeEF-PoissonEIminusViandeEI))=ViandeEF;## At step 0 : PoissonEFminusViandeEF is now equal to 3
+Tc4p;Int_Solve;((T1-P1)-d)+(P1-d);((PoissonEF-PoissonGAIN)-(PoissonGAINminusViandeGAIN-PoissonEFminusViandeEF))+(PoissonGAIN-PoissonGAINminusViandeGAIN)=ViandeEF;## At step 0 : PoissonEFminusViandeEF is now equal to 0
+Tc4p;Int_Solve;T1-d;PoissonEF-(PoissonGAINminusViandeGAIN+PoissonEIminusViandeEI)=ViandeEF;## At step 0 : PoissonEI is now equal to 5
+Tc4p;Int_Solve;T1-d;(PoissonEF-PoissonGAIN)-PoissonEIminusViandeEI=ViandeEI;## At step 0 : PoissonGAIN is now equal to 3
+Tc4p;Int_Solve;T1-d;PoissonEF-PoissonEFminusViandeEF=ViandeEF;## At step 0 : PoissonEFminusViandeEF is now equal to 3
