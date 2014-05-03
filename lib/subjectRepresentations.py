@@ -13,6 +13,7 @@ class InfoStep:
         self.valueToFind=""
         self.type=""
         self.operands="no"
+        self.solved=False
 
 
 class Problem: #fields : structure, text
