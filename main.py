@@ -96,8 +96,11 @@ class TreePaths: # contains all valuable informations on the different paths fol
 		finalValue=infos.valueToFind
 		operands=infos.operands
 		formula=infos.objectsFormula
+		if(formula==""):
+			formula=infos.newlyAssignedObject
+			operands=[infos.newlyAssignedObject]
 		summaryRepresentation=""
-		if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)): #TODO: DRY not respected here (and below)
+		if not((" 0 " in infos.formulaFirstPart)and(not keepzeros))and(infos.formulaFirstPart!=""): #TODO: DRY not respected here (and below)
 			computedFormula=infos.formulaFirstPart
 		else:
 			computedFormula=" "+str(infos.valueToFind)+" "
@@ -106,11 +109,12 @@ class TreePaths: # contains all valuable informations on the different paths fol
 		notroot=True
 		while (notroot):
 			if(unknow=="")or(unknow not in operands): # if the schema did not allow to find the needed operand
+				if(self.getStep(IdCursor).move.type=="RepresentationMove"):
+					if(self.getStep(IdCursor).infos.newlyAssignedObject in operands):
+						summaryRepresentation=summaryRepresentation+"##"+self.getStep(IdCursor).infos.shortInfo
 				IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
 				if(IdCursor!=self.nullMoveId):
 					unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
-					if(self.getStep(IdCursor).move.type=="RepresentationMove"):
-						summaryRepresentation=summaryRepresentation+"## At step "+str(self.getStep(IdCursor).level)+" : "+self.getStep(IdCursor).infos.shortInfo
 				else:
 					notroot=False
 			else :
@@ -124,7 +128,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
 			computedFormula=self.replaceByGenerVal(computedFormula)
 		computedFormula=self.sanitizeFormula(computedFormula)
 		formula=self.sanitizeFormula(formula)
-		self.pathList.append(Path(computedFormula,formula,summaryRepresentation,finalValue))#TODO: interpSteps, also avoid extern parenthesis like (T1-d) instead T1-d
+		self.pathList.append(Path(computedFormula,formula,summaryRepresentation,finalValue))
 		return computedFormula+" : interpretation -> "+formula
 
 	def sanitizeFormula(self,computedFormula):
@@ -177,6 +181,7 @@ class Solver:
 		if(level!=0):
 			currentStepId=currentStep.sId
 			infos=updater.applyMove(currentStep.move,self.constraints)
+			updater.updatePossibleRepresentationChange(self.constraints)
 			updater.updateAppliableSchemas(self.constraints)
 			currentStep.addInfos(infos)
 			self.TreePaths.addStep(currentStep)
@@ -201,8 +206,8 @@ class Solver:
 
 
 	def interpretationSteps(self,updater,level,listOfActions,currentStepId):
-		self.updater.updatePossibleRepresentationChange(self.constraints)
-		moveList=self.updater.possibleRepresentationChangeList
+		updater.updatePossibleRepresentationChange(self.constraints)
+		moveList=updater.possibleRepresentationChangeList
 		for repMove in moveList:
 			newstep=Step(Move(repMove),currentStepId,level=level)
 			self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))

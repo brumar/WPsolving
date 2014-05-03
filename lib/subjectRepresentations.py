@@ -171,6 +171,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
         infos=InfoStep()
         infos.type="RepresentationMove"
+        infos.newlyAssignedObject=quanti.object
+        infos.valueToFind=quanti.value
         infos.shortInfo=quanti.object+" is now equal to "+str(quanti.value)
         return infos
 
