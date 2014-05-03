@@ -243,19 +243,55 @@ simulatedDatas=SimulatedDatas()
 
 upD=Updater(probleme1)
 upD.startAsUnderstood()
-solver=Solver(upD)
-solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
-solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
-solver.generalSequentialSolver(listOfActions=[solver.INTERP, solver.SOLVER])
-solver.TreePaths.scanTree()
-simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int_Solve")
 
 solver=Solver(upD)
-solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
 solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
 solver.generalSequentialSolver(listOfActions=[solver.SOLVER])
 solver.TreePaths.scanTree()
 simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Solve")
+
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
+solver.generalSequentialSolver(listOfActions=[solver.INTERP, solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int+Solve_BREAK")
+
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
+solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.SCHEMA,solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int+Schem+Int+Solve_BREAK")
+
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=True))
+solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.INTERP,solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int+Int+Solve_BREAK")
+
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=False))
+solver.generalSequentialSolver(listOfActions=[solver.INTERP, solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int+Solve_NOBREAK")
+
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0))
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=False))
+solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.SCHEMA,solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int+Schem+Int+Solve_NOBREAK")
+
+solver=Solver(upD)
+solver.addConstraint(IntervalConstraint(['EF','EI'],operations.superiorOrEqualTo0)) #TODO: changer le equal
+solver.addConstraint(BehavioralConstraint(breakTheOldOne=False))
+solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.INTERP,solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4p","Int+Int+Solve_NOBREAK")
 
 simulatedDatas.printCSV()
 
