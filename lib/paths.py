@@ -75,7 +75,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
             if(unknow=="")or(unknow not in operands): # if the schema did not allow to find the needed operand
                 if(self.getStep(IdCursor).move.type=="RepresentationMove"):
                     if(self.getStep(IdCursor).infos.newlyAssignedObject in operands):
-                        summaryRepresentation=summaryRepresentation+"##"+self.getStep(IdCursor).infos.shortInfo
+                        summaryRepresentation=" # "+self.getStep(IdCursor).infos.shortInfo+summaryRepresentation
                 IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
                 if(IdCursor!=self.nullMoveId):
                     unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
@@ -89,6 +89,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
                 if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)):
                     computedFormula=computedFormula.replace(" "+str(infos.valueToFind)+" ","( "+infos.formulaFirstPart+" )")
         if(replaceByGenericValues):
+            summaryRepresentation=self.replaceByGenerVal(summaryRepresentation)
             computedFormula=self.replaceByGenerVal(computedFormula)
         computedFormula=self.sanitizeFormula(computedFormula)
         formula=self.sanitizeFormula(formula)
@@ -98,6 +99,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
     def sanitizeFormula(self,computedFormula):
         computedFormula=computedFormula.replace(" ","")
         computedFormula=computedFormula.replace("--","+") #TODO: Mention this somewhere
+        computedFormula=computedFormula.replace("+-","-")
         if(computedFormula.count("(")==1)and(computedFormula[0]=="(")and(computedFormula[-1]==")"):# we want to drop parenthesis for single expression like (T1-P1)
             computedFormula=computedFormula[1:-1]
         return computedFormula

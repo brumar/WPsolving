@@ -22,12 +22,13 @@ class Problem: #fields : structure, text
         self.text=text
         self.problemInitialStaticValues={} #link T1,P1,etc.. to its values
 
-    def setInitialValues(self,dic):
+    def setInitialValues(self,dic,onlyDic=False):
         self.problemInitialStaticValues=dic
-        for tInfo in self.text.textInformations:
-            for rep in tInfo.representations:
-                oldValue=rep.quantity.value
-                rep.quantity.value=dic[oldValue]
+        if(not onlyDic):
+            for tInfo in self.text.textInformations:
+                for rep in tInfo.representations:
+                    oldValue=rep.quantity.value
+                    rep.quantity.value=dic[oldValue]
 
 class Move:
     def __init__(self,move):
@@ -174,7 +175,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         infos.type="RepresentationMove"
         infos.newlyAssignedObject=quanti.object
         infos.valueToFind=quanti.value
-        infos.shortInfo=quanti.object+" is now equal to "+str(quanti.value)
+        infos.shortInfo=str(quanti.value)+" interpreted as "+quanti.object
         return infos
 
     def doIBreakTheOldOne(self, constraints):
