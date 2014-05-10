@@ -2,6 +2,7 @@ import operations
 
 class ProblemStructure:#fields : schemas,objectSet
     def __init__(self):
+        self.objectSet=set()
         self.schemas=[]
     def addSchema(self,schema):
         self.schemas.append(schema)
@@ -38,7 +39,7 @@ class ProblemStructure:#fields : schemas,objectSet
     def detectCommonObject(self,schema1,schema2):
         return schema1.getSetObjects().intersection(schema2.getSetObjects())
 
-    def updateObjectList(self):
+    def updateObjectSet(self):
         objectList=[]
         for schema in self.schemas:
             for obj in schema.getSetObjects():
