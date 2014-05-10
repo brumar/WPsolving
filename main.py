@@ -4,44 +4,7 @@ from lib.schemas import *
 from lib.subjectRepresentations import *
 from lib.textRepresentations import *
 from lib.paths import *
-import uuid
-import csv
-
-class SimulatedDatas: # gathering and printing informations accross the different solving models
-	def __init__(self):
-		self.datas={}
-
-	def addDataSet(self,pathList,problemName,solvingModel):
-		formulaDic=self.createFormulaDic(pathList)
-		self.createDataSet(formulaDic,problemName,solvingModel)
-
-	def createFormulaDic(self,pathList):
-		formulaDic={}
-		for path in pathList:
-			if path.formula not in formulaDic.keys():
-				formulaDic[path.formula]=[path]
-			else :
-				formulaDic[path.formula].append(path)
-		return formulaDic
-
-	def createDataSet(self,formulaDic,problem,model):
-		self.datas[problem,model]=[]
-		for key in formulaDic:
-			for path in formulaDic[key]:
-				line=[key,path.problemSolved,path.objectFormula,path.interpretationsSummary]
-				if line not in self.datas[problem,model]:
-					self.datas[problem,model].append(line)
-					print(line)
-
-	def printCSV(self):
-		with open('datas.csv', 'wb') as csvfile:
-			writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-			for problem,solvingModel in self.datas:
-				for line in self.datas[problem,solvingModel]:
-					writer.writerow([problem]+[solvingModel]+line)
-
-
-
+from lib.dataManager import *
 
 schema1=Schema("PoissonEF","PoissonEI",operations.addition,"PoissonGAIN","change")
 schema2=Schema("ViandeEF","ViandeEI",operations.addition,"ViandeGAIN","change")
@@ -49,7 +12,7 @@ struct=ProblemStructure()
 struct.addSchema(schema1)
 struct.addSchema(schema2)
 struct.addBridgingSchemas(schema1,schema2)
-struct.updateObjectList()
+struct.updateObjectSet()
 
 text=Text()
 text.addTextInformation(TextInformation(Representation(Quantity("PoissonGAIN","P1"),'Au supermarché, le kilo de poisson a augmenté de 5 euros cette année')))
@@ -97,6 +60,11 @@ solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.INTERP,solver
 solver.TreePaths.scanTree()
 simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4t","Int+Int+Solve_BREAK")
 
+solver=Solver(upD,constraints)
+solver.generalSequentialSolver(listOfActions=[solver.SCHEMA,solver.INTERP,solver.SCHEMA,solver.INTERP,solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4t","Schem+Int+Schem+Int+Solve_BREAK")
+
 c2=BehavioralConstraint(breakTheOldOne=False)
 constraints=[c1,c2]
 
@@ -104,6 +72,11 @@ solver=Solver(upD,constraints)
 solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.SCHEMA,solver.SOLVER])
 solver.TreePaths.scanTree()
 simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4t","Int+Schem+Int+Solve_NOBREAK")
+
+solver=Solver(upD,constraints)
+solver.generalSequentialSolver(listOfActions=[solver.SCHEMA,solver.INTERP,solver.SCHEMA,solver.INTERP,solver.SOLVER])
+solver.TreePaths.scanTree()
+simulatedDatas.addDataSet(solver.TreePaths.pathList,"Tc4t","Schem+Int+Schem+Int+Solve_NOBREAK")
 
 solver=Solver(upD,constraints)
 solver.generalSequentialSolver(listOfActions=[solver.INTERP,solver.INTERP,solver.SOLVER])
