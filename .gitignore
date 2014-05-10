@@ -217,4 +217,7 @@ pip-log.txt
 #############
 ## User
 #############
-.xmind
+*.xmind
+notebook
+datasTO_R.csv
+doc.odt
