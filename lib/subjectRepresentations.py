@@ -91,16 +91,16 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         self.problem=problem
         self.appliableSchemaList=[]
         self.possibleRepresentationChangeList=[]
-        self.representations=[]
 
     def startAsUnderstood(self):    #initialise all the quantities, goals and representations, as experts do
         goal=self.problem.text.goal.expertGoal
         quantitiesDic = QuantityDic(dict.fromkeys(self.problem.structure.objectSet,operations.unknown),startAsVoid=True)    #get all the objects, init with unknow                                                                                                                  #note : maybe one day => necessary to consider multiple values for a single object
+        representations=[]
         for info in self.problem.text.textInformations:
             quantitiesDic.addValue(info.expertRepresentation.quantity.object, info.expertRepresentation.quantity.value) # update the dic bind object to their values according the representations
-            self.representations.append(0)    #0 indicate that the first (the good one) interpretation is selected
+            representations.append(0)    #0 indicate that the first (the good one) interpretation is selected
 
-        self.problemState=ProblemState(quantitiesDic,goal,self.representations) # the most important line
+        self.problemState=ProblemState(quantitiesDic,goal,representations) # the most important line
 
         self.updateAppliableSchemas()
 
@@ -161,13 +161,13 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
     def applyRepresentationMove(self,representationMove,constraints=[],):
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
-        oldSelection=self.representations.pop(indexInfo)
+        oldSelection=self.problemState.representations.pop(indexInfo)
         breakTheOldOne=self.doIBreakTheOldOne(constraints)
         if(breakTheOldOne):
             oldRep=self.problem.text.textInformations[indexInfo].representations[oldSelection] # TODO
             oldQuanti=oldRep.quantity
             self.problemState.quantitiesDic.removeValue(oldQuanti.object, oldQuanti.value)
-        self.representations.insert(indexInfo, indexSelection)#pop and insert in order to avoid loosing the value
+        self.problemState.representations.insert(indexInfo, indexSelection)#pop and insert in order to avoid loosing the value
         rep=self.problem.text.textInformations[indexInfo].representations[indexSelection]
         quanti=rep.quantity
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
