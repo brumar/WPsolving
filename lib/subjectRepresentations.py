@@ -101,14 +101,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             representations.append(0)    #0 indicate that the first (the good one) interpretation is selected
 
         self.problemState=ProblemState(quantitiesDic,goal,representations) # the most important line
-
+        self.updatePossibleRepresentationChange()
         self.updateAppliableSchemas()
-
-    def applyMoveList(self,movelist,startAsUnderstood=True):
-        if(startAsUnderstood):
-            self.startAsUnderstood()
-        for move in movelist:
-            self.applyMove(move)
 
     def applyMove(self,move,constraints=[]):
         if (move.type=="schema"):
