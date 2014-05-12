@@ -21,7 +21,7 @@ class SimulatedDatas: # gathering and printing informations accross the differen
         self.datas[problem,model]=[]
         for key in formulaDic:
             for path in formulaDic[key]:
-                line=[key,path.problemSolved,path.objectFormula,path.interpretationsSummary]
+                line=[key,path.problemSolved,path.objectFormula,set(path.interpretationsList)]
                 if line not in self.datas[problem,model]:
                     self.datas[problem,model].append(line)
                     #print(line)

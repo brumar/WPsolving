@@ -60,10 +60,10 @@ class TreePaths: # contains all valuable informations on the different paths fol
         operands=infos.operands
         formula=infos.objectsFormula
         problemSolved=infos.solved
+        alternativeRepresentationsUsed=[]
         if(formula==""):
             formula=infos.newlyAssignedObject
             operands=[infos.newlyAssignedObject]
-        summaryRepresentation=""
         if not((" 0 " in infos.formulaFirstPart)and(not keepzeros))and(infos.formulaFirstPart!=""): #TODO: DRY not respected here (and below)
             computedFormula=infos.formulaFirstPart
         else:
@@ -75,7 +75,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
             if(unknow=="")or(unknow not in operands): # if the schema did not allow to find the needed operand
                 if(self.getStep(IdCursor).move.type=="RepresentationMove"):
                     if(self.getStep(IdCursor).infos.newlyAssignedObject in operands):
-                        summaryRepresentation=" # "+self.getStep(IdCursor).infos.shortInfo+summaryRepresentation
+                        alternativeRepresentationsUsed.append(self.getStep(IdCursor).infos.shortInfo)
                 IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
                 if(IdCursor!=self.nullMoveId):
                     unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
@@ -89,11 +89,11 @@ class TreePaths: # contains all valuable informations on the different paths fol
                 if not((" 0 " in infos.formulaFirstPart)and(not keepzeros)):
                     computedFormula=computedFormula.replace(" "+str(infos.valueToFind)+" ","( "+infos.formulaFirstPart+" )")
         if(replaceByGenericValues):
-            summaryRepresentation=self.replaceByGenerVal(summaryRepresentation)
+            alternativeRepresentationsUsed=self.replaceByGenerVal(alternativeRepresentationsUsed)
             computedFormula=self.replaceByGenerVal(computedFormula)
         computedFormula=self.sanitizeFormula(computedFormula)
         formula=self.sanitizeFormula(formula)
-        self.pathList.append(Path(computedFormula,formula,summaryRepresentation,finalValue,problemSolved))
+        self.pathList.append(Path(computedFormula,formula,alternativeRepresentationsUsed,finalValue,problemSolved))
         return computedFormula+" : interpretation -> "+formula
 
     def sanitizeFormula(self,computedFormula):
@@ -105,19 +105,25 @@ class TreePaths: # contains all valuable informations on the different paths fol
         return computedFormula
 
     def replaceByGenerVal(self,computedFormula):
-        for generVal in self.initialValuesDic.keys() :
-            if not("-" in generVal):    # we wish to avoid -d
-                val=str(self.initialValuesDic[generVal])
-                if ( val in computedFormula):
-                    computedFormula=computedFormula.replace(val,generVal)
-        return computedFormula
+        if(type(computedFormula)==list):
+            l2=[]
+            for element in computedFormula:
+                l2.append(self.replaceByGenerVal(element)) # it means that else part of this function will be applied for each element
+            return l2
+        else:
+            for generVal in self.initialValuesDic.keys() :
+                if not("-" in generVal):    # we wish to avoid -d
+                    val=str(self.initialValuesDic[generVal])
+                    if ( val in computedFormula):
+                        computedFormula=computedFormula.replace(val,generVal)
+            return computedFormula
 
 
 class Path:
-    def __init__(self,formula,objectFormula,interpretationsSummary,valueFound,problemSolved):
+    def __init__(self,formula,objectFormula,interpretationsList,valueFound,problemSolved):
         self.formula=formula
         self.objectFormula=objectFormula
-        self.interpretationsSummary=interpretationsSummary
+        self.interpretationsList=interpretationsList
         self.valueFound=valueFound
         self.problemSolved=problemSolved
 
