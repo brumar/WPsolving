@@ -111,7 +111,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             return self.applyRepresentationMove(move.move,constraints)
 
     def applySchema(self,schema,constraints=[],trial=False): # when trial is True, the unknown is computed without any change in the problemState
-        infos=InfoStep() #if non appliable
+        infos=InfoStep()
         if(self.isSchemaAppliable(schema)):
             qdic=self.problemState.quantitiesDic
             n,unknow=findTheUnknown(schema,qdic)
