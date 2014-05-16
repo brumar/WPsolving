@@ -221,3 +221,8 @@ pip-log.txt
 notebook
 datasTO_R.csv
 doc.odt
+datas.csv
+evelyne.csv
+evelyne.xlsx
+.ipynb_checkpoints/*
+*.lnk
