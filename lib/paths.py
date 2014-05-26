@@ -71,7 +71,11 @@ class TreePaths: # contains all valuable informations on the different paths fol
         unknow=""
         IdCursor=leafId
         notroot=True
-        while (notroot):
+        while (notroot):    # We inspect the path starting from the last step
+                            # we include in the summary only steps which have have been usefull
+                            # a step is usefull if its output(unknow) are in the list of quantities used (operands)
+                            # at each usefull step encountered we update operancs
+
             if(unknow=="")or(unknow not in operands): # if the schema did not allow to find the needed operand
                 if(self.getStep(IdCursor).move.type=="RepresentationMove"):
                     if(self.getStep(IdCursor).infos.newlyAssignedObject in operands):
