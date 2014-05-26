@@ -13,6 +13,7 @@ class InfoStep:
         self.valueToFind=""
         self.type=""
         self.operands="no"
+        self.move=""
         self.solved=False
 
 
@@ -166,6 +167,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         quanti=rep.quantity
         self.problemState.quantitiesDic.addValue(quanti.object, quanti.value)
         infos=InfoStep()
+        infos.move=representationMove
         infos.type="RepresentationMove"
         infos.newlyAssignedObject=quanti.object
         infos.valueToFind=quanti.value
