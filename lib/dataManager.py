@@ -30,7 +30,7 @@ class SimulatedDatas: # gathering and printing informations accross the differen
             for line in self.datas[problem,solvingModel]:
                 print(problem,solvingModel,line)
 
-    def printCSV(self,csvFile="datas.csv"):
+    def printCSV(self,csvFile="datas.csv",fieldToHide=[]):
         with open(csvFile, 'wb') as csvfile:
             writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for problem,solvingModel in self.datas:
