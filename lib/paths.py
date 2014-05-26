@@ -61,6 +61,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
         formula=infos.objectsFormula
         problemSolved=infos.solved
         alternativeRepresentationsUsed=[]
+        richInterpretationsList=[]
         if(formula==""):
             formula=infos.newlyAssignedObject
             operands=[infos.newlyAssignedObject]
@@ -80,6 +81,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
                 if(self.getStep(IdCursor).move.type=="RepresentationMove"):
                     if(self.getStep(IdCursor).infos.newlyAssignedObject in operands):
                         alternativeRepresentationsUsed.append(self.getStep(IdCursor).infos.shortInfo)
+                        richInterpretationsList.append(self.getStep(IdCursor).infos.move) # get the representationMove
                 IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
                 if(IdCursor!=self.nullMoveId):
                     unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
@@ -97,7 +99,9 @@ class TreePaths: # contains all valuable informations on the different paths fol
             computedFormula=self.replaceByGenerVal(computedFormula)
         computedFormula=self.sanitizeFormula(computedFormula)
         formula=self.sanitizeFormula(formula)
-        self.pathList.append(Path(computedFormula,formula,alternativeRepresentationsUsed,finalValue,problemSolved))
+        path=Path(computedFormula,formula,alternativeRepresentationsUsed,finalValue,problemSolved,richInterpretationsList)
+        if path.checkIfRealPath():
+            self.pathList.append(path)
         return computedFormula+" : interpretation -> "+formula
 
     def sanitizeFormula(self,computedFormula):
@@ -124,12 +128,18 @@ class TreePaths: # contains all valuable informations on the different paths fol
 
 
 class Path:
-    def __init__(self,formula,objectFormula,interpretationsList,valueFound,problemSolved):
+    def __init__(self,formula,objectFormula,interpretationsList,valueFound,problemSolved,richInterpretationsList=[]):
         self.formula=formula
         self.objectFormula=objectFormula
         self.interpretationsList=interpretationsList
+        self.richInterpretationsList=richInterpretationsList
         self.valueFound=valueFound
         self.problemSolved=problemSolved
+
+    def checkIfRealPath(self):
+        for interpretation in self.richInterpretationsList:
+            stop=1
+        return True
 
 class Step:
     def __init__(self,move,parentId=0,infos="",level=0):
