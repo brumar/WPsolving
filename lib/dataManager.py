@@ -44,18 +44,19 @@ class SimulatedDatas: # gathering and printing informations accross the differen
             for line in self.datas[problem,solvingModel]:
                 print(problem,solvingModel,line)
 
-    def printCSV(self,csvFile="datas.csv",hideModel=True):
+    def printCSV(self,csvFile="datas.csv",hideModel=True,hideUnsolved=True):
         dataSeen=[]
         with open(csvFile, 'wb') as csvfile:
             writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for data in self.datas:
                 path=data["path"]
-                if(hideModel):
-                    line=[path.formula,path.problemSolved,path.objectFormula,path.interpretationsList]
-                    writer.writerow([data["problem"]]+line)
-                else:
-                    line=[path.problemSolved,path.objectFormula,path.interpretationsList]
-                    writer.writerow([data["problem"]]+[data["model"]]+line)
+                if not(hideUnsolved and not path.problemSolved):
+                    if(hideModel):
+                        line=[path.formula,path.problemSolved,path.objectFormula,path.interpretationsList]
+                        writer.writerow([data["problem"]]+line)
+                    else:
+                        line=[path.problemSolved,path.objectFormula,path.interpretationsList]
+                        writer.writerow([data["problem"]]+[data["model"]]+line)
 
     def printDatas(self):
         for data in self.datas:
