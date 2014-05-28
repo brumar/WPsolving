@@ -100,8 +100,8 @@ class TreePaths: # contains all valuable informations on the different paths fol
         computedFormula=self.sanitizeFormula(computedFormula)
         formula=self.sanitizeFormula(formula)
         path=Path(computedFormula,formula,alternativeRepresentationsUsed,finalValue,problemSolved,richInterpretationsList)
-        if path.checkIfRealPath():
-            self.pathList.append(path)
+        path.deleteUselessBackAndForth()
+        self.pathList.append(path)
         return computedFormula+" : interpretation -> "+formula
 
     def sanitizeFormula(self,computedFormula):
@@ -136,10 +136,23 @@ class Path:
         self.valueFound=valueFound
         self.problemSolved=problemSolved
 
-    def checkIfRealPath(self):
-        for interpretation in self.richInterpretationsList:
-            stop=1
-        return True
+    def deleteUselessBackAndForth(self):
+        # Some special paths needs to be detected
+        # Some paths goes just a back and forth between alternative and expert representation
+        # Very often this back and forth is useless, as no use of the alternative representation has not been used by the user
+        # Because of this, traceback function reports paths with just one expert reprensentation used
+        # This is not a big problem, but it generates too many paths. For each text element, there is a possibility to do this back and forth
+        # Then for each of this text element it reports useless paths mentionning that the representation move returning to the expert representation has been used
+        # We want to avoid these patterns
+
+        # For the sake of the simplicity we stay in the case of only 2 reinterpretations steps are used in the solving process.
+        # This function needs to be generalized if more than 2 interpretations are allowed
+        # Then these patterns have these two properties (1)only one representation move is reported (2) The representation move goes to an expert representation.
+
+        if(len(self.richInterpretationsList)==1): # (1) Only one representation move is reported
+            for interpMove in self.richInterpretationsList:
+                if(interpMove.indexSelectedRepresentation==0): # (2) The representation move goes to an expert representation.
+                    self.interpretationsList=[]
 
 class Step:
     def __init__(self,move,parentId=0,infos="",level=0):
