@@ -7,6 +7,7 @@ import uuid
 
 KEEPZEROS=False #when writing the formula with true values, the operation containing 0 are dropped
 REPLACEBYGENERICVALUES=True
+globalPathCount=0 #usefull to debug as this value appears in the csv and is bound to the path when the tree is scanned
 
 class TreePaths: # contains all valuable informations on the different paths followed by the solver
     def __init__(self,updater):
@@ -38,13 +39,15 @@ class TreePaths: # contains all valuable informations on the different paths fol
         return (self.steps[self.dicStep[sId]])
 
     def scanTree(self,sId=0,level=0,addFormula=True): # to be use
+        global globalPathCount
         if sId==0:
             sId=self.nullMoveId
         firstStep=self.getStep(sId)
         childrenIds=firstStep.childrenIds
         if not childrenIds: # the tree is at its last step, we can now track back the path
             self.pathsCount+=1
-            formula=self.trackBack(sId)
+            globalPathCount+=1
+            formula=self.trackBack(sId,count=globalPathCount) #important line as self.pathlist is updated
             if(addFormula):
                 formulaLine=level*"\t"+formula+"\r\n"
                 self.treeOutput+=formulaLine
@@ -54,7 +57,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
             self.treeOutput+=line
             self.scanTree(childrenId,level+1)
 
-    def trackBack(self,leafId,keepzeros=KEEPZEROS,replaceByGenericValues=REPLACEBYGENERICVALUES):
+    def trackBack(self,leafId,keepzeros=KEEPZEROS,replaceByGenericValues=REPLACEBYGENERICVALUES,count=0):
         infos=self.getStep(leafId).infos
         finalValue=infos.valueToFind
         operands=infos.operands
@@ -62,7 +65,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
         problemSolved=infos.solved
         alternativeRepresentationsUsed=[]
         richInterpretationsList=[]
-        if(formula==""):
+        if(formula==""): # case for which the last step  is a representation change
             formula=infos.newlyAssignedObject
             operands=[infos.newlyAssignedObject]
         if not((" 0 " in infos.formulaFirstPart)and(not keepzeros))and(infos.formulaFirstPart!=""): #TODO: DRY not respected here (and below)
@@ -82,6 +85,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
                     if(self.getStep(IdCursor).infos.newlyAssignedObject in operands):
                         alternativeRepresentationsUsed.append(self.getStep(IdCursor).infos.shortInfo)
                         richInterpretationsList.append(self.getStep(IdCursor).infos.move) # get the representationMove
+                        operands.remove(self.getStep(IdCursor).infos.newlyAssignedObject)
                 IdCursor=self.getStep(IdCursor).parentId #then continue the search with the parent node
                 if(IdCursor!=self.nullMoveId):
                     unknow=self.getStep(IdCursor).infos.unknow #and take its output (unknow)
@@ -99,7 +103,7 @@ class TreePaths: # contains all valuable informations on the different paths fol
             computedFormula=self.replaceByGenerVal(computedFormula)
         computedFormula=self.sanitizeFormula(computedFormula)
         formula=self.sanitizeFormula(formula)
-        path=Path(computedFormula,formula,alternativeRepresentationsUsed,finalValue,problemSolved,richInterpretationsList)
+        path=Path(computedFormula,formula,alternativeRepresentationsUsed,finalValue,problemSolved,richInterpretationsList,index=count)
         path.deleteUselessBackAndForth()
         self.pathList.append(path)
         return computedFormula+" : interpretation -> "+formula
@@ -128,13 +132,14 @@ class TreePaths: # contains all valuable informations on the different paths fol
 
 
 class Path:
-    def __init__(self,formula,objectFormula,interpretationsList,valueFound,problemSolved,richInterpretationsList=[]):
+    def __init__(self,formula,objectFormula,interpretationsList,valueFound,problemSolved,richInterpretationsList=[],index=0):
         self.formula=formula
         self.objectFormula=objectFormula
         self.interpretationsList=interpretationsList
         self.richInterpretationsList=richInterpretationsList
         self.valueFound=valueFound
         self.problemSolved=problemSolved
+        self.index=index
 
     def deleteUselessBackAndForth(self):
         # Some special paths needs to be detected
