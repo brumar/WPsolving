@@ -13,23 +13,10 @@ def unique(iterable):
         seen.add(x)
         yield x
 
-def optionsFactory(options):
+def optionsFactory(options): #iterator
     listes=unique(itertools.permutations(options))
     finals=productOnIterables(listes,[True,False])
     for final in finals:
         a=list(final[0])
         a.append(3)
         yield (a,final[1])
-
-it=optionsFactory([1,1,2,2,2])
-for i in it:
-    print(i)
-
-
-#===============================================================================
-# test3=[True,False]
-# listes2=itertools.product(test3,test4)
-# print(listes2)
-# for l in listes2:
-#     print (l)
-#===============================================================================
