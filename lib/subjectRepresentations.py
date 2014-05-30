@@ -18,7 +18,8 @@ class InfoStep:
 
 
 class Problem: #fields : structure, text
-    def __init__(self,structure,text):
+    def __init__(self,structure,text,name="untitled"):
+        self.name=name
         self.structure=structure
         self.text=text
         self.problemInitialStaticValues={} #link T1,P1,etc.. to its values
