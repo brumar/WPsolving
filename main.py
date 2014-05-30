@@ -24,7 +24,7 @@ def generateAllPossibilities(problem):
         solver.generalSequentialSolver(listOfActions=options[0])
         solver.TreePaths.scanTree()
         #print(solver.TreePaths.treeOutput)
-        simulatedDatas.addDataSet(solver.TreePaths.pathList,probleme1.name,model)
+        simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
         print("DONE : model "+model+"( "+str(i)+" )")
 
 
@@ -67,11 +67,13 @@ info3_prime.addAlternativeRepresentation(Representation(Quantity("ViandeEF","d")
 problem2.text.textInformations[3]=info3_prime
 problem2.text.setGoal(TextGoal(Goal('ViandeGAIN','De combien le kilo de viande a t-il augmenté ?')))
 problem2.name="Tc4p"
+probleme1.name="Tc4t"
 
 simulatedDatas=SimulatedDatas()
 probleme1.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 problem2.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 generateAllPossibilities(problem2) # change simulated datas
+generateAllPossibilities(probleme1)
 
 print(simulatedDatas.printCSV(hideUnsolved=True))
 
