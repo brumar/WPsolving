@@ -18,6 +18,7 @@ class InfoStep:
 
 
 class Problem: #fields : structure, text
+
     def __init__(self,structure,text,name="untitled"):
         self.name=name
         self.structure=structure
@@ -31,6 +32,14 @@ class Problem: #fields : structure, text
                 for rep in tInfo.representations:
                     oldValue=rep.quantity.value
                     rep.quantity.value=dic[oldValue]
+
+    def renameObjects(self,renameDic):
+        self.text.renameObjects_t(renameDic)
+        self.structure.renameObjects_s(renameDic)
+
+    def renameKeywordObjects(self,renameDic):
+        self.text.renameKeywordObjects_t(renameDic)
+        self.structure.renameKeywordObjects_s(renameDic)
 
 class Move:
     def __init__(self,move):

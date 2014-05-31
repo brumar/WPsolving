@@ -26,6 +26,34 @@ class ProblemStructure:#fields : schemas,objectSet
                     self.bridge(schema1,schema2,position,operations.soustractionBridge)
             self.lastbridge(schema1,schema2,operations.soustractionBridge)
 
+    def renameObjects_s(self,remaningDic):
+        for schema in self.schemas:
+            setObj=schema.getSetObjects()
+            if (setObj-set(remaningDic.keys())):
+                raise Exception("the set is not complete")
+            newDicObjet={}
+            newDicPosition={}
+            for k,v in schema.objects.iteritems():
+                newDicObjet[k]=remaningDic[v]
+                newDicPosition[remaningDic[v]]=k
+            schema.objects=newDicObjet
+            schema.positions=newDicPosition
+        self.updateObjectSet()
+
+
+    def renameKeywordObjects_s(self,remaningDic):
+        for schema in self.schemas:
+            for k,v in schema.objects.iteritems():
+                vcurrent=v
+                for keyword,newKeyword in remaningDic.iteritems():
+                    if(keyword in vcurrent):
+                        vcurrent=vcurrent.replace(keyword,newKeyword)
+                        if(v in schema.positions.keys()):
+                            del schema.positions[v]
+                schema.objects[k]=vcurrent
+                schema.positions[vcurrent]=k
+        self.updateObjectSet()
+
     def bridge(self,schema1,schema2,position,operationBridge):
         bridge=schema1.objects[position]+operationBridge+schema2.objects[position] # create string like T2minusT1
         self.addSchema(Schema(bridge,schema1.objects[position],operations.soustraction,schema2.objects[position])) # create T1-T2=T1minusT2 schema and to the structure

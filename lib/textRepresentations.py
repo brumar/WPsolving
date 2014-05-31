@@ -32,6 +32,30 @@ class Text:
     def addTextInformation(self,textInformation):
         self.textInformations.append(textInformation)
 
+    def renameObjects_t(self,remaningDic):
+        for infos in self.textInformations:
+            for representation in infos.representations:
+                oldobj=representation.quantity.object
+                newoobj=remaningDic[oldobj]
+                representation.quantity.object=newoobj
+        oldgoal=self.goal.expertGoal.obj
+        self.goal.expertGoal.obj=remaningDic[oldgoal]
+
+    def renameKeywordObjects_t(self,remaningDic):
+        for infos in self.textInformations:
+            for representation in infos.representations:
+                oldobj=representation.quantity.object
+                currentObj=oldobj
+                for keyword,newKeyword in remaningDic.iteritems():
+                    if (keyword in oldobj):
+                        currentObj=currentObj.replace(keyword,newKeyword)
+                representation.quantity.object=currentObj
+        currentG=self.goal.expertGoal.obj
+        for keyword,newKeyword in remaningDic.iteritems():
+            if (keyword in currentG):
+                currentG=currentG.replace(keyword,newKeyword)
+        self.goal.expertGoal.obj=currentG
+
     def setGoal(self,goal):
         self.goal=goal
 

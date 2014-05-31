@@ -56,6 +56,7 @@ text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity(
 text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("ViandeEF","d"),'Le kilo coute 3 euros à la fin'))
 probleme1=Problem(struct,text)
 
+
 problem2=copy.deepcopy(probleme1)
 info3_prime=TextInformation(Representation(Quantity("PoissonEFminusViandeEF","d"),'Le kilo de viande vaut 3 euros de moins que le kilo de poisson'))
 info3_prime.addAlternativeRepresentation(Representation(Quantity("ViandeGAIN","d"),'Le kilo de viande a augmenté de 3 euros'))
@@ -69,8 +70,22 @@ problem2.text.setGoal(TextGoal(Goal('ViandeGAIN','De combien le kilo de viande a
 problem2.name="Tc4p"
 probleme1.name="Tc4t"
 
+problem3=copy.deepcopy(problem2)
+problem3.renameObjects({'PoissonEF': 'PoissonEFsecond',
+           'PoissonEI': 'PoissonEIsecond',
+           'PoissonGAIN': 'PoissonGAINsecond',
+           'ViandeEF': 'ViandeEFsecond',
+           'ViandeEI': 'ViandeEIsecond',
+           'ViandeGAIN': 'ViandeGAINsecond',
+           'PoissonGAINminusViandeGAIN' : 'PoissonGAINminusViandeGAIN_second',
+           'PoissonEIminusViandeEI' : 'PoissonEIminusViandeEI_second',
+           'PoissonEFminusViandeEF' : 'PoissonEFminusViandeEF_second'
+           })
+problem3.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+problem3.name="Tc4t_replace"
+
 simulatedDatas=SimulatedDatas()
-probleme1.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+probleme1.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})#important : always set the initial values at the start
 problem2.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 generateAllPossibilities(problem2) # change simulated datas
 generateAllPossibilities(probleme1)
