@@ -63,16 +63,19 @@ class TextInformation:
     def __init__(self,representation):
         self.representations=[]
         self.representations.append(representation) #by convention the expert representation is also the first element in representations
-        self.expertRepresentation=representation #should be deleted
 
     def addAlternativeRepresentation(self,representation):
         self.representations.append(representation)
 
     def getExpertRepresentation(self):
-        return self.expertRepresentation
+        return self.representations[0]
 
     def getRepresentations(self):
         return self.representations
+
+    def removeAlternativeRepresentations(self):
+        self.representations=[self.getExpertRepresentation()]
+
 
 class Goal:
     def __init__(self,obj,phrase="",weight=0):
