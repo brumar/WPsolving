@@ -148,6 +148,7 @@ def r1(oper):
         for o2 in oper:
             if(o2!=o):
                 yield([o,o2,o2])
+#------------------------------------------------------------------------------
 
 def r2(oper):
     """
@@ -159,10 +160,14 @@ def r2(oper):
         op2.append(o)
         yield(op2)
 
+#------------------------------------------------------------------------------
+
 def printMyList(l,defaultindent=1):
     for e in l:
         print ("\t"*defaultindent+e)
     return(len(l))
+
+#------------------------------------------------------------------------------
 
 def printMyDoubleList(l,prefix="set"):
     count=0
@@ -170,6 +175,8 @@ def printMyDoubleList(l,prefix="set"):
         print("\t"+prefix+str(i))
         count+=printMyList(e,defaultindent=2)
     return count
+
+#------------------------------------------------------------------------------
 
 if __name__ == "__main__":
 
