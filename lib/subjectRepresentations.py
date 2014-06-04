@@ -108,7 +108,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         quantitiesDic = QuantityDic(dict.fromkeys(self.problem.structure.objectSet,operations.unknown),startAsVoid=True)    #get all the objects, init with unknow                                                                                                                  #note : maybe one day => necessary to consider multiple values for a single object
         representations=[]
         for info in self.problem.text.textInformations:
-            quantitiesDic.addValue(info.expertRepresentation.quantity.object, info.expertRepresentation.quantity.value) # update the dic bind object to their values according the representations
+            quantitiesDic.addValue(info.getExpertRepresentation().quantity.object, info.getExpertRepresentation().quantity.value) # update the dic bind object to their values according the representations
             representations.append(0)    #0 indicate that the first (the good one) interpretation is selected
 
         self.problemState=ProblemState(quantitiesDic,goal,representations) # the most important line
