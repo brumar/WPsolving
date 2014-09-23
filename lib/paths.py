@@ -145,9 +145,9 @@ class Path:
         # Some special paths needs to be detected
         # Some paths goes just a back and forth between alternative and expert representation
         # Very often this back and forth is useless, as no use of the alternative representation has not been used by the user
-        # Because of this, traceback function reports paths with just one expert reprensentation used
+        # Because of this, traceback function reports paths with just one expert representation used
         # This is not a big problem, but it generates too many paths. For each text element, there is a possibility to do this back and forth
-        # Then for each of this text element it reports useless paths mentionning that the representation move returning to the expert representation has been used
+        # Then for each of this text element it reports useless paths mentioning that the representation move returning to the expert representation has been used
         # We want to avoid these patterns
 
         # For the sake of the simplicity we stay in the case of only 2 reinterpretations steps are used in the solving process.
@@ -180,7 +180,7 @@ class Solver:
         self.TreePaths=TreePaths(updater) # store all the paths taken by solver
         self.constraints=constraints
 
-    def generalSequentialSolver(self,currentStep="",updater="",level=0,listOfActions=[SOLVER]):
+    def generalSequentialSolver(self, currentStep="", updater="", level = 0, listOfActions=[SOLVER]):
         currentStepId=0
         infos=""
         if(level!=0):

@@ -7,8 +7,8 @@ class IntervalConstraint:
         self.condition=condition
 
 class BehavioralConstraint:
-    def __init__(self,breakTheOldOne):
-        self.breakTheOldOne=breakTheOldOne
+    def __init__(self,breakPreviousInterpretations):
+        self.breakPreviousRepresentation=breakPreviousInterpretations
 
 class Quantity:
     def __init__(self,obj,value):

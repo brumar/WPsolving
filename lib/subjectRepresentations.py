@@ -1,6 +1,6 @@
 import operations
 
-BREAKTHEOLDONE=False
+BREAKPREVIOUSREPRESENTATION=False
 ERASE=True
 
 class InfoStep:
@@ -31,7 +31,7 @@ class Problem: #fields : structure, text
             for tInfo in self.text.textInformations:
                 for rep in tInfo.representations:
                     oldValue=rep.quantity.value
-                    rep.quantity.value=dic[oldValue]
+                    rep.quantity.value=dic[oldValue] # TODO: not a good line as it alters the generic aspect of the problem
 
     def renameObjects(self,renameDic):
         self.text.renameObjects_t(renameDic)
@@ -167,8 +167,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
         oldSelection=self.problemState.representations.pop(indexInfo)
-        breakTheOldOne=self.doIBreakTheOldOne(constraints)
-        if(breakTheOldOne):
+        breakPreviousInterpretations=self.doIBreakTheOldOne(constraints)
+        if(breakPreviousInterpretations):
             oldRep=self.problem.text.textInformations[indexInfo].representations[oldSelection] # TODO
             oldQuanti=oldRep.quantity
             self.problemState.quantitiesDic.removeValue(oldQuanti.object, oldQuanti.value)
@@ -188,8 +188,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         for constraint in constraints:
             classname=constraint.__class__.__name__
             if(classname=="BehavioralConstraint"):
-                return constraint.breakTheOldOne
-        return BREAKTHEOLDONE #default value
+                return constraint.breakPreviousRepresentation
+        return BREAKPREVIOUSREPRESENTATION #default value
 
 
     def updatePossibleRepresentationChange(self,constraints=[]):
@@ -235,9 +235,11 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         objectComputed=infos.unknow
         valueComputed=infos.valueToFind
         for objectToCheck in constraint.listOfObjects:
-            if(objectToCheck in objectComputed) and (constraint.condition==operations.superiorOrEqualTo0) and (valueComputed<=0): # e.g if 'EI' is in poissonEI and poissonEI<0
-                #TODO: new function(condition,value)
-                return False
+            if (valueComputed<0):
+                if(objectToCheck in objectComputed) and (constraint.condition==operations.allowsNegativeValues) : # e.g if 'EI' is in poissonEI and poissonEI<0
+                    return True
+                else:
+                    return False
         return True
 
 

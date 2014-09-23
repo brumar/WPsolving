@@ -1,9 +1,21 @@
 import csv
+import pickle
 
 class SimulatedDatas: # gathering and printing informations accross the different solving models
     def __init__(self):
         self.datas=[] #list of dictionnaries
+        self.datasDic={} # composite dictionnary to get better access to datas
         self.seenLines=[]
+
+    def pickleSave(self,src):
+        output = open(src, 'wb')
+        pickle.dump(self.datas, output)
+
+    def pickleLoad(self,src):
+        pkl_file = open(src, 'rb')
+        self.datas=pickle.load(pkl_file)
+
+
 
     def addDataSet(self,pathList,problemName,solvingModel,reducePaths=True):
         for path in pathList:
@@ -16,13 +28,13 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 else:
                     add=False
             if(add):
-                print(path.formula)
+                #print(path.formula)
                 data["problem"]=problemName
                 data["model"]=solvingModel
                 data["path"]=path
                 self.datas.append(data)
 
-    def createFormulaDic(self,pathList):
+    def createFormulaDic(self,pathList): # unused !
         formulaDic={}
         for path in pathList:
             if path.formula not in formulaDic.keys():
@@ -39,13 +51,13 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 if line not in self.datas[problem,model]:
                     self.datas[problem,model].append(line)
                     #print(line)
+
     def printLines(self):
         for problem,solvingModel in self.datas:
             for line in self.datas[problem,solvingModel]:
                 print(problem,solvingModel,line)
 
     def printCSV(self,csvFile="datas.csv",hideModel=True,hideUnsolved=True,printIndex=True):
-        dataSeen=[]
         with open(csvFile, 'wb') as csvfile:
             writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for data in self.datas:
@@ -57,6 +69,44 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                     else:
                         line=[path.index,path.problemSolved,path.objectFormula,path.interpretationsList]
                         writer.writerow([data["problem"]]+[data["model"]]+line)
+    def printMiniCSV(self, csvFile="minidatas.csv"):
+        dicPbmSetFormula=self.buildMiniDic()
+        self.printMyDic(dicPbmSetFormula, csvFile)
+
+    def printMyDic(self, dic, filename):
+        with open(filename, 'wb') as csvfile:
+            writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for problem in dic.iterkeys():
+                l=list(dic[problem])
+                l.sort()
+                l.sort(lambda x,y: cmp(len(x), len(y) ) )
+                writer.writerow([problem]+l)
+
+
+    def buildMiniDic(self,excludeUnsolvingProcesses=False):
+        dicPbmSetFormula={}
+        for data in self.datas:
+            path=data["path"]
+            if not(excludeUnsolvingProcesses and not path.problemSolved):
+                pbm=data["problem"]
+                if(pbm not in dicPbmSetFormula.keys()):
+                    dicPbmSetFormula[pbm]=set()
+                dicPbmSetFormula[pbm].add(data["path"].formula)
+        return dicPbmSetFormula
+
+    def buildBigDic(self,excludeUnsolvingProcesses=False):
+        self.datasDic={}
+        for data in self.datas:
+            path=data["path"]
+            if not(excludeUnsolvingProcesses and not path.problemSolved):
+                pbm=data["problem"]
+                formula=data["path"].formula
+                if(pbm not in self.datasDic.keys()):
+                    self.datasDic[pbm]={}
+                if (formula not in self.datasDic[pbm].keys() ):
+                    self.datasDic[pbm][formula]=[]
+                self.datasDic[pbm][formula].append({"path":data["path"],"model":data["model"]})
+        return self.datasDic
 
     def printDatas(self):
         for data in self.datas:

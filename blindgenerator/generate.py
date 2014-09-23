@@ -2,23 +2,76 @@ import copy
 import ast
 v={"+":1,"-":-1}
 
+class tripleComparison():
+    def __init__(self):
+        self.dicProblems={}
+
+    def addDic(self,dic,pbm):
+        self.dicProblems[pbm]=dic
+
+class GlobalAprioriDic():
+    def __init__(self):
+        self.problemDic={}
+
+    def addProblem(self,problem,oper,values):
+        pbmdic=AprioriDic()
+        l0,l1,l2,l3=findAllPossiblesFormulas_stringRepresentation_withOptions(oper,values)
+        pbmdic.addDoubleList(l0, "set0")
+        pbmdic.addList(l1, "set1")
+        pbmdic.addDoubleList(l2,"set2")
+        pbmdic.addDoubleList(l3,"set3")
+        self.problemDic[problem]=pbmdic
+
+class AprioriDic():
+    def __init__(self):
+        self.formulaTosetDic={}
+        self.settofomulaDic={}
+
+    def addList(self,l,name):
+        for e in l:
+            self.formulaTosetDic[e]=name
+        self.settofomulaDic[name]=set(l)
+
+    def addDoubleList(self,doublel,name):
+        for l in doublel:
+            self.addList(l,name)
+
+
+
+
+    #===========================================================================
+    # def addSettoformulaElement(self,formula,planned,stratSet):
+    #     if(stratSet in self.settofomulaDic.keys()):
+    #         if planned not in  self.settofomulaDic[stratSet].keys():
+    #             self.settofomulaDic[stratSet]={planned:set([formula])}
+    #         else :
+    #             self.settofomulaDic[stratSet][planned]|=set([formula])
+    #     else:
+    #         self.settofomulaDic[stratSet]={planned:set([formula])}
+    #===========================================================================
+
+
 
 def findAllPossiblesFormulas_stringRepresentation_withOptions(oper,values):
     """
     Custom calls to findAllPossiblesFormulas_stringRepresentation
     corresponding to the kind of formulas we want
     """
+    loper0=r0(oper)
     loper1=r1(oper)
     loper2=r2(oper)
-    listDefault=[]
-    listDefault.append(findAllPossiblesFormulas_stringRepresentation(oper,values))
-    list1=[]
+
+    l1=findAllPossiblesFormulas_stringRepresentation(oper,values)
+    l2=[]
+    l0=[]
+    for opers0 in loper0:
+        l0.append(findAllPossiblesFormulas_stringRepresentation(opers0,values))
     for opers1 in loper1:
-        list1.append(findAllPossiblesFormulas_stringRepresentation(opers1,values))
-    list2=[]
+        l2.append(findAllPossiblesFormulas_stringRepresentation(opers1,values))
+    l3=[]
     for opers2 in loper2:
-        list2.append(findAllPossiblesFormulas_stringRepresentation(opers2,values))
-    return (listDefault,list1,list2)
+        l3.append(findAllPossiblesFormulas_stringRepresentation(opers2,values))
+    return (l0,l1,l2,l3)
 
 #------------------------------------------------------------------------------
 
@@ -137,6 +190,18 @@ def isListFormula(l,operandes):
     """
     return(len(l)==3 and ((l[0] in v.keys() )) and (l[1] in operandes)  and (l[2] in operandes))
 
+
+
+def r0(oper):
+    """
+    generates [a,b];[b,c];[a,c]
+    [a,b,c] being given
+    """
+    for o in oper:
+        for o2 in oper:
+            if(o2!=o):
+                yield([o,o2])
+
 #------------------------------------------------------------------------------
 
 def r1(oper):
@@ -178,11 +243,14 @@ def printMyDoubleList(l,prefix="set"):
 
 #------------------------------------------------------------------------------
 
+#def buildSets(l1,l2,l3):
+
+
 if __name__ == "__main__":
 
     l1,l2,l3=findAllPossiblesFormulas_stringRepresentation_withOptions(["T1","P1","d"],{"P1":7,"T1":16,"d":2})
     print ("solution avec 2 operations, sans reutilisation d'operandes")
-    lenght1=printMyList(l1[0])
+    lenght1=printMyList(l1)
     print(str(lenght1)+" possibillites")
     print ("solution avec 2 operations, avec reutilisation d'operandes")
     lenght2=printMyDoubleList(l2)
@@ -190,6 +258,12 @@ if __name__ == "__main__":
     print ("solution avec 3 operations, avec reutilisation d'operandes")
     lenght3=printMyDoubleList(l3)
     print(str(lenght3)+" possibillites")
+    myAprioriDic=AprioriDic()
+    myAprioriDic.addList(l1, "set1")
+    myAprioriDic.addDoubleList(l2,"set2")
+    myAprioriDic.addDoubleList(l3,"set3")
+    print (myAprioriDic.formulaTosetDic)
+   # mySet=buildSets(l1,l2,l3)
 
     #===============================================================================
     # p=findAllPossiblesFormulas_stringRepresentation(["T1","d","d"],{"P1":7,"T1":16,"d":2,"d2":3})
