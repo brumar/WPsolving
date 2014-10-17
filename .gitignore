@@ -219,10 +219,20 @@ pip-log.txt
 #############
 *.xmind
 notebook
-datasTO_R.csv
-doc.odt
-datas.csv
-evelyne.csv
-evelyne.xlsx
-.ipynb_checkpoints/*
+*.odt
+*.csv
+*.doc
+*.docx
+*.xlsx
+*checkpoints*/
 *.lnk
+trash/
+envoisRichard/*
+evelyne.py
+ProblemJarres.py
+R_Analysis/.RData
+R_Analysis/.Rhistory
+.ipynb_*
+Codagesrésultats 05122013.xls
+
+
