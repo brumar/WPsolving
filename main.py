@@ -12,6 +12,11 @@ from lib.problemBank import *
 from lib.postEvaluation import *
 import csv
 
+## GLOBAL OPTIONS
+alreadySimulated=True
+pickleFile="simulation24072014.pkl"
+newsimulation="simulationtemp.pkl"
+
 
 class SimulationAprioribinderDic():
     """
@@ -61,6 +66,11 @@ def generateAllPossibilities(problem,dropToTest=False,
             #print(solver.TreePaths.treeOutput)
             simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
             print("DONE : model "+model+"( "+str(i)+" )")
+
+
+#===============================================================================
+# STEP 1 : Create problems
+#===============================================================================
 
 #=================PROBLEME 1 : Tc4t=============================================
 #===============================================================================
@@ -425,40 +435,41 @@ problemTc1p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 bank=problemBank()
 bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, problemTc3p, problemTc4t, problemTc4p, problemCc1t, problemCc1p, problemCc2t, problemCc2p, problemCc3t, problemCc3p, problemCc4t, problemCc4p])
 
-#===============================================================================
-# SIMULATIONS
-#===============================================================================
+# #=============================================================================
+# # STEP 2 : SIMULATIONS
+# #=============================================================================
 
-simulatedDatas=SimulatedDatas()
-simulatedDatas.pickleLoad("simulation24072014.pkl")
+if(alreadySimulated): # to avoid long time of computations, we can load and save a pickle file that can replace the simulation
+    simulatedDatas=SimulatedDatas()
+    simulatedDatas.pickleLoad(pickleFile)
+else:
+    generateAllPossibilities(problemTc1t,dropToTest=False)
+    generateAllPossibilities(problemTc1p,dropToTest=False)
+    generateAllPossibilities(problemTc2t,dropToTest=False)
+    generateAllPossibilities(problemTc2p,dropToTest=False)
+    generateAllPossibilities(problemTc3t,dropToTest=False)
+    generateAllPossibilities(problemTc3p,dropToTest=False)
+    generateAllPossibilities(problemTc4t,dropToTest=False)
+    generateAllPossibilities(problemTc4p,dropToTest=False)
 
-#===============================================================================
-# generateAllPossibilities(problemTc1t,dropToTest=False)
-# generateAllPossibilities(problemTc1p,dropToTest=False)
-# generateAllPossibilities(problemTc2t,dropToTest=False)
-# generateAllPossibilities(problemTc2p,dropToTest=False)
-# generateAllPossibilities(problemTc3t,dropToTest=False)
-# generateAllPossibilities(problemTc3p,dropToTest=False)
-# generateAllPossibilities(problemTc4t,dropToTest=False)
-# generateAllPossibilities(problemTc4p,dropToTest=False)
-#
-# generateAllPossibilities(problemCc1t,dropToTest=False)
-# generateAllPossibilities(problemCc1p,dropToTest=False)
-# generateAllPossibilities(problemCc2t,dropToTest=False)
-# generateAllPossibilities(problemCc2p,dropToTest=False)
-# generateAllPossibilities(problemCc3t,dropToTest=False)
-# generateAllPossibilities(problemCc3p,dropToTest=False)
-# generateAllPossibilities(problemCc4t,dropToTest=False)
-# generateAllPossibilities(problemCc4p,dropToTest=False)
-#===============================================================================
+    generateAllPossibilities(problemCc1t,dropToTest=False)
+    generateAllPossibilities(problemCc1p,dropToTest=False)
+    generateAllPossibilities(problemCc2t,dropToTest=False)
+    generateAllPossibilities(problemCc2p,dropToTest=False)
+    generateAllPossibilities(problemCc3t,dropToTest=False)
+    generateAllPossibilities(problemCc3p,dropToTest=False)
+    generateAllPossibilities(problemCc4t,dropToTest=False)
+    generateAllPossibilities(problemCc4p,dropToTest=False)
+    simulatedDatas.pickleSave(newsimulation)
 
-print(simulatedDatas.printCSV(csvFile="datas_big_solved_only_temp.csv",hideUnsolved=False))
-simulatedDatas.printMiniCSV(csvFile="datas_solved_only_temp.csv")
 simulatedDatas.buildBigDic()
-#simulatedDatas.pickleSave("simulationtemp.pkl")
+simulatedDatas.printCSV(csvFile="datas_big_solved_only_temp.csv",hideUnsolved=False)
+simulatedDatas.printMiniCSV(csvFile="datas_solved_only_temp.csv")
+
 
 #===============================================================================
-# A PRIORIS
+# STEP 3 : A priori generator : find all the possible operations with numbers
+# being given
 #===============================================================================
 
 aprioDIC=GlobalAprioriDic()
@@ -481,18 +492,18 @@ aprioDIC.addProblem("Tc3t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2
 aprioDIC.addProblem("Tc1p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 
 #===============================================================================
-# EMPIRICAL DATAS
+# STEP 4 : Read empiricical datas
 #===============================================================================
 
+## We read the dataset of formulas (children answers)
 obsdic=globalEmpiricalDic()
 obsdic.readCsv("mergedDatas_final.csv")
 
 
-#===============================================================================
 # #=============================================================================
-# # CONFRONTATION
+# # STEP 5 : Compare empirical datas with simulated datas using the a priori
+# # formula dataset
 # #=============================================================================
-#===============================================================================
 
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 sim=SimulationAprioribinderDic(aprioDIC,simulationDic)
@@ -502,11 +513,11 @@ d2.printCSV("CONFRONTATION_SOLVED_ONLY_temp.csv")
 
 
 #===============================================================================
-# POST_EVALUATION
+# POST_EVALUATION -- (experimental)
 #===============================================================================
-eval=weightEvaluator()
-eval.prepareStructure(bank)
-eval.bindConfrontationToPathsDatas(d2,simulatedDatas.datasDic)#simDatasDic
-eval.normaliseWeightByPbm()
-eval.printCSV()
+weight_eval=weightEvaluator()
+weight_eval.prepareStructure(bank)
+weight_eval.bindConfrontationToPathsDatas(d2,simulatedDatas.datasDic)#simDatasDic
+weight_eval.normaliseWeightByPbm()
+weight_eval.printCSV()
 
