@@ -15,7 +15,11 @@ class SimulationAprioriEmpiricbinderDic():
 
     def listAndCompare(self,dicPbmSetFormula,observationDic):
         """
-        check the formulas not in the a priori set
+        Not mandatory for analysis, does not involve changes in
+        SimulationAprioriEmpiricbinderDic instance.
+
+        Check the formulas which are not in the a priori set but in the
+        simulation set. This designed for debugging purpose.
         """
         for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
             print(pbm)
