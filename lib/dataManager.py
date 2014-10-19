@@ -23,7 +23,7 @@ class SimulatedDatas: # gathering and printing informations accross the differen
             add=True
             if (reducePaths):
                 curLine=[problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
-                if (curLine not in self.seenLines):
+                if (curLine not in self.seenLines): # We add datas only when the path is new (formula + reintepretations used)
                     self.seenLines.append(curLine)
                 else:
                     add=False
