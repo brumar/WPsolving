@@ -6,7 +6,8 @@ class SimulatedDatas: # gathering and printing informations accross the differen
         self.datas=[] #list of dictionnaries (selected datas)
         self.datasBrut=[] #list of dictionnaries (all the datas)
         self.datasDic={} # composite dictionnary to get better access to datas
-        self.seenLines=[]
+        self.seenLinesDatas=[]
+        self.seenLinesDatasBrut=[]
 
     def pickleSave(self,src):
         output = open(src, 'wb')
@@ -22,12 +23,17 @@ class SimulatedDatas: # gathering and printing informations accross the differen
             data["problem"]=problemName
             data["model"]=solvingModel
             data["path"]=path
-            self.datasBrut.append(data)
-            curLine=[problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
-            if (curLine not in self.seenLines): # We add datas only when the path is new (formula + reintepretations used)
-                self.seenLines.append(curLine)
+
+            curLineDatas=[problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
+            if (curLineDatas not in self.seenLinesDatas): # We add datas only when the path is new (formula + reintepretations used)
+                self.seenLinesDatas.append(curLineDatas)
                 self.datas.append(data)
 
+            curLineDatasBrut=[solvingModel,problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
+            # same as curLineDatas but with solvingModel taken into account
+            if (curLineDatasBrut not in self.seenLinesDatasBrut):
+                self.seenLinesDatasBrut.append(curLineDatasBrut)
+                self.datasBrut.append(data)
 
     def createFormulaDic(self,pathList): # unused !
         formulaDic={}
@@ -53,17 +59,21 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 print(problem,solvingModel,line)
 
     def printCSV(self,csvFile="datas.csv",hideModel=True,hideUnsolved=True,printIndex=True):
+        if(hideModel):
+            dataToWorkWith=self.datas
+        else:
+            dataToWorkWith=self.datasBrut
         with open(csvFile, 'wb') as csvfile:
             writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for data in self.datas:
+            for data in dataToWorkWith:
                 path=data["path"]
                 if not(hideUnsolved and not path.problemSolved):
+                    line=[path.index,path.formula,path.problemSolved,path.objectFormula,path.interpretationsList]
                     if(hideModel):
-                        line=[path.index,path.formula,path.problemSolved,path.objectFormula,path.interpretationsList]
                         writer.writerow([data["problem"]]+line)
                     else:
-                        line=[path.index,path.problemSolved,path.objectFormula,path.interpretationsList]
                         writer.writerow([data["problem"]]+[data["model"]]+line)
+
     def printMiniCSV(self, csvFile="minidatas.csv"):
         dicPbmSetFormula=self.buildMiniDic()
         self.printMyDic(dicPbmSetFormula, csvFile)
