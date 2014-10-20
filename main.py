@@ -18,7 +18,7 @@ start = time.time()
 timestamp = datetime.datetime.fromtimestamp(start).strftime('%Y_%m_%d__%H_%M_%S')
 
 ## GLOBAL OPTIONS
-alreadySimulated=False
+alreadySimulated=True
 pickleFile="simulation24072014.pkl"
 newsimulation="simulation"+timestamp+".pkl"
 
@@ -66,7 +66,6 @@ def generateAllPossibilities(problem,dropToTest=False,
     constraints=[c1]
     solver=Solver(upD,constraints)
     solver.generalSequentialSolver(listOfActions=[Solver.SOLVER]) # = just solve
-    upD.startAsUnderstood()
     solver.TreePaths.scanTree()
     #print(solver.TreePaths.treeOutput)
     simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
@@ -482,10 +481,13 @@ else:
     generateAllPossibilities(problemCc4p,dropToTest=False)
 
     simulatedDatas.pickleSave(newsimulation)
-    print('The simulation took', time.time()-start, 'seconds.')
+    print('The simulation took '+str(time.time()-start)+' seconds.')
+    print(len(simulatedDatas.datas))
+    print(len(simulatedDatas.datasBrut))
 
 simulatedDatas.buildBigDic()
-simulatedDatas.printCSV(csvFile="simulation"+timestamp+".csv",hideUnsolved=False)
+simulatedDatas.printCSV(csvFile="simulation"+timestamp+".csv",hideUnsolved=True)
+simulatedDatas.printCSV(csvFile="simulationWithModel"+timestamp+".csv",hideModel=False,hideUnsolved=True)
 simulatedDatas.printMiniCSV(csvFile="Mini_simulation"+timestamp+".csv")
 
 
@@ -530,9 +532,11 @@ obsdic.readCsv("mergedDatas_final.csv")
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 sim=SimulationAprioribinderDic(aprioDIC,simulationDic)
 d2=SimulationAprioriEmpiricbinderDic(sim,obsdic)
-#d2.excludeGoodAnswer()
+formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 1, 2, 2, 2, 3]'])
+formulasToExclude2=simulatedDatas.findFormulas(models=['goodAnswers'])
 d2.listAndCompare(sim,obsdic)
-d2.printCSV("simulations_versus_observations"+timestamp+".csv")
+d2.printCSV("simulations_versus_observations"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
+d2.printCSV("simulations_versus_observations"+timestamp+".csv",formulasToExclude2) # print the csv which will be used for R analysis
 
 
 #===============================================================================

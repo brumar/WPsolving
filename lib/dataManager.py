@@ -113,6 +113,18 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 self.datasDic[pbm][formula].append({"path":data["path"],"model":data["model"]})
         return self.datasDic
 
+    def findFormulas(self,models):
+        dicPbmForms={}
+        for pbm in self.datasDic.keys():
+            forms=[]
+            for data in self.datas:
+                f=data["path"].formula
+                if(data["model"]in models) and (f not in forms ):
+                    forms.append(f)
+            dicPbmForms[pbm]=forms
+        return dicPbmForms
+
+
     def printDatas(self):
         for data in self.datas:
             path=data["path"]

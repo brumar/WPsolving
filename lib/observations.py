@@ -35,15 +35,19 @@ class SimulationAprioriEmpiricbinderDic():
                         formulaToBePrinted="No Answer"
                     print(formulaToBePrinted+" : "+str(observationDic.problemDic[pbm][formula])+" occurences")
 
-    def printCSV(self,filename):
+
+    def printCSV(self,filename,formulasToExclude={}):
+        noExclusion=(len(formulasToExclude.keys())==0)
         with open(filename, 'wb') as csvfile:
             writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(["problem"]+["set"]+["formula"]+["selected"]+["occurrences"])
             for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
                 for setName in  self.dicPbmSetFormulaPlannedObserved[pbm].iterkeys():
                     for formula in  self.dicPbmSetFormulaPlannedObserved[pbm][setName].iterkeys():
-                        planned = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][0]
-                        observationsCount = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][1]
-                        writer.writerow([pbm]+[setName]+[formula]+[planned]+[observationsCount])
+                        if noExclusion or (formula not in formulasToExclude[pbm]):
+                            planned = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][0]
+                            observationsCount = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][1]
+                            writer.writerow([pbm]+[setName]+[formula]+[planned]+[observationsCount])
 
 
 
