@@ -32,7 +32,7 @@ class weightEvaluator():
                 for formula in dic[problem][set]:
                     if dic[problem][set][formula][0]==True:
                         numberOfObservations=dic[problem][set][formula][1]
-                        print("found")
+                        #print("found")
                         congruentLines=(len(dDic[problem][formula]))
                         for pathLine in dDic[problem][formula]:
                             path=pathLine["path"]
@@ -41,9 +41,9 @@ class weightEvaluator():
                                 verbalDescription=path.interpretationsList[interpIndex]
                                 textIndex=path.richInterpretationsList[interpIndex].indexTextInformation
                                 repIndex=path.richInterpretationsList[interpIndex].indexSelectedRepresentation
-                                print(verbalDescription,textIndex,repIndex)
+                                #print(verbalDescription,textIndex,repIndex)
                                 self.datas[problem][textIndex][repIndex]["occurences"]+=float(numberOfObservations)/congruentLines
-                                print(self.datas[problem][textIndex][repIndex]["occurences"])
+                                #print(self.datas[problem][textIndex][repIndex]["occurences"])
                                 if( self.datas[problem][textIndex][repIndex]["verbalDescription"]==""):
                                     self.datas[problem][textIndex][repIndex]["verbalDescription"]=verbalDescription
 
