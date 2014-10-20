@@ -19,7 +19,8 @@ class SimulationAprioriEmpiricbinderDic():
         SimulationAprioriEmpiricbinderDic instance.
 
         Check the formulas which are not in the a priori set but in the
-        simulation set. This designed for debugging purpose.
+        simulation set. This designed for debugging purpose but also to count the number
+        of errors that are not in our scope.
         """
         for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
             print(pbm)
@@ -29,7 +30,10 @@ class SimulationAprioriEmpiricbinderDic():
                     if( formula in  self.dicPbmSetFormulaPlannedObserved[pbm][setName].iterkeys()):
                         booli=True
                 if not booli:
-                    print(formula+" : "+str(observationDic.problemDic[pbm][formula])+" occurences")
+                    formulaToBePrinted=formula
+                    if (formula=="")or(formula==" ")or(formula=="Neant"):
+                        formulaToBePrinted="No Answer"
+                    print(formulaToBePrinted+" : "+str(observationDic.problemDic[pbm][formula])+" occurences")
 
     def printCSV(self,filename):
         with open(filename, 'wb') as csvfile:
