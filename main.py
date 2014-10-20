@@ -13,14 +13,16 @@ from lib.postEvaluation import *
 import csv
 import datetime
 import time
+import os
 
 start = time.time()
 timestamp = datetime.datetime.fromtimestamp(start).strftime('%Y_%m_%d__%H_%M_%S')
-
+simulationDirectory="simulations/"+timestamp+"/"
+os.makedirs(simulationDirectory)
 ## GLOBAL OPTIONS
 alreadySimulated=True
 pickleFile="simulation24072014.pkl"
-newsimulation="simulation"+timestamp+".pkl"
+newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
 
 
 class SimulationAprioribinderDic():
@@ -458,6 +460,9 @@ bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, 
 # #=============================================================================
 # # STEP 2 : SIMULATIONS
 # #=============================================================================
+
+
+
 simulatedDatas=SimulatedDatas() # Most important instance of the programm
                                 # Contains all the informations related to simulations
 if(alreadySimulated): # to avoid long time of computations, we can load and save a pickle file that can replace the simulation
@@ -480,15 +485,14 @@ else:
     generateAllPossibilities(problemCc4t,dropToTest=False)
     generateAllPossibilities(problemCc4p,dropToTest=False)
 
-    simulatedDatas.pickleSave(newsimulation)
-    print('The simulation took '+str(time.time()-start)+' seconds.')
-    print(len(simulatedDatas.datas))
-    print(len(simulatedDatas.datasBrut))
 
+    print('The simulation took '+str(time.time()-start)+' seconds.')
+
+simulatedDatas.pickleSave(newsimulation)
 simulatedDatas.buildBigDic()
-simulatedDatas.printCSV(csvFile="simulation"+timestamp+".csv",hideUnsolved=True)
-simulatedDatas.printCSV(csvFile="simulationWithModel"+timestamp+".csv",hideModel=False,hideUnsolved=True)
-simulatedDatas.printMiniCSV(csvFile="Mini_simulation"+timestamp+".csv")
+simulatedDatas.printCSV(csvFile=simulationDirectory+"simulation"+timestamp+".csv",hideUnsolved=True)
+simulatedDatas.printCSV(csvFile=simulationDirectory+"simulationWithModel"+timestamp+".csv",hideModel=True,hideUnsolved=True)
+simulatedDatas.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"+timestamp+".csv")
 
 
 #===============================================================================
@@ -535,8 +539,8 @@ d2=SimulationAprioriEmpiricbinderDic(sim,obsdic)
 formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 1, 2, 2, 2, 3]'])
 formulasToExclude2=simulatedDatas.findFormulas(models=['goodAnswers'])
 d2.listAndCompare(sim,obsdic)
-d2.printCSV("simulations_versus_observations"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
-d2.printCSV("simulations_versus_observations"+timestamp+".csv",formulasToExclude2) # print the csv which will be used for R analysis
+d2.printCSV(simulationDirectory+"simulations_versus_observations_exclusionOfLateReinterpretations"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
+d2.printCSV(simulationDirectory+"simulations_versus_observations_noExclusion"+timestamp+".csv",formulasToExclude2) # print the csv which will be used for R analysis
 
 
 #===============================================================================
@@ -546,5 +550,5 @@ weight_eval=weightEvaluator()
 weight_eval.prepareStructure(bank)
 weight_eval.bindConfrontationToPathsDatas(d2,simulatedDatas.datasDic)#simDatasDic
 weight_eval.normaliseWeightByPbm()
-weight_eval.printCSV("weightAnalysis"+timestamp+".csv")
+weight_eval.printCSV(simulationDirectory+"weightAnalysis"+timestamp+".csv")
 
