@@ -3,8 +3,8 @@ import pickle
 
 class SimulatedDatas: # gathering and printing informations accross the different solving models
     def __init__(self):
-        self.datas=[] #list of dictionnaries
-        self.datasBrut=[] #list of dictionnaries
+        self.datas=[] #list of dictionnaries (selected datas)
+        self.datasBrut=[] #list of dictionnaries (all the datas)
         self.datasDic={} # composite dictionnary to get better access to datas
         self.seenLines=[]
 
@@ -16,22 +16,18 @@ class SimulatedDatas: # gathering and printing informations accross the differen
         pkl_file = open(src, 'rb')
         self.datas=pickle.load(pkl_file)
 
-    def addDataSet(self,pathList,problemName,solvingModel,reducePaths=True):
+    def addDataSet(self,pathList,problemName,solvingModel):
         for path in pathList:
             data={}
             data["problem"]=problemName
             data["model"]=solvingModel
             data["path"]=path
             self.datasBrut.append(data)
-            add=True
-            if (reducePaths):
-                curLine=[problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
-                if (curLine not in self.seenLines): # We add datas only when the path is new (formula + reintepretations used)
-                    self.seenLines.append(curLine)
-                else:
-                    add=False
-            if(add):
+            curLine=[problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
+            if (curLine not in self.seenLines): # We add datas only when the path is new (formula + reintepretations used)
+                self.seenLines.append(curLine)
                 self.datas.append(data)
+
 
     def createFormulaDic(self,pathList): # unused !
         formulaDic={}
