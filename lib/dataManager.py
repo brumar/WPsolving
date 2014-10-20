@@ -4,6 +4,7 @@ import pickle
 class SimulatedDatas: # gathering and printing informations accross the different solving models
     def __init__(self):
         self.datas=[] #list of dictionnaries
+        self.datasBrut=[] #list of dictionnaries
         self.datasDic={} # composite dictionnary to get better access to datas
         self.seenLines=[]
 
@@ -15,11 +16,13 @@ class SimulatedDatas: # gathering and printing informations accross the differen
         pkl_file = open(src, 'rb')
         self.datas=pickle.load(pkl_file)
 
-
-
     def addDataSet(self,pathList,problemName,solvingModel,reducePaths=True):
         for path in pathList:
             data={}
+            data["problem"]=problemName
+            data["model"]=solvingModel
+            data["path"]=path
+            self.datasBrut.append(data)
             add=True
             if (reducePaths):
                 curLine=[problemName,path.problemSolved,path.formula,path.objectFormula,set(path.interpretationsList)]
@@ -28,10 +31,6 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 else:
                     add=False
             if(add):
-                #print(path.formula)
-                data["problem"]=problemName
-                data["model"]=solvingModel
-                data["path"]=path
                 self.datas.append(data)
 
     def createFormulaDic(self,pathList): # unused !
