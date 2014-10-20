@@ -57,9 +57,11 @@ class weightEvaluator():
                 for rep in self.datas[pbm][info]:
                     if(self.datas[pbm][info][rep]["verbalDescription"]!=""):
                         self.datas[pbm][info][rep]["weight"]=float(self.datas[pbm][info][rep]["occurences"])/suma
-                        print(pbm)
-                        print(self.datas[pbm][info][rep]["verbalDescription"])
-                        print(self.datas[pbm][info][rep]["weight"])
+                        #=======================================================
+                        # print(pbm)
+                        # print(self.datas[pbm][info][rep]["verbalDescription"])
+                        # print(self.datas[pbm][info][rep]["weight"])
+                        #=======================================================
 
     def printCSV(self,csvFile="datasWeight.csv"):
             with open(csvFile, 'wb') as csvfile:
