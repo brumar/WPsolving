@@ -17,12 +17,14 @@ import os
 import logging
 
 
-
+simulationName=raw_input("simulation Name ? : ")
+#simulationName=""
 start = time.time()
 timeformat='%Y_%m_%d__%H_%M_%S'
 timestamp = datetime.datetime.fromtimestamp(start).strftime(timeformat)
-simulationDirectory="simulations/"+timestamp+"/"
+simulationDirectory="simulations/"+timestamp+"_"+simulationName+"/"
 os.makedirs(simulationDirectory)
+
 ## GLOBAL OPTIONS
 alreadySimulated=False
 pickleFile="simulation24072014.pkl"
