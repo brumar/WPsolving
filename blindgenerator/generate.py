@@ -237,7 +237,7 @@ def printMyList(l,defaultindent=1):
 def printMyDoubleList(l,prefix="set"):
     count=0
     for i,e in enumerate(l):
-        print("\t"+prefix+str(i))
+        logging.info("\t"+prefix+str(i))
         count+=printMyList(e,defaultindent=2)
     return count
 
@@ -251,13 +251,13 @@ if __name__ == "__main__":
     l1,l2,l3=findAllPossiblesFormulas_stringRepresentation_withOptions(["T1","P1","d"],{"P1":7,"T1":16,"d":2})
     print ("solution avec 2 operations, sans reutilisation d'operandes")
     lenght1=printMyList(l1)
-    print(str(lenght1)+" possibillites")
+    logging.info(str(lenght1)+" possibillites")
     print ("solution avec 2 operations, avec reutilisation d'operandes")
     lenght2=printMyDoubleList(l2)
-    print(str(lenght2)+" possibillites")
+    logging.info(str(lenght2)+" possibillites")
     print ("solution avec 3 operations, avec reutilisation d'operandes")
     lenght3=printMyDoubleList(l3)
-    print(str(lenght3)+" possibillites")
+    logging.info(str(lenght3)+" possibillites")
     myAprioriDic=AprioriDic()
     myAprioriDic.addList(l1, "set1")
     myAprioriDic.addDoubleList(l2,"set2")

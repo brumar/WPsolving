@@ -1,5 +1,6 @@
 import csv
 import pickle
+import logging
 
 class SimulatedDatas: # gathering and printing informations accross the different solving models
     def __init__(self):
@@ -51,12 +52,12 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 line=[key,path.problemSolved,path.objectFormula,set(path.interpretationsList)]
                 if line not in self.datas[problem,model]:
                     self.datas[problem,model].append(line)
-                    #print(line)
+                    #logging.info(line)
 
     def printLines(self):
         for problem,solvingModel in self.datas:
             for line in self.datas[problem,solvingModel]:
-                print(problem,solvingModel,line)
+                logging.info(problem,solvingModel,line)
 
     def printCSV(self,csvFile="datas.csv",hideModel=True,hideUnsolved=True,printIndex=True):
         if(hideModel):
@@ -117,10 +118,11 @@ class SimulatedDatas: # gathering and printing informations accross the differen
         dicPbmForms={}
         for pbm in self.datasDic.keys():
             forms=[]
-            for data in self.datas:
-                f=data["path"].formula
-                if(data["model"]in models) and (f not in forms ):
-                    forms.append(f)
+            for data in self.datasBrut:
+                if(data["problem"]==pbm):
+                    f=data["path"].formula
+                    if(data["model"]in models) and (f not in forms ):
+                        forms.append(f)
             dicPbmForms[pbm]=forms
         return dicPbmForms
 
@@ -128,7 +130,7 @@ class SimulatedDatas: # gathering and printing informations accross the differen
     def printDatas(self):
         for data in self.datas:
             path=data["path"]
-            print(path.formula)
+            logging.info(path.formula)
 
 
 

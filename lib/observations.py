@@ -1,4 +1,5 @@
 import csv
+import logging
 
 class SimulationAprioriEmpiricbinderDic():
     def __init__(self,dicPbmSetFormula,globalobservationDic):
@@ -23,7 +24,7 @@ class SimulationAprioriEmpiricbinderDic():
         of errors that are not in our scope.
         """
         for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
-            print(pbm)
+            logging.info(pbm)
             for formula in observationDic.problemDic[pbm].keys():
                 booli=False
                 for setName in  self.dicPbmSetFormulaPlannedObserved[pbm].iterkeys():
@@ -33,7 +34,7 @@ class SimulationAprioriEmpiricbinderDic():
                     formulaToBePrinted=formula
                     if (formula=="")or(formula==" ")or(formula=="Neant"):
                         formulaToBePrinted="No Answer"
-                    print(formulaToBePrinted+" : "+str(observationDic.problemDic[pbm][formula])+" occurences")
+                    logging.info(formulaToBePrinted+" : "+str(observationDic.problemDic[pbm][formula])+" occurences")
 
 
     def printCSV(self,filename,formulasToExclude={}):

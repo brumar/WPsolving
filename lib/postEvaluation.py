@@ -32,7 +32,7 @@ class weightEvaluator():
                 for formula in dic[problem][set]:
                     if dic[problem][set][formula][0]==True:
                         numberOfObservations=dic[problem][set][formula][1]
-                        #print("found")
+                        #logging.info("found")
                         congruentLines=(len(dDic[problem][formula]))
                         for pathLine in dDic[problem][formula]:
                             path=pathLine["path"]
@@ -41,9 +41,9 @@ class weightEvaluator():
                                 verbalDescription=path.interpretationsList[interpIndex]
                                 textIndex=path.richInterpretationsList[interpIndex].indexTextInformation
                                 repIndex=path.richInterpretationsList[interpIndex].indexSelectedRepresentation
-                                #print(verbalDescription,textIndex,repIndex)
+                                #logging.info(verbalDescription,textIndex,repIndex)
                                 self.datas[problem][textIndex][repIndex]["occurences"]+=float(numberOfObservations)/congruentLines
-                                #print(self.datas[problem][textIndex][repIndex]["occurences"])
+                                #logging.info(self.datas[problem][textIndex][repIndex]["occurences"])
                                 if( self.datas[problem][textIndex][repIndex]["verbalDescription"]==""):
                                     self.datas[problem][textIndex][repIndex]["verbalDescription"]=verbalDescription
 
@@ -58,9 +58,9 @@ class weightEvaluator():
                     if(self.datas[pbm][info][rep]["verbalDescription"]!=""):
                         self.datas[pbm][info][rep]["weight"]=float(self.datas[pbm][info][rep]["occurences"])/suma
                         #=======================================================
-                        # print(pbm)
-                        # print(self.datas[pbm][info][rep]["verbalDescription"])
-                        # print(self.datas[pbm][info][rep]["weight"])
+                        # logging.info(pbm)
+                        # logging.info(self.datas[pbm][info][rep]["verbalDescription"])
+                        # logging.info(self.datas[pbm][info][rep]["weight"])
                         #=======================================================
 
     def printCSV(self,csvFile="datasWeight.csv"):

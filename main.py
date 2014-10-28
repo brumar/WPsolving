@@ -14,16 +14,23 @@ import csv
 import datetime
 import time
 import os
+import logging
+
+
 
 start = time.time()
-timestamp = datetime.datetime.fromtimestamp(start).strftime('%Y_%m_%d__%H_%M_%S')
+timeformat='%Y_%m_%d__%H_%M_%S'
+timestamp = datetime.datetime.fromtimestamp(start).strftime(timeformat)
 simulationDirectory="simulations/"+timestamp+"/"
 os.makedirs(simulationDirectory)
 ## GLOBAL OPTIONS
-alreadySimulated=True
+alreadySimulated=False
 pickleFile="simulation24072014.pkl"
 newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
 
+## LOGGING
+logging.basicConfig(filename=simulationDirectory+'simulation.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt=timeformat)
+logging.getLogger().addHandler(logging.StreamHandler())
 
 class SimulationAprioribinderDic():
     """
@@ -45,7 +52,7 @@ class SimulationAprioribinderDic():
 
 
 def generateAllPossibilities(problem,dropToTest=False,
-                             unorderedSteps=[Solver.INTERP,Solver.INTERP,Solver.SCHEMA,Solver.SCHEMA,Solver.SCHEMA],
+                             unorderedSteps=[Solver.INTERP,Solver.SCHEMA,Solver.SCHEMA,Solver.SCHEMA],
                              breakPreviousInterpretations="undefined"):
     """
     The main function of this program, generate all the paths possible for a problem
@@ -54,7 +61,7 @@ def generateAllPossibilities(problem,dropToTest=False,
     by the optionsFactory script. New developpments should
     to find as much as paths as possible.
     """
-    print(problem.name)
+    logging.info(problem.name)
     global simulatedDatas #BAD LINE TODO:Fix this
 
 
@@ -69,9 +76,9 @@ def generateAllPossibilities(problem,dropToTest=False,
     solver=Solver(upD,constraints)
     solver.generalSequentialSolver(listOfActions=[Solver.SOLVER]) # = just solve
     solver.TreePaths.scanTree()
-    #print(solver.TreePaths.treeOutput)
+    #logging.info(solver.TreePaths.treeOutput)
     simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
-    print("DONE : model "+model)
+    logging.info("DONE : model "+model)
 
     optionsList=optionsFactory(unorderedSteps) # will generate all the options possible with 2 interpretations step randomly occuring
     for i,options in enumerate(optionsList) :
@@ -85,9 +92,9 @@ def generateAllPossibilities(problem,dropToTest=False,
             solver=Solver(upD,constraints)
             solver.generalSequentialSolver(listOfActions=options[0])
             solver.TreePaths.scanTree()
-            #print(solver.TreePaths.treeOutput)
+            #logging.info(solver.TreePaths.treeOutput)
             simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
-            print("DONE : model "+model+"( "+str(i)+" )")
+            logging.info("DONE : model "+model+"( "+str(i)+" )")
 
 
 #===============================================================================
@@ -310,7 +317,7 @@ problemCc1t.name="Cc1t"
 # solver=Solver(upD,constraints)
 # solver.generalSequentialSolver(listOfActions=[1,1,3])
 # solver.TreePaths.scanTree()
-# print(solver.TreePaths.treeOutput)
+# logging.info(solver.TreePaths.treeOutput)
 #===============================================================================
 
 #===============================================================================
@@ -486,12 +493,12 @@ else:
     generateAllPossibilities(problemCc4p,dropToTest=False)
 
 
-    print('The simulation took '+str(time.time()-start)+' seconds.')
+    logging.info('The simulation took '+str(time.time()-start)+' seconds.')
 
 simulatedDatas.pickleSave(newsimulation)
 simulatedDatas.buildBigDic()
 simulatedDatas.printCSV(csvFile=simulationDirectory+"simulation"+timestamp+".csv",hideUnsolved=True)
-simulatedDatas.printCSV(csvFile=simulationDirectory+"simulationWithModel"+timestamp+".csv",hideModel=True,hideUnsolved=True)
+simulatedDatas.printCSV(csvFile=simulationDirectory+"simulationWithModel"+timestamp+".csv",hideModel=False,hideUnsolved=True)
 simulatedDatas.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"+timestamp+".csv")
 
 
@@ -536,9 +543,10 @@ obsdic.readCsv("mergedDatas_final.csv")
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 sim=SimulationAprioribinderDic(aprioDIC,simulationDic)
 d2=SimulationAprioriEmpiricbinderDic(sim,obsdic)
-formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 1, 2, 2, 2, 3]'])
+formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 2, 2, 2, 3]'])
 formulasToExclude2=simulatedDatas.findFormulas(models=['goodAnswers'])
-d2.listAndCompare(sim,obsdic)
+logging.info(formulasToExclude2)
+#d2.listAndCompare(sim,obsdic)
 d2.printCSV(simulationDirectory+"simulations_versus_observations_exclusionOfLateReinterpretations"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
 d2.printCSV(simulationDirectory+"simulations_versus_observations_noExclusion"+timestamp+".csv",formulasToExclude2) # print the csv which will be used for R analysis
 

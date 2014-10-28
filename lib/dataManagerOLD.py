@@ -24,11 +24,11 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 line=[key,path.problemSolved,path.objectFormula,set(path.interpretationsList)]
                 if line not in self.datas[problem,model]:
                     self.datas[problem,model].append(line)
-                    #print(line)
+                    #logging.info(line)
     def printLines(self):
         for problem,solvingModel in self.datas:
             for line in self.datas[problem,solvingModel]:
-                print(problem,solvingModel,line)
+                logging.info(problem,solvingModel,line)
 
     def printCSV(self,csvFile="datas.csv",fieldToHide=[]):
         with open(csvFile, 'wb') as csvfile:
