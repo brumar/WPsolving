@@ -117,11 +117,17 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
 
     def applyMove(self,move,constraints=[]):
         if (move.type=="schema"):
-            return self.applySchema(move.move,constraints)
+            return self.tryApplySchema(move.move,constraints)
         if (move.type=="RepresentationMove"):
             return self.applyRepresentationMove(move.move,constraints)
 
-    def applySchema(self,schema,constraints=[],trial=False): # when trial is True, the unknown is computed without any change in the problemState
+    def tryApplySchema(self,schema,constraints=[],trial=False):
+        """
+        the function that try to compute an unknown quantity
+        when trial is True, the unknown is computed without any change in the problemState
+        it is usefull to check the compatibility with the constraints
+        """
+        #
         infos=InfoStep()
         if(self.isSchemaAppliable(schema)):
             qdic=self.problemState.quantitiesDic
@@ -231,7 +237,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             return True
 
     def checkIntervall(self,schema,constraint): #listOfObjects, condition
-        infos=self.applySchema(schema,trial=True)
+        infos=self.tryApplySchema(schema,trial=True)
         objectComputed=infos.unknow
         valueComputed=infos.valueToFind
         for objectToCheck in constraint.listOfObjects:
@@ -244,7 +250,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
 
 
 
-    #def applySchema(self,schema):
+    #def tryApplySchema(self,schema):
 
 class ProblemState:
     def __init__(self,quantitiesDic,goal,representations):
