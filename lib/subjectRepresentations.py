@@ -211,14 +211,14 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
     def isSchemaAppliable(self,schema,constraints=[]):
         dic=self.problemState.quantitiesDic
         n,unknow=findTheUnknown(schema,dic)
-        if(n!=1):
+        if(n!=1): # the number of unknown in a schema must be equal to one
             return False
-        else:
+        else:# in this case we check the consistency with the constraints of the solver
             return self.isConstraintsRespectedBySchema(schema,constraints)
 
     def isConstraintsRespectedBySchema(self,schema,constraints=[]):
         isAllConstraintsRespectedBySchema=True
-        for constraint in constraints:
+        for constraint in constraints: # all the constraints must be in agreement
             if not (self.isConstraintRespectedBySchema(schema,constraint)):
                 isAllConstraintsRespectedBySchema=False
         return isAllConstraintsRespectedBySchema

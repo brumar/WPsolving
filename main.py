@@ -16,7 +16,7 @@ import time
 import os
 import logging
 
-
+## SIMULATION DIRECTORY
 simulationName=raw_input("simulation Name ? : ")
 #simulationName=""
 start = time.time()
