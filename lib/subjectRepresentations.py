@@ -103,7 +103,10 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         self.appliableSchemaList=[]
         self.possibleRepresentationChangeList=[]
 
-    def startAsUnderstood(self):    #initialise all the quantities, goals and representations, as experts do
+    def startAsUnderstood(self):
+        '''
+        initialise all the quantities, goals and representations as experts ones
+        '''
         goal=self.problem.text.goal.expertGoal
         quantitiesDic = QuantityDic(dict.fromkeys(self.problem.structure.objectSet,operations.unknown),startAsVoid=True)    #get all the objects, init with unknow                                                                                                                  #note : maybe one day => necessary to consider multiple values for a single object
         representations=[]
@@ -129,44 +132,43 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         """
         #
         infos=InfoStep()
-        if(self.isSchemaAppliable(schema)):
-            qdic=self.problemState.quantitiesDic
-            n,unknow=findTheUnknown(schema,qdic)
-            positionTofind=schema.positions[unknow]
-            positionList=['qf','q1','q2']
-            positionList.remove(positionTofind)
-            operation=schema.operation
-            if(positionTofind!='qf'):
-                operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
-            if(positionTofind=='q2'):   #if q2 is the quantity to find then the operation needed is always a substraction
-                operation=operations.soustraction
+        qdic=self.problemState.quantitiesDic
+        n,unknow=findTheUnknown(schema,qdic)
+        positionTofind=schema.positions[unknow]
+        positionList=['qf','q1','q2']
+        positionList.remove(positionTofind)
+        operation=schema.operation
+        if(positionTofind!='qf'):
+            operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
+        if(positionTofind=='q2'):   #if q2 is the quantity to find then the operation needed is always a substraction
+            operation=operations.soustraction
 
-            objectA=schema.objects[positionList[0]]
-            valueA=qdic.find(objectA)
-            objectB=schema.objects[positionList[1]]
-            valueB=qdic.find(objectB)
+        objectA=schema.objects[positionList[0]]
+        valueA=qdic.find(objectA)
+        objectB=schema.objects[positionList[1]]
+        valueB=qdic.find(objectB)
 
-            if (valueB>valueA):
-                valueA, valueB = valueB, valueA #invert the values
-                objectA, objectB = objectB, objectA #invert the object
+        if (valueB>valueA):
+            valueA, valueB = valueB, valueA #invert the values
+            objectA, objectB = objectB, objectA #invert the object
 
-            valueToFind=valueA+valueB*(operation)
+        valueToFind=valueA+valueB*(operation)
 
-            stringOperation='-'
-            if(operation==1):
-                stringOperation='+'
-            infos.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" "
-            infos.shortInfo=infos.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')' #12-3=9 (ViandeEF)
-            infos.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
-            infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" " #PoissonEF-PoissonEFminusViandeEF=ViandeEF
-            infos.unknow=unknow
-            infos.valueToFind=valueToFind
-            infos.type="schema"
-            infos.operands=[objectA,objectB]
+        stringOperation='-'
+        if(operation==1):
+            stringOperation='+'
+        infos.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" "
+        infos.shortInfo=infos.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')' #12-3=9 (ViandeEF)
+        infos.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
+        infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" " #PoissonEF-PoissonEFminusViandeEF=ViandeEF
+        infos.unknow=unknow
+        infos.valueToFind=valueToFind
+        infos.type="schema"
+        infos.operands=[objectA,objectB]
 
-            if not trial: # when trial is True, the unknown is computed without any change in the problemState
-                qdic.addValue(unknow,valueToFind)
-                self.updateAppliableSchemas()
+        if self.areConstraintRespected(infos,constraints)and not trial : # when trial is True, the unknown is computed without any change in the problemState
+            qdic.addValue(unknow,valueToFind)
+            self.updateAppliableSchemas()
         return infos
 
     def applyRepresentationMove(self,representationMove,constraints=[],):
@@ -214,6 +216,13 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             if(self.isSchemaAppliable(schema,constraints)):
                 self.appliableSchemaList.append(schema)
 
+    def areConstraintRespected(self,infos,constraints):
+        isAllConstraintsRespectedBySchema=True
+        for constraint in constraints: # all the constraints must be in agreement
+            if not (self.isConstraintRespectedByComputation(infos,constraint)):
+                isAllConstraintsRespectedBySchema=False
+        return isAllConstraintsRespectedBySchema
+
     def isSchemaAppliable(self,schema,constraints=[]):
         dic=self.problemState.quantitiesDic
         n,unknow=findTheUnknown(schema,dic)
@@ -224,7 +233,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
 
     def isConstraintsRespectedBySchema(self,schema,constraints=[]):
         isAllConstraintsRespectedBySchema=True
-        for constraint in constraints: # all the constraints must be in agreement
+        for constraint in constraints:
             if not (self.isConstraintRespectedBySchema(schema,constraint)):
                 isAllConstraintsRespectedBySchema=False
         return isAllConstraintsRespectedBySchema
@@ -232,12 +241,20 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
     def isConstraintRespectedBySchema(self,schema,constraint):
         classname=constraint.__class__.__name__
         if(classname=="IntervalConstraint"):
-            return self.checkIntervall(schema,constraint)
+            infos=self.tryApplySchema(schema,trial=True)
+            return self.checkIntervall(infos,constraint)
         else:
             return True
 
-    def checkIntervall(self,schema,constraint): #listOfObjects, condition
-        infos=self.tryApplySchema(schema,trial=True)
+    def isConstraintRespectedByComputation(self,infos,constraint):#TODO: should rather be a method of the constraint class
+        classname=constraint.__class__.__name__
+        if(classname=="IntervalConstraint"):
+            return self.checkIntervall(infos,constraint)
+        else:
+            return True
+
+    def checkIntervall(self,infos,constraint): #listOfObjects, condition
+        # TODO: this function must be drunk-coded (return can be faster)
         objectComputed=infos.unknow
         valueComputed=infos.valueToFind
         for objectToCheck in constraint.listOfObjects:
@@ -249,9 +266,6 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         return True
 
 
-
-    #def tryApplySchema(self,schema):
-
 class ProblemState:
     def __init__(self,quantitiesDic,goal,representations):
         self.quantitiesDic=quantitiesDic
@@ -261,7 +275,10 @@ class ProblemState:
     def isProblemEnded(self):
         return(not self.quantitiesDic.isUnknown(self.goal.obj))
 
-def findTheUnknown (schema,quantitiesDic): #count the number of unknowns in the schema, and give the object of the last unknown found
+def findTheUnknown (schema,quantitiesDic):
+    '''
+    count the number of unknowns in the schema, and give the object of the last unknown found
+    '''
     numberOfUnknow=0
     theLastUnknown=""
     for obj in schema.positions.keys():

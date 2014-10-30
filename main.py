@@ -80,7 +80,9 @@ def generateAllPossibilities(problem,dropToTest=False,
     solver.TreePaths.scanTree()
     #logging.info(solver.TreePaths.treeOutput)
     simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
+    nbDiscoveries=str(len(solver.TreePaths.pathList))
     logging.info("DONE : model "+model)
+    logging.info("Number of paths found : "+nbDiscoveries)
 
     optionsList=optionsFactory(unorderedSteps) # will generate all the options possible with 2 interpretations step randomly occuring
     for i,options in enumerate(optionsList) :
@@ -97,6 +99,8 @@ def generateAllPossibilities(problem,dropToTest=False,
             #logging.info(solver.TreePaths.treeOutput)
             simulatedDatas.addDataSet(solver.TreePaths.pathList,problem.name,model)
             logging.info("DONE : model "+model+"( "+str(i)+" )")
+            nbDiscoveries=str(len(solver.TreePaths.pathList))
+            logging.info("Number of paths found : "+nbDiscoveries)
 
 
 #===============================================================================
