@@ -118,6 +118,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         self.problem=problem
         self.appliableSchemaList=[]
         self.possibleRepresentationChangeList=[]
+        self.constraintController=None #constraint controller will check the consistency with constraints
 
     def startAsUnderstood(self):
         '''
@@ -134,13 +135,13 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         self.updatePossibleRepresentationChange()
         self.updateAppliableSchemas()
 
-    def applyMove(self,move,constraints=[]):
+    def applyMove(self,move):
         if (move.type=="schema"):
-            return self.tryApplySchema(move.move,constraints)
+            return self.tryApplySchema(move.move)
         if (move.type=="RepresentationMove"):
-            return self.applyRepresentationMove(move.move,constraints)
+            return self.applyRepresentationMove(move.move)
 
-    def tryApplySchema(self,schema,constraints=[],trial=False):
+    def tryApplySchema(self,schema,trial=False):
         """
         the function that try to compute an unknown quantity
         when trial is True, the unknown is computed without any change in the problemState
@@ -171,34 +172,32 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
             objectA, objectB = objectB, objectA #invert the object
 
         valueToFind=valueA+valueB*(operation)
-        #=======================================================================
-        # if(valueToFind==0):
-        #     tolog="zero"
-        #=======================================================================
-
         stringOperation='-'
         if(operation==1):
             stringOperation='+'
-        infos.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" "
-        infos.shortInfo=infos.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')' #12-3=9 (ViandeEF)
+        infos.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" " #12-3=9 (ViandeEF)
+        infos.shortInfo=infos.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')'#PoissonEF-PoissonEFminusViandeEF=ViandeEF
         infos.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
-        infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" " #PoissonEF-PoissonEFminusViandeEF=ViandeEF
+        infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" "
         infos.unknow=unknow
         infos.valueToFind=valueToFind
         infos.type="schema"
         infos.operands=[objectA,objectB]
-        if(valueToFind<0):
-            infos.log()
-        if self.areConstraintRespected(infos,constraints)and not trial : # when trial is True, the unknown is computed without any change in the problemState
-            qdic.addValue(unknow,valueToFind)
-            self.updateAppliableSchemas()
-        return infos
+        if self.constraintController.checkStep(infos): # the step is compatible with constraints
+            if not trial : # when trial is True, the unknown is computed without any change in the problemState
+                qdic.addValue(unknow,valueToFind)
+                self.updateAppliableSchemas()
+                return infos
+            else :
+                return True
+        else:
+            return False
 
-    def applyRepresentationMove(self,representationMove,constraints=[],):
+    def applyRepresentationMove(self,representationMove):
         indexInfo=representationMove.indexTextInformation
         indexSelection=representationMove.indexSelectedRepresentation
         oldSelection=self.problemState.representations.pop(indexInfo)
-        breakPreviousInterpretations=self.doIBreakTheOldOne(constraints)
+        breakPreviousInterpretations=self.constraintController.breakPreviousInterpretation
         if(breakPreviousInterpretations):
             oldRep=self.problem.text.textInformations[indexInfo].representations[oldSelection] # TODO
             oldQuanti=oldRep.quantity
@@ -215,15 +214,14 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         infos.shortInfo=str(quanti.value)+" interpreted as "+quanti.object
         return infos
 
-    def doIBreakTheOldOne(self, constraints):
-        for constraint in constraints:
-            classname=constraint.__class__.__name__
-            if(classname=="BehavioralConstraint"):
-                return constraint.breakPreviousRepresentation
-        return BREAKPREVIOUSREPRESENTATION #default value
+    def isSchemaAppliable(self,schema):
+        dic=self.problemState.quantitiesDic
+        n,unknow=findTheUnknown(schema,dic)
+        if(n==1)and(self.tryApplySchema(schema,trial=True)):
+            return True
+        return False
 
-
-    def updatePossibleRepresentationChange(self,constraints=[]):
+    def updatePossibleRepresentationChange(self):
         self.possibleRepresentationChangeList=[]
         currentReps=self.problemState.representations
         for t,textInfo in enumerate(self.problem.text.textInformations):
@@ -232,61 +230,15 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
                     self.possibleRepresentationChangeList.append(RepresentationMove(t,r))
 
 
-    def updateAppliableSchemas(self,constraints=[]):
+    def updateAppliableSchemas(self):
         self.appliableSchemaList=[]
         schemasList=self.problem.structure.schemas
         for schema in schemasList:
-            if(self.isSchemaAppliable(schema,constraints)):
+            if(self.isSchemaAppliable(schema)):
                 self.appliableSchemaList.append(schema)
 
-    def areConstraintRespected(self,infos,constraints):
-        isAllConstraintsRespectedBySchema=True
-        for constraint in constraints: # all the constraints must be in agreement
-            if not (self.isConstraintRespectedByComputation(infos,constraint)):
-                isAllConstraintsRespectedBySchema=False
-        return isAllConstraintsRespectedBySchema
-
-    def isSchemaAppliable(self,schema,constraints=[]):
-        dic=self.problemState.quantitiesDic
-        n,unknow=findTheUnknown(schema,dic)
-        if(n!=1): # the number of unknown in a schema must be equal to one
-            return False
-        else:# in this case we check the consistency with the constraints of the solver
-            return self.isConstraintsRespectedBySchema(schema,constraints)
-
-    def isConstraintsRespectedBySchema(self,schema,constraints=[]):
-        isAllConstraintsRespectedBySchema=True
-        for constraint in constraints:
-            if not (self.isConstraintRespectedBySchema(schema,constraint)):
-                isAllConstraintsRespectedBySchema=False
-        return isAllConstraintsRespectedBySchema
-
-    def isConstraintRespectedBySchema(self,schema,constraint):
-        classname=constraint.__class__.__name__
-        if(classname=="IntervalConstraint"):
-            infos=self.tryApplySchema(schema,trial=True)
-            return self.checkIntervall(infos,constraint)
-        else:
-            return True
-
-    def isConstraintRespectedByComputation(self,infos,constraint):#TODO: should rather be a method of the constraint class
-        classname=constraint.__class__.__name__
-        if(classname=="IntervalConstraint"):
-            return self.checkIntervall(infos,constraint)
-        else:
-            return True
-
-    def checkIntervall(self,infos,constraint): #listOfObjects, condition
-        # TODO: this function must be drunk-coded (return can be faster)
-        objectComputed=infos.unknow
-        valueComputed=infos.valueToFind
-        for objectToCheck in constraint.listOfObjects:
-            if (valueComputed<0):
-                if(objectToCheck in objectComputed) and (constraint.condition==operations.avoidNegativeValuesWithException) : # e.g if 'EI' is in poissonEI and poissonEI<0
-                    return True
-                else:
-                    return False
-        return True
+    def attachConstraintController(self,constraintController):
+        self.constraintController=constraintController
 
 
 class ProblemState:

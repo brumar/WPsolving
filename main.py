@@ -10,6 +10,7 @@ from lib.optionsFactory import *
 from lib.observations import *
 from lib.problemBank import *
 from lib.postEvaluation import *
+from lib.constraints  import *
 import csv
 import datetime
 import time
@@ -67,15 +68,17 @@ def generateAllPossibilities(problem,dropToTest=False,
     global simulatedDatas #BAD LINE TODO:Fix this
 
 
-    c1=IntervalConstraint(['GAIN','Minus'],operations.avoidNegativeValuesWithException)
+    c1=StepConstraint(lambda info: (info.valueToFind>0)or("MINUS" in info.unknow) , "avoid negative static quantity")
+    c2=StepConstraint(lambda info: (info.valueToFind!=0), "No Null Values")
+    c_controller=ConstraintsController([c1,c2])
     upD=Updater(problem)
+    upD.attachConstraintController(c_controller)
     upD.startAsUnderstood()
 
     # we add the model of goodAnswers, we want to be able to
     # keep them for later
     model="goodAnswers"
-    constraints=[c1]
-    solver=Solver(upD,constraints)
+    solver=Solver(upD)
     solver.generalSequentialSolver(listOfActions=[Solver.SOLVER]) # = just solve
     solver.TreePaths.scanTree()
     #logging.info(solver.TreePaths.treeOutput)
@@ -91,9 +94,7 @@ def generateAllPossibilities(problem,dropToTest=False,
             model=str(options[0])
             if(breakPreviousInterpretations!="undefined"):
                 options[1]=breakPreviousInterpretations
-            c2=BehavioralConstraint(breakPreviousInterpretations=options[1])
-            constraints=[c1,c2]
-            solver=Solver(upD,constraints)
+            solver=Solver(upD)
             solver.generalSequentialSolver(listOfActions=options[0])
             solver.TreePaths.scanTree()
             #logging.info(solver.TreePaths.treeOutput)
@@ -482,23 +483,21 @@ if(alreadySimulated): # to avoid long time of computations, we can load and save
     simulatedDatas.pickleLoad(pickleFile)
 else:
     generateAllPossibilities(problemTc1p,dropToTest=False)
-    #===========================================================================
-    # generateAllPossibilities(problemTc1t,dropToTest=False)
-    # generateAllPossibilities(problemTc2t,dropToTest=False)
-    # generateAllPossibilities(problemTc2p,dropToTest=False)
-    # generateAllPossibilities(problemTc3t,dropToTest=False)
-    # generateAllPossibilities(problemTc3p,dropToTest=False)
-    # generateAllPossibilities(problemTc4t,dropToTest=False)
-    # generateAllPossibilities(problemTc4p,dropToTest=False)
-    # generateAllPossibilities(problemCc1t,dropToTest=False)
-    # generateAllPossibilities(problemCc1p,dropToTest=False)
-    # generateAllPossibilities(problemCc2t,dropToTest=False)
-    # generateAllPossibilities(problemCc2p,dropToTest=False)
-    # generateAllPossibilities(problemCc3t,dropToTest=False)
-    # generateAllPossibilities(problemCc3p,dropToTest=False)
-    # generateAllPossibilities(problemCc4t,dropToTest=False)
-    # generateAllPossibilities(problemCc4p,dropToTest=False)
-    #===========================================================================
+    generateAllPossibilities(problemTc1t,dropToTest=False)
+    generateAllPossibilities(problemTc2t,dropToTest=False)
+    generateAllPossibilities(problemTc2p,dropToTest=False)
+    generateAllPossibilities(problemTc3t,dropToTest=False)
+    generateAllPossibilities(problemTc3p,dropToTest=False)
+    generateAllPossibilities(problemTc4t,dropToTest=False)
+    generateAllPossibilities(problemTc4p,dropToTest=False)
+    generateAllPossibilities(problemCc1t,dropToTest=False)
+    generateAllPossibilities(problemCc1p,dropToTest=False)
+    generateAllPossibilities(problemCc2t,dropToTest=False)
+    generateAllPossibilities(problemCc2p,dropToTest=False)
+    generateAllPossibilities(problemCc3t,dropToTest=False)
+    generateAllPossibilities(problemCc3p,dropToTest=False)
+    generateAllPossibilities(problemCc4t,dropToTest=False)
+    generateAllPossibilities(problemCc4p,dropToTest=False)
 
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')
