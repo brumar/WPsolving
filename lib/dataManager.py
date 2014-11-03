@@ -12,11 +12,16 @@ class SimulatedDatas: # gathering and printing informations accross the differen
 
     def pickleSave(self,src):
         output = open(src, 'wb')
-        pickle.dump(self.datas, output)
+        pickle.dump([self.datas,self.datasBrut], output)
 
     def pickleLoad(self,src):
         pkl_file = open(src, 'rb')
-        self.datas=pickle.load(pkl_file)
+        loadedPickle=pickle.load(pkl_file)
+        if(len(loadedPickle)==2):
+            self.datas=loadedPickle[0]
+            self.datasBrut=loadedPickle[1]
+        else:
+            self.datas=loadedPickle #to be retrocompatible
 
     def addDataSet(self,pathList,problemName,solvingModel):
         for path in pathList:
