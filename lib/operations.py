@@ -4,4 +4,4 @@ soustractionBridge="minus"
 multiplication=3
 division=4
 unknown="unknown"
-allowsNegativeValues=3
+avoidNegativeValuesWithException=3

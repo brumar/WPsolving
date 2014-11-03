@@ -54,7 +54,7 @@ class SimulationAprioribinderDic():
 
 
 def generateAllPossibilities(problem,dropToTest=False,
-                             unorderedSteps=[Solver.INTERP,Solver.SCHEMA,Solver.SCHEMA,Solver.SCHEMA],
+                             unorderedSteps=[Solver.INTERP,Solver.INTERP,Solver.SCHEMA,Solver.SCHEMA,Solver.SCHEMA],
                              breakPreviousInterpretations="undefined"):
     """
     The main function of this program, generate all the paths possible for a problem
@@ -67,7 +67,7 @@ def generateAllPossibilities(problem,dropToTest=False,
     global simulatedDatas #BAD LINE TODO:Fix this
 
 
-    c1=IntervalConstraint(['GAIN','Minus'],operations.allowsNegativeValues)
+    c1=IntervalConstraint(['GAIN','Minus'],operations.avoidNegativeValuesWithException)
     upD=Updater(problem)
     upD.startAsUnderstood()
 
@@ -315,7 +315,7 @@ problemCc1t=Problem(structCc1t,textCc1t)
 problemCc1t.name="Cc1t"
 
 #===============================================================================
-# c1=IntervalConstraint(['GAIN','Minus'],operations.allowsNegativeValues)
+# c1=IntervalConstraint(['GAIN','Minus'],operations.avoidNegativeValuesWithException)
 # c2=BehavioralConstraint(breakPreviousInterpretations=False) # when True, the old representation of the text information is still available
 # upD=Updater(problemCc1t)
 # upD.startAsUnderstood()
@@ -482,21 +482,23 @@ if(alreadySimulated): # to avoid long time of computations, we can load and save
     simulatedDatas.pickleLoad(pickleFile)
 else:
     generateAllPossibilities(problemTc1p,dropToTest=False)
-    generateAllPossibilities(problemTc1t,dropToTest=False)
-    generateAllPossibilities(problemTc2t,dropToTest=False)
-    generateAllPossibilities(problemTc2p,dropToTest=False)
-    generateAllPossibilities(problemTc3t,dropToTest=False)
-    generateAllPossibilities(problemTc3p,dropToTest=False)
-    generateAllPossibilities(problemTc4t,dropToTest=False)
-    generateAllPossibilities(problemTc4p,dropToTest=False)
-    generateAllPossibilities(problemCc1t,dropToTest=False)
-    generateAllPossibilities(problemCc1p,dropToTest=False)
-    generateAllPossibilities(problemCc2t,dropToTest=False)
-    generateAllPossibilities(problemCc2p,dropToTest=False)
-    generateAllPossibilities(problemCc3t,dropToTest=False)
-    generateAllPossibilities(problemCc3p,dropToTest=False)
-    generateAllPossibilities(problemCc4t,dropToTest=False)
-    generateAllPossibilities(problemCc4p,dropToTest=False)
+    #===========================================================================
+    # generateAllPossibilities(problemTc1t,dropToTest=False)
+    # generateAllPossibilities(problemTc2t,dropToTest=False)
+    # generateAllPossibilities(problemTc2p,dropToTest=False)
+    # generateAllPossibilities(problemTc3t,dropToTest=False)
+    # generateAllPossibilities(problemTc3p,dropToTest=False)
+    # generateAllPossibilities(problemTc4t,dropToTest=False)
+    # generateAllPossibilities(problemTc4p,dropToTest=False)
+    # generateAllPossibilities(problemCc1t,dropToTest=False)
+    # generateAllPossibilities(problemCc1p,dropToTest=False)
+    # generateAllPossibilities(problemCc2t,dropToTest=False)
+    # generateAllPossibilities(problemCc2p,dropToTest=False)
+    # generateAllPossibilities(problemCc3t,dropToTest=False)
+    # generateAllPossibilities(problemCc3p,dropToTest=False)
+    # generateAllPossibilities(problemCc4t,dropToTest=False)
+    # generateAllPossibilities(problemCc4p,dropToTest=False)
+    #===========================================================================
 
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')

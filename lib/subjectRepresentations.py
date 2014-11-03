@@ -1,4 +1,5 @@
 import operations
+import logging
 
 BREAKPREVIOUSREPRESENTATION=False
 ERASE=True
@@ -15,6 +16,21 @@ class InfoStep:
         self.operands="no"
         self.move=""
         self.solved=False
+
+    def log(self,prefix=""):
+        if(prefix!=""):
+            logging.info("step prefixed "+prefix)
+        logging.info(self.shortInfo);
+        logging.info(self.objectsFormula);
+        logging.info(self.objectsFormulaFirstPart);
+        logging.info(self.formulaFirstPart);
+        logging.info(self.unknow);
+        logging.info(self.valueToFind);
+        logging.info(self.type);
+        logging.info(self.operands);
+        logging.info(self.move);
+        logging.info(self.solved);
+
 
 
 class Problem: #fields : structure, text
@@ -130,7 +146,6 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         when trial is True, the unknown is computed without any change in the problemState
         it is usefull to check the compatibility with the constraints
         """
-        #
         infos=InfoStep()
         qdic=self.problemState.quantitiesDic
         n,unknow=findTheUnknown(schema,qdic)
@@ -138,21 +153,28 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         positionList=['qf','q1','q2']
         positionList.remove(positionTofind)
         operation=schema.operation
+        needToRevert=False
         if(positionTofind!='qf'):
             operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
         if(positionTofind=='q2'):   #if q2 is the quantity to find then the operation needed is always a substraction
             operation=operations.soustraction
+            if(schema.operation==operations.soustraction):
+                needToRevert=True
 
         objectA=schema.objects[positionList[0]]
         valueA=qdic.find(objectA)
         objectB=schema.objects[positionList[1]]
         valueB=qdic.find(objectB)
 
-        if (valueB>valueA):
+        if (needToRevert):
             valueA, valueB = valueB, valueA #invert the values
             objectA, objectB = objectB, objectA #invert the object
 
         valueToFind=valueA+valueB*(operation)
+        #=======================================================================
+        # if(valueToFind==0):
+        #     tolog="zero"
+        #=======================================================================
 
         stringOperation='-'
         if(operation==1):
@@ -165,7 +187,8 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         infos.valueToFind=valueToFind
         infos.type="schema"
         infos.operands=[objectA,objectB]
-
+        if(valueToFind<0):
+            infos.log()
         if self.areConstraintRespected(infos,constraints)and not trial : # when trial is True, the unknown is computed without any change in the problemState
             qdic.addValue(unknow,valueToFind)
             self.updateAppliableSchemas()
@@ -259,7 +282,7 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         valueComputed=infos.valueToFind
         for objectToCheck in constraint.listOfObjects:
             if (valueComputed<0):
-                if(objectToCheck in objectComputed) and (constraint.condition==operations.allowsNegativeValues) : # e.g if 'EI' is in poissonEI and poissonEI<0
+                if(objectToCheck in objectComputed) and (constraint.condition==operations.avoidNegativeValuesWithException) : # e.g if 'EI' is in poissonEI and poissonEI<0
                     return True
                 else:
                     return False
