@@ -28,7 +28,7 @@ os.makedirs(simulationDirectory)
 
 ## GLOBAL OPTIONS
 alreadySimulated=False
-pickleFile="simulation24072014.pkl"
+pickleFile="simulations/2014_11_03__16_08_03_seriousStuff/simulation2014_11_03__16_08_03.pkl"
 newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
 
 ## LOGGING
@@ -55,7 +55,7 @@ class SimulationAprioribinderDic():
 
 
 def generateAllPossibilities(problem,dropToTest=False,
-                             unorderedSteps=[Solver.INTERP,Solver.INTERP,Solver.SCHEMA,Solver.SCHEMA,Solver.SCHEMA],
+                             unorderedSteps=[Solver.INTERP,Solver.SCHEMA,Solver.SCHEMA,Solver.SCHEMA],
                              breakPreviousInterpretations="undefined"):
     """
     The main function of this program, generate all the paths possible for a problem
@@ -70,7 +70,8 @@ def generateAllPossibilities(problem,dropToTest=False,
 
     c1=StepConstraint(lambda info: (info.valueToFind>0)or("MINUS" in info.unknow) , "avoid negative static quantity")
     c2=StepConstraint(lambda info: (info.valueToFind!=0), "No Null Values")
-    c_controller=ConstraintsController([c1,c2])
+    alter_c1=AlterStepConstraint()
+    c_controller=ConstraintsController([c1,c2],[alter_c1])
     upD=Updater(problem)
     upD.attachConstraintController(c_controller)
     upD.startAsUnderstood()
@@ -550,6 +551,7 @@ simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 sim=SimulationAprioribinderDic(aprioDIC,simulationDic)
 d2=SimulationAprioriEmpiricbinderDic(sim,obsdic)
 formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 2, 2, 2, 3]'])
+logging.info(formulasToExclude)
 formulasToExclude2=simulatedDatas.findFormulas(models=['goodAnswers'])
 logging.info(formulasToExclude2)
 #d2.listAndCompare(sim,obsdic)

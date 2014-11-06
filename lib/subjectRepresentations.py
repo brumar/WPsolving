@@ -31,6 +31,19 @@ class InfoStep:
         logging.info(self.move);
         logging.info(self.solved);
 
+    def buildSchemaInfos(self,operation, objectA, valueA, objectB, valueB, unknow):
+        valueToFind=valueA+valueB*(operation)
+        stringOperation='-'
+        if(operation==1):
+            stringOperation='+'
+        self.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" " #12-3=9 (ViandeEF)
+        self.shortInfo=self.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')'#PoissonEF-PoissonEFminusViandeEF=ViandeEF
+        self.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
+        self.objectsFormula=self.objectsFormulaFirstPart+'='+" "+unknow+" "
+        self.unknow=unknow
+        self.valueToFind=valueToFind
+        self.type="schema"
+        self.operands=[objectA,objectB]
 
 
 class Problem: #fields : structure, text
@@ -147,48 +160,36 @@ class Updater: #fields : problem, problemState, representations, quantitiesDic
         when trial is True, the unknown is computed without any change in the problemState
         it is usefull to check the compatibility with the constraints
         """
-        infos=InfoStep()
+
         qdic=self.problemState.quantitiesDic
         n,unknow=findTheUnknown(schema,qdic)
         positionTofind=schema.positions[unknow]
         positionList=['qf','q1','q2']
         positionList.remove(positionTofind)
         operation=schema.operation
-        needToRevert=False
+        objectA=schema.objects[positionList[0]]
+        valueA=qdic.find(objectA)
+        objectB=schema.objects[positionList[1]]
+        valueB=qdic.find(objectB)
+        # we need to find the operation needed to get the unknown quantity
         if(positionTofind!='qf'):
             operation=-1*schema.operation # if the quantity to find is qf then no need to revert the operation of the schema to find the unknown
         if(positionTofind=='q2'):   #if q2 is the quantity to find then the operation needed is always a substraction
             operation=operations.soustraction
             if(schema.operation==operations.soustraction):
-                needToRevert=True
+                valueA, valueB = valueB, valueA #invert the values
+                objectA, objectB = objectB, objectA #invert the object
+        infos=InfoStep()
 
-        objectA=schema.objects[positionList[0]]
-        valueA=qdic.find(objectA)
-        objectB=schema.objects[positionList[1]]
-        valueB=qdic.find(objectB)
+        infos.buildSchemaInfos(operation, objectA, valueA, objectB, valueB, unknow)
 
-        if (needToRevert):
-            valueA, valueB = valueB, valueA #invert the values
-            objectA, objectB = objectB, objectA #invert the object
-
-        valueToFind=valueA+valueB*(operation)
-        stringOperation='-'
-        if(operation==1):
-            stringOperation='+'
-        infos.formulaFirstPart=" "+str(valueA)+" "+stringOperation+" "+str(valueB)+" " #12-3=9 (ViandeEF)
-        infos.shortInfo=infos.formulaFirstPart+'='+" "+str(valueToFind)+" "+' ('+unknow+')'#PoissonEF-PoissonEFminusViandeEF=ViandeEF
-        infos.objectsFormulaFirstPart=" "+objectA+" "+stringOperation+" "+objectB+" "
-        infos.objectsFormula=infos.objectsFormulaFirstPart+'='+" "+unknow+" "
-        infos.unknow=unknow
-        infos.valueToFind=valueToFind
-        infos.type="schema"
-        infos.operands=[objectA,objectB]
         if self.constraintController.checkStep(infos): # the step is compatible with constraints
             if not trial : # when trial is True, the unknown is computed without any change in the problemState
-                qdic.addValue(unknow,valueToFind)
+                infos=self.constraintController.alterStep(infos) # some constraints can alter the step, for example reverse the operands when negative numbers found
+                qdic.addValue(unknow,infos.valueToFind)
                 self.updateAppliableSchemas()
                 return infos
-            else :
+            else : # if we enter this function with the trial mode, then we just want to know if it's compatible with the constraints or not
                 return True
         else:
             return False
@@ -252,7 +253,8 @@ class ProblemState:
 
 def findTheUnknown (schema,quantitiesDic):
     '''
-    count the number of unknowns in the schema, and give the object of the last unknown found
+    count the number of unknowns in the schema,
+    and give the object of the last unknown found
     '''
     numberOfUnknow=0
     theLastUnknown=""
