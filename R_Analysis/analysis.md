@@ -66,7 +66,7 @@ Binomial tests will be used to determine if there are significantly "more" occur
 Interpretation :
 - The number of trial is taken as the number of occurences in the global set (set0, set1, set2, set3)
 - The number of successes is the number of occurences belonging to the sub-selection determined by the programm
-- The null hypothesis probability of success for each trial is the relative size of the subselection
+- The probability of success for each trial (under the null hypothesis) is the relative size of the subselection compared to the size of its belonging set.
 
 ## Binomial test for the set0 
 set 0 = one operation only

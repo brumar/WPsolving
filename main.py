@@ -67,8 +67,6 @@ def generateAllPossibilities(problem,dropToTest=False,
     """
     logging.info(problem.name)
     global simulatedDatas #BAD LINE TODO:Fix this
-
-    # constraint which
     c1=StepConstraint(lambda info: (info.valueToFind>0)or("MINUS" in info.unknow) , "avoid negative values, except for comparisons")
     c2=StepConstraint(lambda info: (info.valueToFind!=0), "avoid null value")
     alter_c1=AlterStepConstraint()
