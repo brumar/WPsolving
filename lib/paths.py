@@ -175,19 +175,18 @@ class Solver:
     INTERP=1
     SCHEMA=2
     SOLVER=3
-    def __init__(self,updater,constraints=[]):
+    def __init__(self,updater):
         self.updater=updater
         self.TreePaths=TreePaths(updater) # store all the paths taken by solver
-        self.constraints=constraints
 
     def generalSequentialSolver(self, currentStep="", updater="", level = 0, listOfActions=[SOLVER]):
         currentStepId=0
         infos=""
         if(level!=0):
             currentStepId=currentStep.sId
-            infos=updater.applyMove(currentStep.move,self.constraints)
-            updater.updatePossibleRepresentationChange(self.constraints)
-            updater.updateAppliableSchemas(self.constraints)
+            infos=updater.applyMove(currentStep.move)
+            updater.updatePossibleRepresentationChange()
+            updater.updateAppliableSchemas()
             infos.solved=updater.problemState.isProblemEnded()
             currentStep.addInfos(infos)
             self.TreePaths.addStep(currentStep)
@@ -205,19 +204,17 @@ class Solver:
                 self.schemaSteps(updater,level,listOfActions,currentStepId)
 
     def schemaSteps(self,updater,level,listOfActions,currentStepId):
-        updater.updateAppliableSchemas(self.constraints)
+        updater.updateAppliableSchemas()
         for schem in updater.appliableSchemaList:
             newstep=Step(Move(schem),currentStepId,level=level)
             self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))
 
 
     def interpretationSteps(self,updater,level,listOfActions,currentStepId):
-        updater.updatePossibleRepresentationChange(self.constraints)
+        updater.updatePossibleRepresentationChange()
         moveList=updater.possibleRepresentationChangeList
         for repMove in moveList:
             newstep=Step(Move(repMove),currentStepId,level=level)
             self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))
 
-    def addConstraint(self,constraint):
-        self.constraints.append(constraint)
 
