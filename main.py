@@ -108,13 +108,12 @@ def generateAllPossibilities(problem,dropToTest=False,
 #===============================================================================
 
 #=================PROBLEME 1 : Tc4t=============================================
-#===============================================================================
-# Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.
-# Un kilo de poisson coûte maintenant 12 euros.
-# Au début de l'année, le kilo de viande coûtait le même prix que le kilo de poisson.
-# Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson.
-# Combien coûte le kilo de viande maintenant ?
-#===============================================================================
+Tc4t='Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.'
+'Un kilo de poisson coûte maintenant 12 euros.'
+'Au début de l\'année, le kilo de viande coûtait le même prix que le kilo de poisson.'
+'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson.'
+'Combien coûte le kilo de viande maintenant ?'
+
 
 
 schema1=Schema("PoissonEF","PoissonEI",operations.addition,"PoissonGAIN","change")
@@ -146,16 +145,13 @@ text.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity(
 problemTc4t=Problem(struct,text)
 problemTc4t.name="Tc4t"
 
-
-
 #===============PROBLEME 2 : Tc1t ====================================================
-#==============================================================================
-# Pendant la récréation, Lucas gagne 7 billes.
-# Après la récréation, Lucas a 16 billes.
-# Avant la récréation, Simon avait autant de billes que Lucas.
-# Pendant la récréation, Simon gagne 3 billes de moins que Lucas.
-# Combien Simon a-t-il de billes après la récréation ?
-#===============================================================================
+Tc1t='Pendant la récréation, Lucas gagne 7 billes.'
+'Après la récréation, Lucas a 16 billes.'
+'Avant la récréation, Simon avait autant de billes que Lucas.'
+'Pendant la récréation, Simon gagne 3 billes de moins que Lucas.'
+'Combien Simon a-t-il de billes après la récréation ?'
+
 problemTc1t=copy.deepcopy(problemTc4t)
 problemTc1t.name="Tc1t"
 keydic={"Poisson":"Lucas","Viande":"Simon"}
@@ -165,13 +161,12 @@ problemTc1t.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 
 #===============PROBLEME 3 : Tc2t ============================================
-# Cette année, Théo a été pesé par le pédiatre.
-# Théo a pris 5 kilos depuis le début de l’année.
-# Théo pèse maintenant 14 kilos.
-# Au début de l’année, Nicolas pesait le même poids que Théo.
-# Nicolas a pris 2 kilos de moins que Théo cette année.
-# Combien Nicolas pèse-t-il maintenant ?
-#===============================================================================
+Tc2t='Cette année, Théo a été pesé par le pédiatre.'
+'Théo a pris 5 kilos depuis le début de l’année.'
+'Théo pèse maintenant 14 kilos.'
+'Au début de l’année, Nicolas pesait le même poids que Théo.'
+'Nicolas a pris 2 kilos de moins que Théo cette année.'
+'Combien Nicolas pèse-t-il maintenant ?'
 
 problemTc2t=copy.deepcopy(problemTc4t)
 problemTc2t.name="Tc2t"
@@ -182,13 +177,12 @@ newrep=Representation(Quantity("NicolasEFminusThéoEF","dEI"),'A la fin de l\'ann
 problemTc2t.text.getTextInformation(2).addAlternativeRepresentation(newrep)
 
 #===============PROBLEME 4 : Tc3t ============================================
-#===============================================================================
-# En janvier, 7 enfants se sont inscrits à la chorale.
-# Après janvier, il y a 16 enfants à la chorale.
-# Avant janvier, il y avait autant d'enfants inscrits au football qu'à la chorale.
-# En janvier, il y a eu 2 inscriptions de moins au football qu'à la chorale.
-# Combien y a-t-il d'enfants au football après janvier ?
-#===============================================================================
+
+Tc3t='En janvier, 7 enfants se sont inscrits à la chorale.'
+'Après janvier, il y a 16 enfants à la chorale.'
+'Avant janvier, il y avait autant d\'enfants inscrits au football qu\'à la chorale.'
+'En janvier, il y a eu 2 inscriptions de moins au football qu\'à la chorale.'
+'Combien y a-t-il d\'enfants au football après janvier ?'
 
 problemTc3t=copy.deepcopy(problemTc4t)
 problemTc3t.name="Tc3t"
@@ -199,14 +193,11 @@ problemTc3t.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 
 #===============PROBLEME 1p : Tc4p  =============================================
-#===============================================================================
-# Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.
-# Un kilo de poisson coûte maintenant 12 euros.
-# Au début de l'année, le kilo de viande coûtait le même prix que le kilo de poisson.
-# Le kilo de viande coûte maintenant 3 euros de moins que le kilos de poisson.
-# De combien d'euros le kilo de viande a-t-il augmenté ?
-#===============================================================================
-
+Tc4p='Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.'
+'Un kilo de poisson coûte maintenant 12 euros.'
+'Au début de l\'année, le kilo de viande coûtait le même prix que le kilo de poisson.'
+'Le kilo de viande coûte maintenant 3 euros de moins que le kilos de poisson.'
+'De combien d\'euros le kilo de viande a-t-il augmenté ?'
 
 problemTc4p=copy.deepcopy(problemTc4t)
 problemTc4p.name="Tc4p"
@@ -220,16 +211,15 @@ info3_prime.addAlternativeRepresentation(Representation(Quantity("ViandeEF","d")
 problemTc4p.text.textInformations[3]=info3_prime
 problemTc4p.text.setGoal(TextGoal(Goal('ViandeGAIN','De combien le kilo de viande a t-il augmenté ?')))
 
-#===============PROBLEME 2p : Tc3p  =============================================
-#===============================================================================
-# En janvier, 7 enfants se sont inscrits à la chorale.
-# Après janvier, il y a 16 enfants à la chorale.
-# Avant janvier, il y avait autant d'enfants inscrits au football qu'à la chorale.
-# En janvier, il y a eu de nouvelles inscriptions au football.
-# Après janvier, il y a 2 enfants de moins au football qu'à la chorale.
-# Combien d'enfants se sont inscrits au football en janvier ?
-#===============================================================================
-#===============================================================================
+#===============PROBLEME 3p : Tc3p  =============================================
+Tc3p='En janvier, 7 enfants se sont inscrits à la chorale.'
+'Après janvier, il y a 16 enfants à la chorale.'
+'Avant janvier, il y avait autant d\'enfants inscrits au football qu\'à la chorale.'
+'En janvier, il y a eu de nouvelles inscriptions au football.'
+'Après janvier, il y a 2 enfants de moins au football qu\'à la chorale.'
+'Combien d\'enfants se sont inscrits au football en janvier ?'
+
+
 problemTc3p=copy.deepcopy(problemTc4p)
 problemTc3p.name="Tc3p"
 keydic={"Viande":"football","Poisson":"chorale"}
@@ -239,15 +229,16 @@ problemTc3p.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 
 #===============PROBLEME 3p : Tc2p  ============================================
-#===============================================================================
-# Cette année, Théo a été pesé par le pédiatre.
-# Théo a pris 5 kilos depuis le début de l’année.
-# Théo pèse maintenant 14 kilos.
-# Au début de l’année, Nicolas pesait le même poids que Théo.
-# Maintenant, Nicolas pèse 2 kilos de moins que Théo.
-# Combien de kilos Nicolas a-t-il pris cette année ?
-#===============================================================================
-#===============================================================================
+
+Tc2p='Cette année, Théo a été pesé par le pédiatre.'
+'Théo a pris 5 kilos depuis le début de l’année.'
+'Théo pèse maintenant 14 kilos.'
+'Au début de l’année, Nicolas pesait le même poids que Théo.'
+'Maintenant, Nicolas pèse 2 kilos de moins que Théo.'
+'Combien de kilos Nicolas a-t-il pris cette année ?'
+
+
+
 problemTc2p=copy.deepcopy(problemTc4p)
 problemTc2p.name="Tc2p"
 keydic={"Viande":"Théo","Poisson":"Nicolas"}
@@ -257,15 +248,13 @@ newrep=Representation(Quantity("NicolasEFminusThéoEF","dEI"),'A la fin de l\'ann
 problemTc2p.text.getTextInformation(2).addAlternativeRepresentation(newrep)
 
 #===============PROBLEME 4p : Tc1p  =============================================
-#===============================================================================
-# Pendant la récréation, Lucas gagne 7 billes.
-# Après la récréation, Lucas a 16 billes.
-# Avant la récréation, Simon avait autant de billes que Lucas.
-# Pendant la récréation, Simon gagne des billes,
-# et après la récréation, il a 3 billes de moins que Lucas.
-# Combien Simon a-t-il gagné de billes pendant la récréation ?
-#===============================================================================
-#===============================================================================
+
+Tc1p='Pendant la récréation, Lucas gagne 7 billes.'
+'Après la récréation, Lucas a 16 billes.'
+'Avant la récréation, Simon avait autant de billes que Lucas.'
+'Pendant la récréation, Simon gagne des billes,'
+'et après la récréation, il a 3 billes de moins que Lucas.'
+'Combien Simon a-t-il gagné de billes pendant la récréation ?'
 
 problemTc1p=copy.deepcopy(problemTc4p)
 problemTc1p.name="Tc1p"
@@ -274,14 +263,13 @@ problemTc1p.renameKeywordObjects(keydic)
 newrep=Representation(Quantity("LucasGAIN","T1"),'Après la récréation, Lucas gagne 16 billes')
 problemTc1p.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
-#===============================================================================
 # Cc1t
-# Antoine a 5 billes.
-# Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
-# Paul réunit ses billes avec celles de Jacques.
-# Jacques a 3 billes de moins qu’Antoine.
-# Combien Paul et Jacques ont-ils de billes ensemble ?
-#===============================================================================
+Cc1t='Antoine a 5 billes.'
+'Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble'
+'Paul réunit ses billes avec celles de Jacques.'
+'Jacques a 3 billes de moins qu’Antoine.'
+'Combien Paul et Jacques ont-ils de billes ensemble ?'
+
 
 schema1Cc1t=Schema(qf="AntoineETPaul",q1="Paul",operation=operations.addition,q2="Antoine",name="combinaison")
 schema2Cc1t=Schema(qf="JacquesETPaul",q1="Paul",operation=operations.addition,q2="Jacques",name="combinaison")
@@ -327,13 +315,12 @@ problemCc1t.name="Cc1t"
 # logging.info(solver.TreePaths.treeOutput)
 #===============================================================================
 
-#===============================================================================
 # Cc1p
-# Antoine a 5 billes.
-# Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
-# Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins.
-# Combien Jacques a-t-il de billes ?
-#===============================================================================
+Cc1p='Antoine a 5 billes'
+'Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble'
+'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins.'
+'Combien Jacques a-t-il de billes ?'
+
 problemCc1p=copy.deepcopy(problemCc1t)
 problemCc1p.name="Cc1p"
 infoCC1p_3=TextInformation(Representation(Quantity("AntoineETPaulminusJacquesETPaul","d"),'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins'))
@@ -348,12 +335,14 @@ problemCc1p.text.setGoal(TextGoal(Goal('Jacques','Combien Jacques a-t-il de bill
 
 #===============================================================================
 # Cc2t
-# Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.
-# Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
-# Fido et Rex montent ensemble sur la balance chez le vétérinaire.
-# Fido pèse 2 kilos de moins que Medor.
-# Combien Fido et Rex pèsent-ils ensemble ?
-#===============================================================================
+
+Cc2t='Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.'
+'Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.'
+'Fido et Rex montent ensemble sur la balance chez le vétérinaire.'
+'Fido pèse 2 kilos de moins que Medor.'
+'Combien Fido et Rex pèsent-ils ensemble ?'
+
+
 problemCc2t=copy.deepcopy(problemCc1t)
 problemCc2t.name="Cc2t"
 keydic={"Antoine":"Medor","Paul":"Rex","Jacques":"Fido"}
@@ -384,11 +373,12 @@ problemCc2t.text.getTextInformation(3).addAlternativeRepresentation(Representati
 
 #===============================================================================
 # Cc2p
-# Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.
-# Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
-# Lorsque Fido et Rex montent sur la balance ensemble, la balance indique 2 kilos de moins.
-# Combien pèse Fido ?
-#===============================================================================
+
+Cc2p='Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.'
+'Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.'
+'Lorsque Fido et Rex montent sur la balance ensemble, la balance indique 2 kilos de moins.'
+'Combien pèse Fido ?'
+
 problemCc2p=copy.deepcopy(problemCc1p)
 problemCc2p.name="Cc2p"
 keydic={"Antoine":"Medor","Paul":"Rex","Jacques":"Fido"}
@@ -412,28 +402,39 @@ problemCc2p.text.getTextInformation(3).addAlternativeRepresentation(Representati
 # Dans la classe de CE2, il y a 2 élèves de moins qu'en CM2.
 # Combien y a-t-il d'élèves dans le groupe réunissant les CE2 et les CM1 ?
 #===============================================================================
+Cc3t='Dans la classe de CM2, il y a 6 élèves.'
+'Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.'
+'On fait un groupe réunissant les CE2 et les CM1.'
+'Dans la classe de CE2, il y a 2 élèves de moins qu\'en CM2.'
+'Combien y a-t-il d\'élèves dans le groupe réunissant les CE2 et les CM1 ?'
+
 problemCc3t=copy.deepcopy(problemCc2t)
 problemCc3t.name="Cc3t"
 keydic={"Medor":"CM2","Rex":"CM1","Fido":"CE2"}
 problemCc3t.renameKeywordObjects(keydic)
 
-#===============================================================================
+
 # Cc3p
-# Dans la classe de CM2, il y a 6 élèves. Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.
-# Si on réunit les CE2 et les CM1, le groupe a 2 élèves de moins.
-# Combien y a-t-il d'élèves en CE2 ?
-#===============================================================================
+
+Cc3p='Dans la classe de CM2, il y a 6 élèves.'
+'Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.'
+'Si on réunit les CE2 et les CM1, le groupe a 2 élèves de moins.'
+'Combien y a-t-il d\'élèves en CE2 ?'
+
 problemCc3p=copy.deepcopy(problemCc2p)
 problemCc3p.name="Cc3p"
 keydic={"Medor":"CM2","Rex":"CM1","Fido":"CE2"}
 problemCc3p.renameKeywordObjects(keydic)
 
-#===============================================================================
+
 # Cc4t
-# Un livre coûte 9 euros. Si on achète un livre et une règle, on paie 14 euros.
-# On achète une règle et un cahier. Le cahier coûte 2 euros de moins que le livre.
-# Combien coûtent la règle et le cahier ensemble ?
-#===============================================================================
+
+Cc4t='Un livre coûte 9 euros. Si on achète un livre et une règle, on paie 14 euros.'
+'On achète une règle et un cahier. Le cahier coûte 2 euros de moins que le livre.'
+'On achète une règle et un cahier.'
+'Le cahier coûte 2 euros de moins que le livre.'
+'Combien coûtent la règle et le cahier ensemble ?'
+
 problemCc4t=copy.deepcopy(problemCc2t)
 problemCc4t.name="Cc4t"
 keydic={"Medor":"livre","Rex":"regle","Fido":"cahier"}
@@ -441,12 +442,13 @@ problemCc4t.renameKeywordObjects(keydic)
 problemCc4t.text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("cahier","P1"),''))
 
 #===============================================================================
-
 # Cc4p
-# Un livre coûte 9 euros. Si on achète un livre et une règle, on paie 14 euros.
-# On achète une règle et un cahier. Cela coûte 2 euros de moins que lorsque l'on achète un livre et une règle.
-# Combien coûte le cahier ?
-#===============================================================================
+Cc4p='Un livre coûte 9 euros.'
+'Si on achète un livre et une règle, on paie 14 euros.'
+'On achète une règle et un cahier.'
+'Cela coûte 2 euros de moins que lorsque l\'on achète un livre et une règle.'
+'Combien coûte le cahier ?'
+
 problemCc4p=copy.deepcopy(problemCc2p)
 problemCc4p.name="Cc4p"
 keydic={"Medor":"livre","Rex":"regle","Fido":"cahier"}
@@ -471,6 +473,23 @@ problemTc2t.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
 problemTc2p.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
 problemTc3t.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 problemTc1p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
+
+problemCc1t.text.fullText=Cc1t
+problemCc1p.text.fullText=Cc1p
+problemCc2t.text.fullText=Cc2t
+problemCc2p.text.fullText=Cc2p
+problemCc3t.text.fullText=Cc3t
+problemCc3p.text.fullText=Cc3p
+problemCc4t.text.fullText=Cc4t
+problemCc4p.text.fullText=Cc4p
+problemTc4t.text.fullText=Tc4t
+problemTc4p.text.fullText=Tc4p
+problemTc1t.text.fullText=Tc1t
+problemTc3p.text.fullText=Tc3p
+problemTc2t.text.fullText=Tc2t
+problemTc2p.text.fullText=Tc2p
+problemTc3t.text.fullText=Tc3t
+problemTc1p.text.fullText=Tc1p
 
 bank=problemBank()
 bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, problemTc3p, problemTc4t, problemTc4p, problemCc1t, problemCc1p, problemCc2t, problemCc2p, problemCc3t, problemCc3p, problemCc4t, problemCc4p])
