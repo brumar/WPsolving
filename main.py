@@ -316,8 +316,8 @@ problemCc1t.name="Cc1t"
 #===============================================================================
 
 # Cc1p
-Cc1p='Antoine a 5 billes'
-'Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble'
+Cc1p='Antoine a 5 billes.'
+'Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.'
 'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins.'
 'Combien Jacques a-t-il de billes ?'
 
