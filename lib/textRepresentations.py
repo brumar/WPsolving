@@ -25,6 +25,7 @@ class Representation:
 class Text:
     def __init__(self):
         self.textInformations=[]
+        self.fullText=""
 
     def getTextInformation(self,index):
         return(self.textInformations[index])
