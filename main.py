@@ -276,7 +276,8 @@ problemTc1p.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 #===============================================================================
 # Cc1t
-# Antoine a 5 billes. Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
+# Antoine a 5 billes.
+# Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
 # Paul réunit ses billes avec celles de Jacques.
 # Jacques a 3 billes de moins qu’Antoine.
 # Combien Paul et Jacques ont-ils de billes ensemble ?
@@ -328,7 +329,8 @@ problemCc1t.name="Cc1t"
 
 #===============================================================================
 # Cc1p
-# Antoine a 5 billes. Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
+# Antoine a 5 billes.
+# Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
 # Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins.
 # Combien Jacques a-t-il de billes ?
 #===============================================================================
@@ -348,7 +350,8 @@ problemCc1p.text.setGoal(TextGoal(Goal('Jacques','Combien Jacques a-t-il de bill
 # Cc2t
 # Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.
 # Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
-# Fido et Rex montent ensemble sur la balance chez le vétérinaire. Fido pèse 2 kilos de moins que Medor.
+# Fido et Rex montent ensemble sur la balance chez le vétérinaire.
+# Fido pèse 2 kilos de moins que Medor.
 # Combien Fido et Rex pèsent-ils ensemble ?
 #===============================================================================
 problemCc2t=copy.deepcopy(problemCc1t)
@@ -403,8 +406,10 @@ problemCc2p.text.getTextInformation(3).addAlternativeRepresentation(Representati
 
 #===============================================================================
 # Cc3t
-# Dans la classe de CM2, il y a 6 élèves. Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.
-# On fait un groupe réunissant les CE2 et les CM1. Dans la classe de CE2, il y a 2 élèves de moins qu'en CM2.
+# Dans la classe de CM2, il y a 6 élèves.
+# Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.
+# On fait un groupe réunissant les CE2 et les CM1.
+# Dans la classe de CE2, il y a 2 élèves de moins qu'en CM2.
 # Combien y a-t-il d'élèves dans le groupe réunissant les CE2 et les CM1 ?
 #===============================================================================
 problemCc3t=copy.deepcopy(problemCc2t)
