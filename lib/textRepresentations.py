@@ -4,7 +4,7 @@ import operations
 class IntervalConstraint:
     def __init__(self,listOfObjects,condition):
         self.listOfObjects=listOfObjects
-        self.conditionFunction=condition
+        self.condition=condition
 
 class BehavioralConstraint:
     def __init__(self,breakPreviousInterpretations):
