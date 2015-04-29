@@ -16,6 +16,7 @@ import datetime
 import time
 import os
 import logging
+import re
 
 ## SIMULATION DIRECTORY
 simulationName=raw_input("simulation Name ? : ")
@@ -42,7 +43,7 @@ dicSignKeyword={"augment":operations.addition,"moins": operations.soustraction,
                 "pris": operations.addition,
                 "ensemble": operations.addition,"réuni": operations.addition}
 
-def addKeyWordModel(d2,kb):
+def addKeyWordModel(d2,kb): #TODO: Comment or refractor quick
     mainDic=d2.dicPbmSetFormulaPlannedObserved
     for problem in mainDic.keys():
         print(problem,kb.dicPbms[problem])
@@ -51,6 +52,11 @@ def addKeyWordModel(d2,kb):
             for formula in setDic.keys():
                 stopCheking_CurrentFormula=False
                 untilNow_FormulaFilteredIn=True
+                for number in kb.dicPbms[problem]["OnceOrNone"]:
+                    if(len(re.findall(number,formula))>1):
+                        stopCheking_CurrentFormula=True
+                        untilNow_FormulaFilteredIn=False
+                        break
                 for inter in kb.dicPbms[problem]["inter"]:
                     if(stopCheking_CurrentFormula):
                         break
@@ -558,6 +564,7 @@ else:
     for problem in bank.dicPbm.values():
         generateAllPossibilities(problem,dropToTest=False)
         generateKeyWordBehaviour(problem)
+        #break
     #===========================================================================
     # generateAllPossibilities(problemTc1t,dropToTest=False)
     # generateAllPossibilities(problemTc2t,dropToTest=False)
