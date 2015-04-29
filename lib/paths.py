@@ -227,12 +227,14 @@ class Solver:
         forcedautorisations=[]
         newMatchs=[]
         unCuedNumbers=[]
+        listOfItems=[]
 
         # turn tuples into list and convert the second member in object
         for match in matchs:
             for item in dicValues.keys():
                 number=str(dicValues[item])
                 if(str(number)==match[1]):
+                    listOfItems.append(item)
                     newMatchs.append([match[0],item])
 
         # find and store the operation cue in sentences
@@ -244,40 +246,54 @@ class Solver:
                     amatch=True
             if not amatch:
                 unCuedNumbers.append(match[1])
-        print(unCuedNumbers)
+        #print(unCuedNumbers)
 
         # generate interdictions and forced autorisations
 
 
         for numberWithKeyword in numberWithKeywordDic.keys():
-            # interdictions
-            interdictions.append(numberWithKeyword+"-")
+            interdictions.append(numberWithKeyword+"-(")
             if(operations.addition not in numberWithKeywordDic[numberWithKeyword] ):
-                interdictions.append(numberWithKeyword+"+")
-                interdictions.append("+"+numberWithKeyword)
+                interdictions.append(numberWithKeyword+"+(")
+                interdictions.append(")+"+numberWithKeyword)
             if(operations.soustraction not in numberWithKeywordDic[numberWithKeyword]):
-                interdictions.append("-"+numberWithKeyword)
+                interdictions.append(")-"+numberWithKeyword)
 
-
-            # forced autorisations
             if(operations.addition in numberWithKeywordDic[numberWithKeyword] ):
-                forcedautorisations.append(numberWithKeyword+"+")
-                forcedautorisations.append("+"+numberWithKeyword)
+                for item in listOfItems:
+                    if(item!=numberWithKeyword):
+                        forcedautorisations.append(numberWithKeyword+"+"+item)
+                        forcedautorisations.append(item+"+"+numberWithKeyword)
+
             if(operations.soustraction in numberWithKeywordDic[numberWithKeyword] ):
-                forcedautorisations.append("-"+numberWithKeyword)
+                for item in listOfItems:
+                    if(item!=numberWithKeyword):
+                        forcedautorisations.append(item+"-"+numberWithKeyword)
 
         # two uncued numbers can't be add
-        uncuedInterdictions=[]
-        unCuedNumberCouples=itertools.product(itertools.permutations(unCuedNumbers, 2),"-+")
+        allCouples=[]
+        unCuedNumberCouples=itertools.product(itertools.permutations(listOfItems, 2),"-+")
         for unc in unCuedNumberCouples:
-            uncuedInterdictions.append("%s%s%s"%(unc[0][0],unc[1],unc[0][1]))
+            allCouples.append("%s%s%s"%(unc[0][0],unc[1],unc[0][1])) # T1+P1
+           # allCouples.append("%s%s%s"%(unc[0][1],unc[1],unc[0][0])) # P1+T1
+        interdictions.extend([c for c in allCouples if not c in forcedautorisations])
 
-        interdictions.extend(uncuedInterdictions)
+        #interdictions.extend(uncuedInterdictions)
+#===============================================================================
+#         uncuedInterdictions=[]
+#         unCuedNumberCouples=itertools.product(itertools.permutations(unCuedNumbers, 2),"-+")
+#         for unc in unCuedNumberCouples:
+#             uncuedInterdictions.append("%s%s%s"%(unc[0][0],unc[1],unc[0][1])) # T1+P1
+#
+#         interdictions.extend(uncuedInterdictions)
+#===============================================================================
 
 
         dicOutput={}
-        dicOutput["inter"]=interdictions
-        dicOutput["autor"]=forcedautorisations
+        dicOutput["inter"]=list(set(interdictions))
+        dicOutput["autor"]=[]#forcedautorisations
+        dicOutput["OnceOrNone"]=unCuedNumbers # uncued numbers can be used in formulas, but not more than once
+        #print(dicOutput)
         return dicOutput
 
 
