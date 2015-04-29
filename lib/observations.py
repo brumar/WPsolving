@@ -50,6 +50,19 @@ class SimulationAprioriEmpiricbinderDic():
                             observationsCount = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][1]
                             writer.writerow([pbm]+[setName]+[formula]+[planned]+[observationsCount])
 
+    def printCSVModelComparison(self,filename,formulasToExclude={}):
+        noExclusion=(len(formulasToExclude.keys())==0)
+        with open(filename, 'wb') as csvfile:
+            writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(["problem"]+["set"]+["formula"]+["selected"]+["selectedKeyword"]+["occurrences"])
+            for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
+                for setName in  self.dicPbmSetFormulaPlannedObserved[pbm].iterkeys():
+                    for formula in  self.dicPbmSetFormulaPlannedObserved[pbm][setName].iterkeys():
+                        if noExclusion or (formula not in formulasToExclude[pbm]):
+                            planned = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][0]
+                            plannedByKeywordModel = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][1]
+                            observationsCount = self.dicPbmSetFormulaPlannedObserved[pbm][setName][formula][2]
+                            writer.writerow([pbm]+[setName]+[formula]+[planned]+[plannedByKeywordModel]+[observationsCount])
 
 
 class globalEmpiricalDic():

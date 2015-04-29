@@ -36,6 +36,40 @@ newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
 logging.basicConfig(filename=simulationDirectory+'simulation.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt=timeformat)
 logging.getLogger().addHandler(logging.StreamHandler())
 
+dicSignKeyword={"augment":operations.addition,"moins": operations.soustraction,
+                "plus": operations.addition,"dimin": operations.soustraction,
+                "après": operations.addition,"gagne":operations.addition,
+                "pris": operations.addition,
+                "ensemble": operations.addition,"réuni": operations.addition}
+
+def addKeyWordModel(d2,kb):
+    mainDic=d2.dicPbmSetFormulaPlannedObserved
+    for problem in mainDic.keys():
+        print(problem,kb.dicPbms[problem])
+        problemDic=mainDic[problem]
+        for setDic in problemDic.values():
+            for formula in setDic.keys():
+                stopCheking_CurrentFormula=False
+                untilNow_FormulaFilteredIn=True
+                for inter in kb.dicPbms[problem]["inter"]:
+                    if(stopCheking_CurrentFormula):
+                        break
+                    if inter not in formula:
+                        continue
+                    untilNow_FormulaFilteredIn=False
+                    for autor in kb.dicPbms[problem]["autor"]:
+                        if(autor in formula):
+                            stopCheking_CurrentFormula=True
+                            untilNow_FormulaFilteredIn=True
+                            break
+                if(untilNow_FormulaFilteredIn):
+                    #print("come one "+formula)
+                    setDic[formula].insert(1,True)
+                else:
+                    #print("get Out "+formula)
+                    setDic[formula].insert(1,False)
+    return d2
+
 class SimulationAprioribinderDic():
     """
     bind datas from simulations and from apriori generators
@@ -53,6 +87,18 @@ class SimulationAprioribinderDic():
                 planned=(formula in simulation[pbm])
                 self.dicPbmSetFormulaPlanned[pbm][setName][formula]=planned
 
+
+def generateKeyWordBehaviour(problem): # TODO: Simulation stuff must be in a class
+    global kBehaviour # TODO: again a bad line
+    psentenceWithNumber = re.compile('(' # TODO: Ugly must be done only once
+               +'[^.!?]*?' # not end of sentence
+               +'(\d+)' # number
+               +'[^.!?]*?' # not end of sentence
+               +'[.!?]' # end of sentence
+               +')')
+    solver=Solver(None)
+    dicIntAut=solver.findInterdictions(problem.text.fullText,problem.problemInitialStaticValues, psentenceWithNumber,dicSignKeyword)
+    kBehaviour.addInterAuthorDic(dicIntAut, problem.name)
 
 
 def generateAllPossibilities(problem,dropToTest=False,
@@ -74,6 +120,8 @@ def generateAllPossibilities(problem,dropToTest=False,
     upD=Updater(problem)
     upD.attachConstraintController(c_controller)
     upD.startAsUnderstood()
+
+    #
 
     # we add the model of goodAnswers, we want to be able to
     # keep them for later
@@ -108,11 +156,11 @@ def generateAllPossibilities(problem,dropToTest=False,
 #===============================================================================
 
 #=================PROBLEME 1 : Tc4t=============================================
-Tc4t='Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.'
-'Un kilo de poisson coûte maintenant 12 euros.'
-'Au début de l\'année, le kilo de viande coûtait le même prix que le kilo de poisson.'
-'Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson.'
-'Combien coûte le kilo de viande maintenant ?'
+Tc4t="""Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.
+Un kilo de poisson coûte maintenant 12 euros.
+Au début de l\'année, le kilo de viande coûtait le même prix que le kilo de poisson.
+Le kilo de viande a augmenté de 3 euros de moins que le kilo de poisson.
+Combien coûte le kilo de viande maintenant ?"""
 
 
 
@@ -146,11 +194,11 @@ problemTc4t=Problem(struct,text)
 problemTc4t.name="Tc4t"
 
 #===============PROBLEME 2 : Tc1t ====================================================
-Tc1t='Pendant la récréation, Lucas gagne 7 billes.'
-'Après la récréation, Lucas a 16 billes.'
-'Avant la récréation, Simon avait autant de billes que Lucas.'
-'Pendant la récréation, Simon gagne 3 billes de moins que Lucas.'
-'Combien Simon a-t-il de billes après la récréation ?'
+Tc1t="""Pendant la récréation, Lucas gagne 7 billes.
+Après la récréation, Lucas a 16 billes.
+Avant la récréation, Simon avait autant de billes que Lucas.
+Pendant la récréation, Simon gagne 3 billes de moins que Lucas.
+Combien Simon a-t-il de billes après la récréation ?"""
 
 problemTc1t=copy.deepcopy(problemTc4t)
 problemTc1t.name="Tc1t"
@@ -161,12 +209,12 @@ problemTc1t.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 
 #===============PROBLEME 3 : Tc2t ============================================
-Tc2t='Cette année, Théo a été pesé par le pédiatre.'
-'Théo a pris 5 kilos depuis le début de l’année.'
-'Théo pèse maintenant 14 kilos.'
-'Au début de l’année, Nicolas pesait le même poids que Théo.'
-'Nicolas a pris 2 kilos de moins que Théo cette année.'
-'Combien Nicolas pèse-t-il maintenant ?'
+Tc2t="""Cette année, Théo a été pesé par le pédiatre.
+Théo a pris 5 kilos depuis le début de l’année.
+Théo pèse maintenant 14 kilos.
+Au début de l’année, Nicolas pesait le même poids que Théo.
+Nicolas a pris 2 kilos de moins que Théo cette année.
+Combien Nicolas pèse-t-il maintenant ?"""
 
 problemTc2t=copy.deepcopy(problemTc4t)
 problemTc2t.name="Tc2t"
@@ -178,11 +226,11 @@ problemTc2t.text.getTextInformation(2).addAlternativeRepresentation(newrep)
 
 #===============PROBLEME 4 : Tc3t ============================================
 
-Tc3t='En janvier, 7 enfants se sont inscrits à la chorale.'
-'Après janvier, il y a 16 enfants à la chorale.'
-'Avant janvier, il y avait autant d\'enfants inscrits au football qu\'à la chorale.'
-'En janvier, il y a eu 2 inscriptions de moins au football qu\'à la chorale.'
-'Combien y a-t-il d\'enfants au football après janvier ?'
+Tc3t="""En janvier, 7 enfants se sont inscrits à la chorale.
+Après janvier, il y a 16 enfants à la chorale.
+Avant janvier, il y avait autant d\'enfants inscrits au football qu\'à la chorale.
+En janvier, il y a eu 2 inscriptions de moins au football qu\'à la chorale.
+Combien y a-t-il d\'enfants au football après janvier ?"""
 
 problemTc3t=copy.deepcopy(problemTc4t)
 problemTc3t.name="Tc3t"
@@ -193,11 +241,11 @@ problemTc3t.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 
 #===============PROBLEME 1p : Tc4p  =============================================
-Tc4p='Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.'
-'Un kilo de poisson coûte maintenant 12 euros.'
-'Au début de l\'année, le kilo de viande coûtait le même prix que le kilo de poisson.'
-'Le kilo de viande coûte maintenant 3 euros de moins que le kilos de poisson.'
-'De combien d\'euros le kilo de viande a-t-il augmenté ?'
+Tc4p="""Au supermarché, le kilo de poisson a augmenté de 5 euros cette année.
+Un kilo de poisson coûte maintenant 12 euros.
+Au début de l\'année, le kilo de viande coûtait le même prix que le kilo de poisson.
+Le kilo de viande coûte maintenant 3 euros de moins que le kilos de poisson.
+De combien d\'euros le kilo de viande a-t-il augmenté ?"""
 
 problemTc4p=copy.deepcopy(problemTc4t)
 problemTc4p.name="Tc4p"
@@ -212,12 +260,12 @@ problemTc4p.text.textInformations[3]=info3_prime
 problemTc4p.text.setGoal(TextGoal(Goal('ViandeGAIN','De combien le kilo de viande a t-il augmenté ?')))
 
 #===============PROBLEME 3p : Tc3p  =============================================
-Tc3p='En janvier, 7 enfants se sont inscrits à la chorale.'
-'Après janvier, il y a 16 enfants à la chorale.'
-'Avant janvier, il y avait autant d\'enfants inscrits au football qu\'à la chorale.'
-'En janvier, il y a eu de nouvelles inscriptions au football.'
-'Après janvier, il y a 2 enfants de moins au football qu\'à la chorale.'
-'Combien d\'enfants se sont inscrits au football en janvier ?'
+Tc3p="""En janvier, 7 enfants se sont inscrits à la chorale.
+Après janvier, il y a 16 enfants à la chorale.
+Avant janvier, il y avait autant d\'enfants inscrits au football qu\'à la chorale.
+En janvier, il y a eu de nouvelles inscriptions au football.
+Après janvier, il y a 2 enfants de moins au football qu\'à la chorale.
+Combien d\'enfants se sont inscrits au football en janvier ?"""
 
 
 problemTc3p=copy.deepcopy(problemTc4p)
@@ -230,12 +278,12 @@ problemTc3p.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 #===============PROBLEME 3p : Tc2p  ============================================
 
-Tc2p='Cette année, Théo a été pesé par le pédiatre.'
-'Théo a pris 5 kilos depuis le début de l’année.'
-'Théo pèse maintenant 14 kilos.'
-'Au début de l’année, Nicolas pesait le même poids que Théo.'
-'Maintenant, Nicolas pèse 2 kilos de moins que Théo.'
-'Combien de kilos Nicolas a-t-il pris cette année ?'
+Tc2p="""Cette année, Théo a été pesé par le pédiatre.
+Théo a pris 5 kilos depuis le début de l’année.
+Théo pèse maintenant 14 kilos.
+Au début de l’année, Nicolas pesait le même poids que Théo.
+Maintenant, Nicolas pèse 2 kilos de moins que Théo.
+Combien de kilos Nicolas a-t-il pris cette année ?"""
 
 
 
@@ -249,12 +297,12 @@ problemTc2p.text.getTextInformation(2).addAlternativeRepresentation(newrep)
 
 #===============PROBLEME 4p : Tc1p  =============================================
 
-Tc1p='Pendant la récréation, Lucas gagne 7 billes.'
-'Après la récréation, Lucas a 16 billes.'
-'Avant la récréation, Simon avait autant de billes que Lucas.'
-'Pendant la récréation, Simon gagne des billes,'
-'et après la récréation, il a 3 billes de moins que Lucas.'
-'Combien Simon a-t-il gagné de billes pendant la récréation ?'
+Tc1p="""Pendant la récréation, Lucas gagne 7 billes.
+Après la récréation, Lucas a 16 billes.
+Avant la récréation, Simon avait autant de billes que Lucas.
+Pendant la récréation, Simon gagne des billes,
+et après la récréation, il a 3 billes de moins que Lucas.
+Combien Simon a-t-il gagné de billes pendant la récréation ?"""
 
 problemTc1p=copy.deepcopy(problemTc4p)
 problemTc1p.name="Tc1p"
@@ -264,11 +312,11 @@ newrep=Representation(Quantity("LucasGAIN","T1"),'Après la récréation, Lucas gag
 problemTc1p.text.getTextInformation(1).addAlternativeRepresentation(newrep)
 
 # Cc1t
-Cc1t='Antoine a 5 billes.'
-'Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble'
-'Paul réunit ses billes avec celles de Jacques.'
-'Jacques a 3 billes de moins qu’Antoine.'
-'Combien Paul et Jacques ont-ils de billes ensemble ?'
+Cc1t="""Antoine a 5 billes.
+Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble
+Paul réunit ses billes avec celles de Jacques.
+Jacques a 3 billes de moins qu’Antoine.
+Combien Paul et Jacques ont-ils de billes ensemble ?"""
 
 
 schema1Cc1t=Schema(qf="AntoineETPaul",q1="Paul",operation=operations.addition,q2="Antoine",name="combinaison")
@@ -316,10 +364,10 @@ problemCc1t.name="Cc1t"
 #===============================================================================
 
 # Cc1p
-Cc1p='Antoine a 5 billes.'
-'Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.'
-'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins.'
-'Combien Jacques a-t-il de billes ?'
+Cc1p="""Antoine a 5 billes.
+Quand Antoine réunit ses billes avec celles de Paul, ils ont 12 billes ensemble.
+Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins.
+Combien Jacques a-t-il de billes ?"""
 
 problemCc1p=copy.deepcopy(problemCc1t)
 problemCc1p.name="Cc1p"
@@ -336,11 +384,11 @@ problemCc1p.text.setGoal(TextGoal(Goal('Jacques','Combien Jacques a-t-il de bill
 #===============================================================================
 # Cc2t
 
-Cc2t='Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.'
-'Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.'
-'Fido et Rex montent ensemble sur la balance chez le vétérinaire.'
-'Fido pèse 2 kilos de moins que Medor.'
-'Combien Fido et Rex pèsent-ils ensemble ?'
+Cc2t="""Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.
+Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
+Fido et Rex montent ensemble sur la balance chez le vétérinaire.
+Fido pèse 2 kilos de moins que Medor.
+Combien Fido et Rex pèsent-ils ensemble ?"""
 
 
 problemCc2t=copy.deepcopy(problemCc1t)
@@ -374,10 +422,10 @@ problemCc2t.text.getTextInformation(3).addAlternativeRepresentation(Representati
 #===============================================================================
 # Cc2p
 
-Cc2p='Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.'
-'Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.'
-'Lorsque Fido et Rex montent sur la balance ensemble, la balance indique 2 kilos de moins.'
-'Combien pèse Fido ?'
+Cc2p="""Quand Medor monte sur la balance chez le vétérinaire, la balance indique 6 kilos.
+Quand Medor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
+Lorsque Fido et Rex montent sur la balance ensemble, la balance indique 2 kilos de moins.
+Combien pèse Fido ?"""
 
 problemCc2p=copy.deepcopy(problemCc1p)
 problemCc2p.name="Cc2p"
@@ -402,11 +450,11 @@ problemCc2p.text.getTextInformation(3).addAlternativeRepresentation(Representati
 # Dans la classe de CE2, il y a 2 élèves de moins qu'en CM2.
 # Combien y a-t-il d'élèves dans le groupe réunissant les CE2 et les CM1 ?
 #===============================================================================
-Cc3t='Dans la classe de CM2, il y a 6 élèves.'
-'Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.'
-'On fait un groupe réunissant les CE2 et les CM1.'
-'Dans la classe de CE2, il y a 2 élèves de moins qu\'en CM2.'
-'Combien y a-t-il d\'élèves dans le groupe réunissant les CE2 et les CM1 ?'
+Cc3t="""Dans la classe de CM2, il y a 6 élèves.
+Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.
+On fait un groupe réunissant les CE2 et les CM1.
+Dans la classe de CE2, il y a 2 élèves de moins qu\'en CM2.
+Combien y a-t-il d\'élèves dans le groupe réunissant les CE2 et les CM1 ?"""
 
 problemCc3t=copy.deepcopy(problemCc2t)
 problemCc3t.name="Cc3t"
@@ -416,10 +464,10 @@ problemCc3t.renameKeywordObjects(keydic)
 
 # Cc3p
 
-Cc3p='Dans la classe de CM2, il y a 6 élèves.'
-'Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.'
-'Si on réunit les CE2 et les CM1, le groupe a 2 élèves de moins.'
-'Combien y a-t-il d\'élèves en CE2 ?'
+Cc3p="""Dans la classe de CM2, il y a 6 élèves.
+Si on réunit les CM2 et les CM1, cela fait un groupe de 15 élèves.
+Si on réunit les CE2 et les CM1, le groupe a 2 élèves de moins.
+Combien y a-t-il d\'élèves en CE2 ?"""
 
 problemCc3p=copy.deepcopy(problemCc2p)
 problemCc3p.name="Cc3p"
@@ -429,11 +477,10 @@ problemCc3p.renameKeywordObjects(keydic)
 
 # Cc4t
 
-Cc4t='Un livre coûte 9 euros. Si on achète un livre et une règle, on paie 14 euros.'
-'On achète une règle et un cahier. Le cahier coûte 2 euros de moins que le livre.'
-'On achète une règle et un cahier.'
-'Le cahier coûte 2 euros de moins que le livre.'
-'Combien coûtent la règle et le cahier ensemble ?'
+Cc4t="""Un livre coûte 9 euros. Si on achète un livre et une règle, on paie 14 euros.
+On achète une règle et un cahier.
+Le cahier coûte 2 euros de moins que le livre.
+Combien coûtent la règle et le cahier ensemble ?"""
 
 problemCc4t=copy.deepcopy(problemCc2t)
 problemCc4t.name="Cc4t"
@@ -443,11 +490,11 @@ problemCc4t.text.getTextInformation(0).addAlternativeRepresentation(Representati
 
 #===============================================================================
 # Cc4p
-Cc4p='Un livre coûte 9 euros.'
-'Si on achète un livre et une règle, on paie 14 euros.'
-'On achète une règle et un cahier.'
-'Cela coûte 2 euros de moins que lorsque l\'on achète un livre et une règle.'
-'Combien coûte le cahier ?'
+Cc4p="""Un livre coûte 9 euros.
+Si on achète un livre et une règle, on paie 14 euros.
+On achète une règle et un cahier.
+Cela coûte 2 euros de moins que lorsque l\'on achète un livre et une règle.
+Combien coûte le cahier ?"""
 
 problemCc4p=copy.deepcopy(problemCc2p)
 problemCc4p.name="Cc4p"
@@ -468,11 +515,11 @@ problemCc4p.setInitialValues({"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
 problemTc4t.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 problemTc4p.setInitialValues({"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 problemTc1t.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
-problemTc3p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
+problemTc3p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2}) #TODO: vérifier avec les pbms de val
 problemTc2t.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
 problemTc2p.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
 problemTc3t.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
-problemTc1p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
+problemTc1p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3}) #TODO: vérifier avec les pbms de val
 
 problemCc1t.text.fullText=Cc1t
 problemCc1p.text.fullText=Cc1p
@@ -491,7 +538,7 @@ problemTc2p.text.fullText=Tc2p
 problemTc3t.text.fullText=Tc3t
 problemTc1p.text.fullText=Tc1p
 
-bank=problemBank()
+bank=problemBank() # TODO: oh never used right ?
 bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, problemTc3p, problemTc4t, problemTc4p, problemCc1t, problemCc1p, problemCc2t, problemCc2p, problemCc3t, problemCc3p, problemCc4t, problemCc4p])
 
 # #=============================================================================
@@ -502,25 +549,32 @@ bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, 
 
 simulatedDatas=SimulatedDatas() # Most important instance of the programm
                                 # Contains all the informations related to simulations
+
+kBehaviour=KeyWordBehaviorDatas()
+
 if(alreadySimulated): # to avoid long time of computations, we can load and save a pickle file that can replace the simulation
     simulatedDatas.pickleLoad(pickleFile)
 else:
-    generateAllPossibilities(problemTc1p,dropToTest=False)
-    generateAllPossibilities(problemTc1t,dropToTest=False)
-    generateAllPossibilities(problemTc2t,dropToTest=False)
-    generateAllPossibilities(problemTc2p,dropToTest=False)
-    generateAllPossibilities(problemTc3t,dropToTest=False)
-    generateAllPossibilities(problemTc3p,dropToTest=False)
-    generateAllPossibilities(problemTc4t,dropToTest=False)
-    generateAllPossibilities(problemTc4p,dropToTest=False)
-    generateAllPossibilities(problemCc1t,dropToTest=False)
-    generateAllPossibilities(problemCc1p,dropToTest=False)
-    generateAllPossibilities(problemCc2t,dropToTest=False)
-    generateAllPossibilities(problemCc2p,dropToTest=False)
-    generateAllPossibilities(problemCc3t,dropToTest=False)
-    generateAllPossibilities(problemCc3p,dropToTest=False)
-    generateAllPossibilities(problemCc4t,dropToTest=False)
-    generateAllPossibilities(problemCc4p,dropToTest=False)
+    for problem in bank.dicPbm.values():
+        generateAllPossibilities(problem,dropToTest=False)
+        generateKeyWordBehaviour(problem)
+    #===========================================================================
+    # generateAllPossibilities(problemTc1t,dropToTest=False)
+    # generateAllPossibilities(problemTc2t,dropToTest=False)
+    # generateAllPossibilities(problemTc2p,dropToTest=False)
+    # generateAllPossibilities(problemTc3t,dropToTest=False)
+    # generateAllPossibilities(problemTc3p,dropToTest=False)
+    # generateAllPossibilities(problemTc4t,dropToTest=False)
+    # generateAllPossibilities(problemTc4p,dropToTest=False)
+    # generateAllPossibilities(problemCc1t,dropToTest=False)
+    # generateAllPossibilities(problemCc1p,dropToTest=False)
+    # generateAllPossibilities(problemCc2t,dropToTest=False)
+    # generateAllPossibilities(problemCc2p,dropToTest=False)
+    # generateAllPossibilities(problemCc3t,dropToTest=False)
+    # generateAllPossibilities(problemCc3p,dropToTest=False)
+    # generateAllPossibilities(problemCc4t,dropToTest=False)
+    # generateAllPossibilities(problemCc4p,dropToTest=False)
+    #===========================================================================
 
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')
@@ -566,20 +620,21 @@ obsdic.readCsv("mergedDatas_final.csv")
 
 
 # #=============================================================================
-# # STEP 5 : Compare empirical datas with simulated datas using the a priori
-# # formula dataset
+# # STEP 5 : Compare empirical datas with simulated datas (keyword and reinterpretations)
+# # using the a priori formula dataset
 # #=============================================================================
 
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
-sim=SimulationAprioribinderDic(aprioDIC,simulationDic)
-d2=SimulationAprioriEmpiricbinderDic(sim,obsdic)
+simReinterpretationModel=SimulationAprioribinderDic(aprioDIC,simulationDic)
+d2=SimulationAprioriEmpiricbinderDic(simReinterpretationModel,obsdic)
+d3=addKeyWordModel(d2,kBehaviour)
 formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 2, 2, 2, 3]'])
 logging.info(formulasToExclude)
 formulasToExclude2=simulatedDatas.findFormulas(models=['goodAnswers'])
 logging.info(formulasToExclude2)
 #d2.listAndCompare(sim,obsdic)
-d2.printCSV(simulationDirectory+"simulations_versus_observations_exclusionOfLateReinterpretations"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
-d2.printCSV(simulationDirectory+"simulations_versus_observations_noExclusion"+timestamp+".csv",formulasToExclude2) # print the csv which will be used for R analysis
+d3.printCSVModelComparison(simulationDirectory+"simulations_versus_observations_exclusionOfLateReinterpretations"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
+d3.printCSVModelComparison(simulationDirectory+"simulations_versus_observations_noExclusion"+timestamp+".csv",formulasToExclude2) # print the csv which will be used for R analysis
 
 
 #===============================================================================

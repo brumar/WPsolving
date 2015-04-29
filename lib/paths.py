@@ -4,6 +4,8 @@ from subjectRepresentations import *
 from textRepresentations import *
 import copy
 import uuid
+import re
+import itertools
 
 KEEPZEROS=False #when writing the formula with true values, the operation containing 0 are dropped
 REPLACEBYGENERICVALUES=True
@@ -177,7 +179,8 @@ class Solver:
     SOLVER=3
     def __init__(self,updater):
         self.updater=updater
-        self.TreePaths=TreePaths(updater) # store all the paths taken by solver
+        if(updater!=None): # TODO: Get rid of this ugly condition (dirty fix to develop keyword behaviour)
+            self.TreePaths=TreePaths(updater) # store all the paths taken by solver
 
     def generalSequentialSolver(self, currentStep="", updater="", level = 0, listOfActions=[SOLVER]):
         currentStepId=0
@@ -216,5 +219,70 @@ class Solver:
         for repMove in moveList:
             newstep=Step(Move(repMove),currentStepId,level=level)
             self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))
+
+    def findInterdictions(self, fullText,dicValues,psentenceWithNumber,dicSignKeyword):
+        matchs=psentenceWithNumber.findall(fullText)
+        numberWithKeywordDic={}
+        interdictions=[]
+        forcedautorisations=[]
+        newMatchs=[]
+        unCuedNumbers=[]
+
+        # turn tuples into list and convert the second member in object
+        for match in matchs:
+            for item in dicValues.keys():
+                number=str(dicValues[item])
+                if(str(number)==match[1]):
+                    newMatchs.append([match[0],item])
+
+        # find and store the operation cue in sentences
+        for match in newMatchs:
+            amatch=False
+            for k in dicSignKeyword.keys():
+                if k in match[0]: # if keyword in sentence
+                    numberWithKeywordDic.setdefault(match[1], []).append(dicSignKeyword[k])
+                    amatch=True
+            if not amatch:
+                unCuedNumbers.append(match[1])
+        print(unCuedNumbers)
+
+        # generate interdictions and forced autorisations
+
+
+        for numberWithKeyword in numberWithKeywordDic.keys():
+            # interdictions
+            interdictions.append(numberWithKeyword+"-")
+            if(operations.addition not in numberWithKeywordDic[numberWithKeyword] ):
+                interdictions.append(numberWithKeyword+"+")
+                interdictions.append("+"+numberWithKeyword)
+            if(operations.soustraction not in numberWithKeywordDic[numberWithKeyword]):
+                interdictions.append("-"+numberWithKeyword)
+
+
+            # forced autorisations
+            if(operations.addition in numberWithKeywordDic[numberWithKeyword] ):
+                forcedautorisations.append(numberWithKeyword+"+")
+                forcedautorisations.append("+"+numberWithKeyword)
+            if(operations.soustraction in numberWithKeywordDic[numberWithKeyword] ):
+                forcedautorisations.append("-"+numberWithKeyword)
+
+        # two uncued numbers can't be add
+        uncuedInterdictions=[]
+        unCuedNumberCouples=itertools.product(itertools.permutations(unCuedNumbers, 2),"-+")
+        for unc in unCuedNumberCouples:
+            uncuedInterdictions.append("%s%s%s"%(unc[0][0],unc[1],unc[0][1]))
+
+        interdictions.extend(uncuedInterdictions)
+
+
+        dicOutput={}
+        dicOutput["inter"]=interdictions
+        dicOutput["autor"]=forcedautorisations
+        return dicOutput
+
+
+        # a+/-b condition will be filtered in if (not in interdiction) or (in forcedautorisations)
+
+
 
 
