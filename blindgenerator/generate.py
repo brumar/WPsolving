@@ -78,7 +78,7 @@ def findAllPossiblesFormulas_stringRepresentation_withOptions(oper,values):
 def findAllPossiblesFormulas_stringRepresentation(operandLists,values):
     """
     find all the possible formulas
-    under the form a+(b-c), a b and c bein given in operandLists
+    under the form a+(b-c), a b and c being given in operandLists
     values are necessary to avoid negative numbers
     """
     possibilities=findAllPossiblesFormulas_listRepresentation(operandLists)
