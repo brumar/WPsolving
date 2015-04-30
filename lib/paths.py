@@ -241,7 +241,9 @@ class Solver:
         for match in newMatchs:
             amatch=False
             for k in dicSignKeyword.keys():
-                if k in match[0]: # if keyword in sentence
+                keyword=k.lower()
+                sentence=match[0].lower()
+                if keyword in sentence: # if keyword in sentence
                     numberWithKeywordDic.setdefault(match[1], []).append(dicSignKeyword[k])
                     amatch=True
             if not amatch:

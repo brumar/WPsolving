@@ -53,7 +53,8 @@ def addKeyWordModel(d2,kb): #TODO: Comment or refractor quick
                 stopCheking_CurrentFormula=False
                 untilNow_FormulaFilteredIn=True
                 for number in kb.dicPbms[problem]["OnceOrNone"]:
-                    if(len(re.findall(number,formula))>1):
+                    if(False):#
+                    #if(len(re.findall(number,formula))>1):
                         stopCheking_CurrentFormula=True
                         untilNow_FormulaFilteredIn=False
                         break
@@ -98,7 +99,9 @@ def generateKeyWordBehaviour(problem): # TODO: Simulation stuff must be in a cla
     global kBehaviour # TODO: again a bad line
     psentenceWithNumber = re.compile('(' # TODO: Ugly must be done only once
                +'[^.!?]*?' # not end of sentence
+               +'\s' # blank space
                +'(\d+)' # number
+               +'\s' # blank space
                +'[^.!?]*?' # not end of sentence
                +'[.!?]' # end of sentence
                +')')
@@ -564,7 +567,7 @@ else:
     for problem in bank.dicPbm.values():
         generateAllPossibilities(problem,dropToTest=False)
         generateKeyWordBehaviour(problem)
-        #break
+
     #===========================================================================
     # generateAllPossibilities(problemTc1t,dropToTest=False)
     # generateAllPossibilities(problemTc2t,dropToTest=False)
@@ -634,6 +637,7 @@ obsdic.readCsv("mergedDatas_final.csv")
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 simReinterpretationModel=SimulationAprioribinderDic(aprioDIC,simulationDic)
 d2=SimulationAprioriEmpiricbinderDic(simReinterpretationModel,obsdic)
+print(kBehaviour)
 d3=addKeyWordModel(d2,kBehaviour)
 formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 2, 2, 2, 3]'])
 logging.info(formulasToExclude)
