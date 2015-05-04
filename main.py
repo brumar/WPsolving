@@ -535,23 +535,23 @@ simulatedDatas.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"+timest
 #===============================================================================
 
 aprioDIC=GlobalAprioriDic()
-aprioDIC.addProblem("Tc1p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Cc1t",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Cc1p",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Cc2t",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Cc2p",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Cc3t",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Cc3p",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Cc4t",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Cc4p",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Tc4t",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Tc4p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Tc1t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Tc3p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
-aprioDIC.addProblem("Tc2t",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Tc2p",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Tc3t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
-aprioDIC.addProblem("Tc1p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Tc1p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Cc1t",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Cc1p",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Cc2t",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Cc2p",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Cc3t",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Cc3p",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Cc4t",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Cc4p",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Tc4t",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Tc4p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Tc1t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Tc3p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
+aprioDIC.processProblem("Tc2t",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Tc2p",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Tc3t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
+aprioDIC.processProblem("Tc1p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 
 #===============================================================================
 # STEP 4 : Read empiricical datas
@@ -567,9 +567,22 @@ obsdic.readCsv("mergedDatas_final.csv")
 # # using the a priori formula dataset
 # #=============================================================================
 
+#=======================REFRACTORY MISSION======================================
+#===============================================================================
+# predictionSpace=aprioDIC.buildPredictionSpace(aprioDIC,simulationDic)
+#
+# m1=simulatedDatas.buildPredictionModel(excludeUnsolvingProcesses=True) # m1 and m2 are modelPredictions Object (basically a dic)
+# m2=keywordSolver.buildPredictionModel(d2) # simulatedDatas and keywordSolver inherit from the same class in order to implement buildPredictionModel method
+#
+# pm=predictionsManager()
+# pm.addBase(base=predictionSpaces) # no "binder anymore", just a prediction space ...
+# pm.addModel(m1) # and some models attending to be added
+# pm.addModel(m2)
+#===============================================================================
+
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 simReinterpretationModel=SimulationAprioribinderDic(aprioDIC,simulationDic)
-d2=SimulationAprioriEmpiricbinderDic(simReinterpretationModel,obsdic)
+d2=predictionsManager(simReinterpretationModel,obsdic)
 print(keywordSolver)
 d3=keywordSolver.addKeyWordModel(d2)
 formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 2, 2, 2, 3]'])

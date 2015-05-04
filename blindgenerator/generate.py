@@ -13,7 +13,7 @@ class GlobalAprioriDic():
     def __init__(self):
         self.problemDic={}
 
-    def addProblem(self,problem,oper,values):
+    def processProblem(self,problem,oper,values):
         pbmdic=AprioriDic()
         l0,l1,l2,l3=findAllPossiblesFormulas_stringRepresentation_withOptions(oper,values)
         pbmdic.addDoubleList(l0, "set0")
