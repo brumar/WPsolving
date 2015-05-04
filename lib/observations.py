@@ -1,7 +1,7 @@
 import csv
 import logging
 
-class SimulationAprioriEmpiricbinderDic():
+class predictionsManager():
     def __init__(self,dicPbmSetFormula,globalobservationDic):
         self.dicPbmSetFormulaPlannedObserved=dicPbmSetFormula.dicPbmSetFormulaPlanned
         for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
@@ -17,7 +17,7 @@ class SimulationAprioriEmpiricbinderDic():
     def listAndCompare(self,dicPbmSetFormula,observationDic):
         """
         Not mandatory for analysis, does not involve changes in
-        SimulationAprioriEmpiricbinderDic instance.
+        predictionsManager instance.
 
         Check the formulas which are not in the a priori set but in the
         simulation set. This designed for debugging purpose but also to count the number
