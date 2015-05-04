@@ -11,6 +11,7 @@ from lib.observations import *
 from lib.problemBank import *
 from lib.postEvaluation import *
 from lib.constraints  import *
+from lib.keywordSolver import KeywordSolver
 import csv
 import datetime
 import time
@@ -37,45 +38,9 @@ newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
 logging.basicConfig(filename=simulationDirectory+'simulation.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt=timeformat)
 logging.getLogger().addHandler(logging.StreamHandler())
 
-dicSignKeyword={"augment":operations.addition,"moins": operations.soustraction,
-                "plus": operations.addition,"dimin": operations.soustraction,
-                "après": operations.addition,"gagne":operations.addition,
-                "pris": operations.addition,
-                "ensemble": operations.addition,"réuni": operations.addition}
 
-def addKeyWordModel(d2,kb): #TODO: Comment or refractor quick
-    mainDic=d2.dicPbmSetFormulaPlannedObserved
-    for problem in mainDic.keys():
-        print(problem,kb.dicPbms[problem])
-        problemDic=mainDic[problem]
-        for setDic in problemDic.values():
-            for formula in setDic.keys():
-                stopCheking_CurrentFormula=False
-                untilNow_FormulaFilteredIn=True
-                for number in kb.dicPbms[problem]["OnceOrNone"]:
-                    if(False):#
-                    #if(len(re.findall(number,formula))>1):
-                        stopCheking_CurrentFormula=True
-                        untilNow_FormulaFilteredIn=False
-                        break
-                for inter in kb.dicPbms[problem]["inter"]:
-                    if(stopCheking_CurrentFormula):
-                        break
-                    if inter not in formula:
-                        continue
-                    untilNow_FormulaFilteredIn=False
-                    for autor in kb.dicPbms[problem]["autor"]:
-                        if(autor in formula):
-                            stopCheking_CurrentFormula=True
-                            untilNow_FormulaFilteredIn=True
-                            break
-                if(untilNow_FormulaFilteredIn):
-                    #print("come one "+formula)
-                    setDic[formula].insert(1,True)
-                else:
-                    #print("get Out "+formula)
-                    setDic[formula].insert(1,False)
-    return d2
+
+
 
 class SimulationAprioribinderDic():
     """
@@ -94,20 +59,6 @@ class SimulationAprioribinderDic():
                 planned=(formula in simulation[pbm])
                 self.dicPbmSetFormulaPlanned[pbm][setName][formula]=planned
 
-
-def generateKeyWordBehaviour(problem): # TODO: Simulation stuff must be in a class
-    global kBehaviour # TODO: again a bad line
-    psentenceWithNumber = re.compile('(' # TODO: Ugly must be done only once
-               +'[^.!?]*?' # not end of sentence
-               +'\s' # blank space
-               +'(\d+)' # number
-               +'\s' # blank space
-               +'[^.!?]*?' # not end of sentence
-               +'[.!?]' # end of sentence
-               +')')
-    solver=Solver(None)
-    dicIntAut=solver.findInterdictions(problem.text.fullText,problem.problemInitialStaticValues, psentenceWithNumber,dicSignKeyword)
-    kBehaviour.addInterAuthorDic(dicIntAut, problem.name)
 
 
 def generateAllPossibilities(problem,dropToTest=False,
@@ -559,36 +510,18 @@ bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, 
 simulatedDatas=SimulatedDatas() # Most important instance of the programm
                                 # Contains all the informations related to simulations
 
-kBehaviour=KeyWordBehaviorDatas()
+keywordSolver=KeywordSolver(extendedKeyWord=False)
 
 if(alreadySimulated): # to avoid long time of computations, we can load and save a pickle file that can replace the simulation
     simulatedDatas.pickleLoad(pickleFile)
 else:
     for problem in bank.dicPbm.values():
         generateAllPossibilities(problem,dropToTest=False)
-        generateKeyWordBehaviour(problem)
-
-    #===========================================================================
-    # generateAllPossibilities(problemTc1t,dropToTest=False)
-    # generateAllPossibilities(problemTc2t,dropToTest=False)
-    # generateAllPossibilities(problemTc2p,dropToTest=False)
-    # generateAllPossibilities(problemTc3t,dropToTest=False)
-    # generateAllPossibilities(problemTc3p,dropToTest=False)
-    # generateAllPossibilities(problemTc4t,dropToTest=False)
-    # generateAllPossibilities(problemTc4p,dropToTest=False)
-    # generateAllPossibilities(problemCc1t,dropToTest=False)
-    # generateAllPossibilities(problemCc1p,dropToTest=False)
-    # generateAllPossibilities(problemCc2t,dropToTest=False)
-    # generateAllPossibilities(problemCc2p,dropToTest=False)
-    # generateAllPossibilities(problemCc3t,dropToTest=False)
-    # generateAllPossibilities(problemCc3p,dropToTest=False)
-    # generateAllPossibilities(problemCc4t,dropToTest=False)
-    # generateAllPossibilities(problemCc4p,dropToTest=False)
-    #===========================================================================
-
+        keywordSolver.generateKeyWordBehaviour(problem)
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')
 
+logging.info('keyword model : '+str(keywordSolver))
 simulatedDatas.pickleSave(newsimulation)
 simulatedDatas.buildBigDic()
 simulatedDatas.printCSV(csvFile=simulationDirectory+"simulation"+timestamp+".csv",hideUnsolved=True)
@@ -637,8 +570,8 @@ obsdic.readCsv("mergedDatas_final.csv")
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
 simReinterpretationModel=SimulationAprioribinderDic(aprioDIC,simulationDic)
 d2=SimulationAprioriEmpiricbinderDic(simReinterpretationModel,obsdic)
-print(kBehaviour)
-d3=addKeyWordModel(d2,kBehaviour)
+print(keywordSolver)
+d3=keywordSolver.addKeyWordModel(d2)
 formulasToExclude=simulatedDatas.findFormulas(models=['goodAnswers','[1, 2, 2, 2, 3]'])
 logging.info(formulasToExclude)
 formulasToExclude2=simulatedDatas.findFormulas(models=['goodAnswers'])

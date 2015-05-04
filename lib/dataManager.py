@@ -2,20 +2,6 @@ import csv
 import pickle
 import logging
 
-class KeyWordBehaviorDatas:
-    def __init__(self):
-        self.dicPbms={}
-
-    def addInterAuthorDic(self,dicIntAut,pbm):
-        self.dicPbms[pbm]=dicIntAut
-
-    def __str__(self):
-        output=""
-        for pbm in self.dicPbms.keys():
-            dic=str(self.dicPbms[pbm])
-            output=output+"%s => %s\n"%(pbm,dic)
-        return output
-
 
 class SimulatedDatas: # gathering and printing informations accross the different solving models
     def __init__(self):
