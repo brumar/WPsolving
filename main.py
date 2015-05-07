@@ -577,7 +577,7 @@ obsdic.readCsv("mergedDatas_final.csv")
 # pm=predictionsManager()
 # pm.addBase(base=predictionSpaces) # no "binder anymore", just a prediction space ...
 # pm.addModel(m1) # and some models attending to be added
-# pm.addModel(m2)
+# pm.addModel(m2) # printCSVModelComparison
 #===============================================================================
 
 simulationDic=simulatedDatas.buildMiniDic(excludeUnsolvingProcesses=True)
