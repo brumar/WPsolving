@@ -4,6 +4,8 @@ from subjectRepresentations import *
 from textRepresentations import *
 import copy
 import uuid
+import re
+import itertools
 
 KEEPZEROS=False #when writing the formula with true values, the operation containing 0 are dropped
 REPLACEBYGENERICVALUES=True
@@ -177,7 +179,8 @@ class Solver:
     SOLVER=3
     def __init__(self,updater):
         self.updater=updater
-        self.TreePaths=TreePaths(updater) # store all the paths taken by solver
+        if(updater!=None): # TODO: Get rid of this ugly condition (dirty fix to develop keyword behaviour)
+            self.TreePaths=TreePaths(updater) # store all the paths taken by solver
 
     def generalSequentialSolver(self, currentStep="", updater="", level = 0, listOfActions=[SOLVER]):
         currentStepId=0
@@ -216,5 +219,11 @@ class Solver:
         for repMove in moveList:
             newstep=Step(Move(repMove),currentStepId,level=level)
             self.generalSequentialSolver(newstep,copy.deepcopy(updater),level+1,copy.deepcopy(listOfActions))
+
+
+
+        # a+/-b condition will be filtered in if (not in interdiction) or (in forcedautorisations)
+
+
 
 

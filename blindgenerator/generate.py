@@ -13,7 +13,7 @@ class GlobalAprioriDic():
     def __init__(self):
         self.problemDic={}
 
-    def addProblem(self,problem,oper,values):
+    def processProblem(self,problem,oper,values):
         pbmdic=AprioriDic()
         l0,l1,l2,l3=findAllPossiblesFormulas_stringRepresentation_withOptions(oper,values)
         pbmdic.addDoubleList(l0, "set0")
@@ -78,7 +78,7 @@ def findAllPossiblesFormulas_stringRepresentation_withOptions(oper,values):
 def findAllPossiblesFormulas_stringRepresentation(operandLists,values):
     """
     find all the possible formulas
-    under the form a+(b-c), a b and c bein given in operandLists
+    under the form a+(b-c), a b and c being given in operandLists
     values are necessary to avoid negative numbers
     """
     possibilities=findAllPossiblesFormulas_listRepresentation(operandLists)

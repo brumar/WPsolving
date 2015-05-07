@@ -2,6 +2,7 @@ import csv
 import pickle
 import logging
 
+
 class SimulatedDatas: # gathering and printing informations accross the different solving models
     def __init__(self):
         self.datas=[] #list of dictionnaries (selected datas)
