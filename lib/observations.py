@@ -3,7 +3,7 @@ import logging
 
 class predictionsManager():
     def __init__(self,dicPbmSetFormula,globalobservationDic):
-        self.dicPbmSetFormulaPlannedObserved=dicPbmSetFormula.dicPbmSetFormulaPlanned
+        self.dicPbmSetFormulaPlannedObserved=dicPbmSetFormula.dicPbmSetFormulaPredicted
         for pbm in  self.dicPbmSetFormulaPlannedObserved.iterkeys():
             observationDic=globalobservationDic.problemDic[pbm]
             for setName in  self.dicPbmSetFormulaPlannedObserved[pbm].iterkeys():

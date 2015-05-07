@@ -33,38 +33,36 @@ class KeywordSolver :
             output=output+"%s => %s\n"%(pbm,dic)
         return output
 
-    def addKeyWordModel(self,d2): #TODO: Comment or refractor quick
-        mainDic=d2.dicPbmSetFormulaPlannedObserved
-        for problem in mainDic.keys():
-            print(problem,self.dicPbmsToconstraints[problem])
-            problemDic=mainDic[problem]
-            for setDic in problemDic.values():
-                for formula in setDic.keys():
-                    stopCheking_CurrentFormula=False
-                    untilNow_FormulaFilteredIn=True
-                    for number in self.dicPbmsToconstraints[problem]["OnceOrNone"]:
-                        if self.rules["limitUncuedNumbers"] and (len(re.findall(number,formula))>1):
-                            stopCheking_CurrentFormula=True
-                            untilNow_FormulaFilteredIn=False
-                            break
-                    for inter in self.dicPbmsToconstraints[problem]["inter"]:
-                        if(stopCheking_CurrentFormula):
-                            break
-                        if inter not in formula:
-                            continue
+    def extractPredictions(self,d2): #TODO: Comment or refractor quick
+        mainDic=d2.problemDic
+        output={}
+        for problem in self.dicPbmsToconstraints.keys():
+            output[problem]=[]
+            #print(problem,self.dicPbmsToconstraints[problem])
+            aprioDic=mainDic[problem]
+            for formula in aprioDic.formulaTosetDic.keys():
+                stopCheking_CurrentFormula=False
+                untilNow_FormulaFilteredIn=True
+                for number in self.dicPbmsToconstraints[problem]["OnceOrNone"]:
+                    if self.rules["limitUncuedNumbers"] and (len(re.findall(number,formula))>1):
+                        stopCheking_CurrentFormula=True
                         untilNow_FormulaFilteredIn=False
-                        for autor in self.dicPbmsToconstraints[problem]["autor"]:
-                            if(autor in formula):
-                                stopCheking_CurrentFormula=True
-                                untilNow_FormulaFilteredIn=True
-                                break
-                    if(untilNow_FormulaFilteredIn):
-                        #print("come one "+formula)
-                        setDic[formula].insert(1,True)
-                    else:
-                        #print("get Out "+formula)
-                        setDic[formula].insert(1,False)
-        return d2
+                        break
+                for inter in self.dicPbmsToconstraints[problem]["inter"]:
+                    if(stopCheking_CurrentFormula):
+                        break
+                    if inter not in formula:
+                        continue
+                    untilNow_FormulaFilteredIn=False
+                    for autor in self.dicPbmsToconstraints[problem]["autor"]:
+                        if(autor in formula):
+                            stopCheking_CurrentFormula=True
+                            untilNow_FormulaFilteredIn=True
+                            break
+                if(untilNow_FormulaFilteredIn):
+                    #print("come one "+formula)
+                    output[problem].append(formula)
+        return output
 
     def generateKeyWordBehaviour(self,problem): # TODO: Simulation stuff must be in a class
         psentenceWithNumber = re.compile('(' # TODO: Ugly must be done only once
@@ -163,5 +161,6 @@ class KeywordSolver :
         dicConstraintsOnBehavior["OnceOrNone"]=unCuedNumbers # uncued numbers can be used in formulas, but not more than once
 
         return dicConstraintsOnBehavior
+
 
 

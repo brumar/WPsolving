@@ -3,7 +3,7 @@ import pickle
 import logging
 
 
-class SimulatedDatas: # gathering and printing informations accross the different solving models
+class SimulatedDatas(): # gathering and printing informations accross the different solving models
     def __init__(self):
         self.datas=[] #list of dictionnaries (selected datas)
         self.datasBrut=[] #list of dictionnaries (all the datas)
@@ -82,7 +82,7 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                         writer.writerow([data["problem"]]+[data["model"]]+line)
 
     def printMiniCSV(self, csvFile="minidatas.csv"):
-        dicPbmSetFormula=self.buildMiniDic()
+        dicPbmSetFormula=self.extractPredictions()
         self.printMyDic(dicPbmSetFormula, csvFile)
 
     def printMyDic(self, dic, filename):
@@ -95,7 +95,7 @@ class SimulatedDatas: # gathering and printing informations accross the differen
                 writer.writerow([problem]+l)
 
 
-    def buildMiniDic(self,excludeUnsolvingProcesses=False):
+    def extractPredictions(self,excludeUnsolvingProcesses=False):
         dicPbmSetFormula={}
         for data in self.datas:
             path=data["path"]

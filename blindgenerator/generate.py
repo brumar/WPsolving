@@ -9,7 +9,7 @@ class tripleComparison():
     def addDic(self,dic,pbm):
         self.dicProblems[pbm]=dic
 
-class GlobalAprioriDic():
+class PredictionSpace():
     def __init__(self):
         self.problemDic={}
 
