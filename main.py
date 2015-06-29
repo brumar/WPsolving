@@ -29,7 +29,7 @@ simulationDirectory="simulations/"+timestamp+"_"+simulationName+"/"
 os.makedirs(simulationDirectory)
 
 ## GLOBAL OPTIONS
-alreadySimulated=False
+alreadySimulated=True
 #change the pickle filename if alreadySimulate==True
 pickleFile="simulations/2014_11_03__16_08_03_seriousStuff/simulation2014_11_03__16_08_03.pkl"
 newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
@@ -46,81 +46,7 @@ class Model():
         raise NotImplementedError("must be implemented")
 
 
-class predictionsManager():
-    """
-    bind datas from simulations and from apriori generators
-    tell if a formula is found or not in the simulations
-    """
-    def __init__(self):
-        self.dicPbmSetFormulaPredicted={}
-        self.dataTable=[]
 
-    def addPredictionsSpace(self,globalAprioriDic):
-        for pbm in globalAprioriDic.problemDic.iterkeys():
-            aprioriDic=globalAprioriDic.problemDic[pbm]
-            self.dicPbmSetFormulaPredicted[pbm]={}
-            for formula in aprioriDic.formulaTosetDic.iterkeys():
-                setName=aprioriDic.formulaTosetDic[formula]
-                if setName not in self.dicPbmSetFormulaPredicted[pbm].keys():
-                    self.dicPbmSetFormulaPredicted[pbm][setName]={}
-                self.dicPbmSetFormulaPredicted[pbm][setName][formula]=[]
-
-    def addModelPredictions(self,predictions,modelName="untitledModel"):
-        for pbm,setName,formula in self.walk():
-            predicted=False
-            if(formula in predictions[pbm]):
-                predicted=True
-            self.dicPbmSetFormulaPredicted[pbm][setName][formula].append((modelName,predicted))
-
-    def walk(self):
-        for pbm in self.dicPbmSetFormulaPredicted.iterkeys():
-            for setName in self.dicPbmSetFormulaPredicted[pbm].iterkeys():
-                for formula in self.dicPbmSetFormulaPredicted[pbm][setName].iterkeys():
-                    yield pbm,setName,formula
-
-    def addEmpiricalDatas(self,empirDatas):
-        for pbm,setName,formula in self.walk():
-            occurences=0
-            if formula in empirDatas.problemDic[pbm].keys():
-                occurences=empirDatas.problemDic[pbm][formula]
-            self.dicPbmSetFormulaPredicted[pbm][setName][formula].append(("occurences",occurences))
-
-    #===========================================================================
-    # def printCSV(self,filename,formulasToExclude={}):
-    #     noExclusion=(len(formulasToExclude.keys())==0)
-    #     with open(filename, 'wb') as csvfile:
-    #         writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    #         writer.writerow(["problem"]+["set"]+["formula"]+["selected"]+["occurrences"])
-    #         for pbm,setName,formula in self.walk():
-    #                 #writer.writerow([pbm]+[setName]+[formula]+[planned]+[observationsCount])
-    #===========================================================================
-
-    def printCSVModelComparison(self,filename,formulasToExclude={}):
-        self.createPrintableTable(formulasToExclude)
-        self.printCSV(filename)
-
-    def printCSV(self,filename):
-        with open(filename, 'wb') as csvfile:
-            writer = csv.writer(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for row in self.dataTable:
-                writer.writerow(row)
-
-    def createPrintableTable(self,formulasToExclude):
-        noExclusion=(len(formulasToExclude.keys())==0)
-        firstIteration=True
-        firstrow=["pbm","set","formula"]
-        for pbm,setName,formula in self.walk():
-            if noExclusion or (formula not in formulasToExclude[pbm]):
-                line=[pbm,setName,formula]
-                for model in self.dicPbmSetFormulaPredicted[pbm][setName][formula]:
-                    name=model[0]
-                    value=model[1]
-                    line.append(value)
-                    if(firstIteration):
-                        firstrow.append(name)
-                firstIteration=False
-                self.dataTable.append(line)
-        self.dataTable.insert(0, firstrow)
 
 
 
@@ -523,25 +449,26 @@ bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, 
 
 
 reinterpretationModel_extended=ReinterpretationModel(numberOfReinterpretation=2,dropToTest=False)
-reinterpretationModel=ReinterpretationModel(numberOfReinterpretation=1,dropToTest=False) # Most important instance of the programm
+reinterpretationModel=ReinterpretationModel(numberOfReinterpretation=1,dropToTest=True)
+reinterpretationModel_direct=ReinterpretationModel(numberOfReinterpretation=1,dropToTest=False,excludeLateReinterpretations=True)
                                 # Contains all the informations related to simulations
 
 keywordSolver=KeywordSolver(extendedKeyWord=False)
 keywordSolver_extended=KeywordSolver(extendedKeyWord=True)
 
 if(alreadySimulated): # to avoid long time of computations, we can load and save a pickle file that can replace the simulation
-    reinterpretationModel.pickleLoad(pickleFile)
+    reinterpretationModel.pickleLoad(pickleFile) # TODO no up to date
 else:
     for problem in bank.dicPbm.values():
-        reinterpretationModel.generateAllPossibilities(problem)
-        reinterpretationModel_extended.generateAllPossibilities(problem)
-        keywordSolver.generateKeyWordBehaviour(problem)
+        #keywordSolver.generateKeyWordBehaviour(problem)
         keywordSolver_extended.generateKeyWordBehaviour(problem)
-        break
+        reinterpretationModel.generateAllPossibilities(problem)
+        #reinterpretationModel_extended.generateAllPossibilities(problem)
+        #reinterpretationModel_direct.generateAllPossibilities(problem)
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')
 
-logging.info('keyword model : '+str(keywordSolver))
+logging.info('keyword model : '+str(keywordSolver_extended))
 reinterpretationModel.pickleSave(newsimulation)
 reinterpretationModel.buildBigDic()
 reinterpretationModel.printCSV(csvFile=simulationDirectory+"simulation"+timestamp+".csv",hideUnsolved=True)
@@ -555,27 +482,23 @@ reinterpretationModel.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"
 #===============================================================================
 
 predictionSpace=PredictionSpace()
-#===============================================================================
-# predictionSpace.processProblem("Tc1p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Cc1t",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Cc1p",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Cc2t",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
-#===============================================================================
+predictionSpace.processProblem("Tc1p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Cc1t",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Cc1p",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Cc2t",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
 predictionSpace.processProblem("Cc2p",["T1","P1","d"],{"P1":6,"T1":15,"(T1+P1)":21,"zero":0,"d":2,"-d":-2})
-#===============================================================================
-# predictionSpace.processProblem("Cc3t",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Cc3p",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Cc4t",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Cc4p",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Tc4t",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Tc4p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Tc1t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Tc3p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
-# predictionSpace.processProblem("Tc2t",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Tc2p",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Tc3t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
-# predictionSpace.processProblem("Tc1p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
-#===============================================================================
+predictionSpace.processProblem("Cc3t",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Cc3p",["T1","P1","d"],{"P1":6,"T1":15,"zero":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Cc4t",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Cc4p",["T1","P1","d"],{"P1":9,"T1":14,"zero":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc4t",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Tc4p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Tc1t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Tc3p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Tc2t",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc2p",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc3t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc1p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 
 #===============================================================================
 # STEP 4 : Read empiricical datas
@@ -594,20 +517,22 @@ obsdic.readCsv("mergedDatas_final.csv")
 rModelPredictions=reinterpretationModel.extractPredictions(excludeUnsolvingProcesses=True)
 kModelPredictions=keywordSolver.extractPredictions(predictionSpace)
 rModelPredictions_extended=reinterpretationModel_extended.extractPredictions(excludeUnsolvingProcesses=True)
+rModelPredictions_direct=reinterpretationModel_direct.extractPredictions(predictionSpace)
 kModelPredictions_extended=keywordSolver_extended.extractPredictions(predictionSpace)
 
 pm=predictionsManager()#pm.
 pm.addPredictionsSpace(predictionSpace)
 pm.addModelPredictions(rModelPredictions,"ReinterpretationModel")
-pm.addModelPredictions(kModelPredictions,"KeywordModel")
-pm.addModelPredictions(rModelPredictions_extended,"ReinterpretationModel_extended")
-pm.addModelPredictions(kModelPredictions_extended,"KeywordModel_extended")
+#pm.addModelPredictions(kModelPredictions,"KeywordModel")
+#pm.addModelPredictions(rModelPredictions_extended,"ReinterpretationModel_extended")
+#pm.addModelPredictions(kModelPredictions_extended,"KeywordModel_extended")
+#pm.addModelPredictions(rModelPredictions_direct,"ReinterpretationModel_direct")
 pm.addEmpiricalDatas(obsdic)
 
 formulasToExclude=reinterpretationModel.findFormulas(models=['goodAnswers'])
 logging.info(formulasToExclude)
 pm.printCSVModelComparison(simulationDirectory+"simulations_versus_observations_noExclusion"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
-
+pm.listAndCompare(obsdic)
 
 
 #===============================================================================
