@@ -29,7 +29,7 @@ simulationDirectory="simulations/"+timestamp+"_"+simulationName+"/"
 os.makedirs(simulationDirectory)
 
 ## GLOBAL OPTIONS
-alreadySimulated=True
+alreadySimulated=False
 #change the pickle filename if alreadySimulate==True
 pickleFile="simulations/2014_11_03__16_08_03_seriousStuff/simulation2014_11_03__16_08_03.pkl"
 newsimulation=simulationDirectory+"simulation"+timestamp+".pkl"
@@ -404,6 +404,202 @@ keydic={"Medor":"livre","Rex":"regle","Fido":"cahier"}
 #problemCc3t.renameKeywordObjects(keydic)
 #problemCc4t.text.getTextInformation(0).addAlternativeRepresentation(Representation(Quantity("cahier","P1"),''))
 
+problemCc1t.text.fullText=Cc1t
+problemCc1p.text.fullText=Cc1p
+problemCc2t.text.fullText=Cc2t
+problemCc2p.text.fullText=Cc2p
+problemCc3t.text.fullText=Cc3t
+problemCc3p.text.fullText=Cc3p
+problemCc4t.text.fullText=Cc4t
+problemCc4p.text.fullText=Cc4p
+problemTc4t.text.fullText=Tc4t
+problemTc4p.text.fullText=Tc4p
+problemTc1t.text.fullText=Tc1t
+problemTc3p.text.fullText=Tc3p
+problemTc2t.text.fullText=Tc2t
+problemTc2p.text.fullText=Tc2p
+problemTc3t.text.fullText=Tc3t
+problemTc1p.text.fullText=Tc1p
+
+##############SECOND VERSION OF THE PROBLEMS####################
+problemTc1t_v2=copy.deepcopy(problemTc1t)
+problemTc2p_v2=copy.deepcopy(problemTc2p)
+problemTc3t_v2=copy.deepcopy(problemTc3t)
+problemTc4p_v2=copy.deepcopy(problemTc1p)## IMPORTANT : ds la v2 les formulations contexte 4 sont équivalents au contexte 1
+problemCc1t_v2=copy.deepcopy(problemCc1t)
+problemCc2p_v2=copy.deepcopy(problemCc2p)
+problemCc3t_v2=copy.deepcopy(problemCc3t)
+problemCc4p_v2=copy.deepcopy(problemCc1p)
+problemTc1p_v2=copy.deepcopy(problemTc1p)
+problemTc2t_v2=copy.deepcopy(problemTc2t)
+problemTc3p_v2=copy.deepcopy(problemTc3p)
+problemTc4t_v2=copy.deepcopy(problemTc1t)
+problemCc1p_v2=copy.deepcopy(problemCc1p)
+problemCc2t_v2=copy.deepcopy(problemCc2t)
+problemCc3p_v2=copy.deepcopy(problemCc3p)
+problemCc4t_v2=copy.deepcopy(problemCc1t)
+
+
+Cc4p_v2="""Jules achète un livre à 7 euros et une règle. Jules paie 15 euros.
+Aurélien achète une règle et un cahier.
+En tout, Aurélien paie 3 euros de moins que Jules.
+Combien coûte le cahier ?"""
+
+keydic={"Antoine":"Livre","Paul":"Règle","Jacques":"Cahier"}
+problemCc4p_v2.renameKeywordObjects(keydic)
+
+Cc4t_v2="""Jules achète un livre à 7 euros et une règle. Jules paie 15 euros.
+Aurélien achète une règle et un cahier.
+Le cahier coûte 3 euros de moins que le livre.
+Combien Aurélien doit-il payer ? """
+
+keydic={"Antoine":"Livre","Paul":"Règle","Jacques":"Cahier"}
+problemCc4t_v2.renameKeywordObjects(keydic)
+
+Tc4p_v2="""Pour Noël, Camille reçoit 7 euros.
+Après Noël, Camille a 12 euros dans sa tirelire.
+Avant Noël, Léa avait autant d'argent que Camille dans sa tirelire.
+Pour Noël, Léa reçoit de l'argent.
+Après Noël, Léa a 3 euros de moins que Camille dans sa tirelire.
+Combien d'euros Léa a-t-elle reçu pour Noël ?"""
+
+keydic={"Lucas":"Camille","Simon":"Léa"}
+problemTc4p_v2.renameKeywordObjects(keydic)
+
+Tc4t_v2="""Après Noël, Camille a 12 euros dans sa tirelire.
+Avant Noël, Léa avait autant d'argent que Camille dans sa tirelire.
+Pour Noël, Léa reçoit 3 euros de moins que Camille.
+Combien Léa a-t-elle d'argent dans sa tirelire après Noël ?"""
+
+keydic={"Lucas":"Camille","Simon":"Léa"}
+problemTc4t_v2.renameKeywordObjects(keydic)
+
+
+Cc1t_v2="""Antoine a 7 billes.
+Quand Antoine réunit ses billes avec celles de Paul, ils ont 16 billes ensemble.
+Jacques a 4 billes de moins qu’Antoine.
+Paul réunit ses billes avec celles de Jacques.
+Combien Paul et Jacques ont-ils de billes ensemble ?"""
+
+Cc2t_v2="""Quand Médor monte sur la balance chez le vétérinaire, la balance indique 9 kilos.
+Quand Médor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
+Fido pèse 4 kilos de moins que Médor.
+Fido et Rex montent ensemble sur la balance chez le vétérinaire.
+Combien Fido et Rex pèsent-ils ensemble ?"""
+
+Cc3t_v2="""Dans la classe de CM2, il y a 9 élèves.
+Si on réunit les CM2 et les CM1, cela fait un groupe de 17 élèves.
+Dans la classe de CE2, il y a 3 élèves de moins qu'en CM2.
+On fait un groupe réunissant les CE2 et les CM1.
+Combien y a-t-il d'élèves dans ce groupe ?"""
+
+Cc1p_v2="""Antoine a 7 billes.
+Quand Antoine réunit ses billes avec celles de Paul, ils ont 16 billes ensemble.
+Quand Paul et Jacques réunissent leurs billes, cela fait 4 billes de moins.
+Combien Jacques a-t-il de billes ?"""
+
+Cc2p_v2="""Quand Médor monte sur la balance chez le vétérinaire, la balance indique 9 kilos.
+Quand Médor et Rex montent ensemble sur la balance chez le vétérinaire, la balance indique 15 kilos.
+Lorsque Fido et Rex montent sur la balance ensemble, la balance indique 4 kilos de moins.
+Combien pèse Fido ?"""
+
+Cc3p_v2="""Dans la classe de CM2, il y a 9 élèves.
+Si on réunit les CM2 et les CM1, cela fait un groupe de 17 élèves.
+Si on réunit les CE2 et les CM1, le groupe a 3 élèves de moins.
+Combien y a-t-il d'élèves en CE2 ?"""
+
+Tc1p_v2="""Pendant la récréation, Lucas gagne 6 billes.
+Après la récréation, Lucas a 15 billes.
+Avant la récréation, Simon avait autant de billes que Lucas.
+Pendant la récréation, Simon gagne 4 billes de moins que Lucas.
+Combien Simon a-t-il de billes après la récréation ?"""
+
+Tc2p_v2="""Cette année, Théo a été pesé par le pédiatre.
+Théo a pris 5 kilos depuis le début de l’année.
+Théo pèse maintenant 14 kilos.
+Au début de l’année, Nicolas pesait le même poids que Théo.
+Nicolas a pris 2 kilos de moins que Théo cette année.
+Combien Nicolas pèse-t-il maintenant ?"""
+
+Tc3p_v2="""En janvier, 6 enfants se sont inscrits à la chorale.
+Après janvier, il y a 13 enfants à la chorale.
+Avant janvier, il y avait autant d'enfants inscrits au football qu'à la chorale.
+En janvier, il y a eu 2 inscriptions de moins au football qu'à la chorale.
+Combien y a-t-il d'enfants au football après janvier ?"""
+
+Tc1t_v2="""Pendant la récréation, Lucas gagne 6 billes.
+Après la récréation, Lucas a 15 billes.
+Avant la récréation, Simon avait autant de billes que Lucas.
+Pendant la récréation, Simon gagne des billes, et après la récréation, il a 4 billes de moins que Lucas.
+Combien Simon a-t-il gagné de billes pendant la récréation ?"""
+
+Tc2t_v2="""Cette année, Théo a été pesé par le pédiatre.
+Théo a pris 5 kilos depuis le début de l’année.
+Théo pèse maintenant 14 kilos.
+Au début de l’année, Nicolas pesait le même poids que Théo.
+Maintenant, Nicolas pèse 2 kilos de moins que Théo.
+Combien de kilos Nicolas a-t-il pris cette année ?"""
+
+Tc3t_v2="""En janvier, 6 enfants se sont inscrits à la chorale.
+Après janvier, il y a 13 enfants à la chorale.
+Avant janvier, il y avait autant d'enfants inscrits au football qu'à la chorale.
+En janvier, il y a eu de nouvelles inscriptions au football.
+Après janvier, il y a 2 enfants de moins au football qu'à la chorale.
+Combien d'enfants se sont inscrits au football en janvier ?"""
+
+
+
+problemCc1t_v2.text.fullText=Cc1t_v2
+problemCc1p_v2.text.fullText=Cc1p_v2
+problemCc2t_v2.text.fullText=Cc2t_v2
+problemCc2p_v2.text.fullText=Cc2p_v2
+problemCc3t_v2.text.fullText=Cc3t_v2
+problemCc3p_v2.text.fullText=Cc3p_v2
+problemCc4t_v2.text.fullText=Cc4t_v2
+problemCc4p_v2.text.fullText=Cc4p_v2
+problemTc4t_v2.text.fullText=Tc4t_v2
+problemTc4p_v2.text.fullText=Tc4p_v2
+problemTc1t_v2.text.fullText=Tc1t_v2
+problemTc3p_v2.text.fullText=Tc3p_v2
+problemTc2t_v2.text.fullText=Tc2t_v2
+problemTc2p_v2.text.fullText=Tc2p_v2
+problemTc3t_v2.text.fullText=Tc3t_v2
+problemTc1p_v2.text.fullText=Tc1p_v2
+
+problemCc1t_v2.name="Cc1t_v2"
+problemCc1p_v2.name="Cc1p_v2"
+problemCc2t_v2.name="Cc2t_v2"
+problemCc2p_v2.name="Cc2p_v2"
+problemCc3t_v2.name="Cc3t_v2"
+problemCc3p_v2.name="Cc3p_v2"
+problemCc4t_v2.name="Cc4t_v2"
+problemCc4p_v2.name="Cc4p_v2"
+problemTc4t_v2.name="Tc4t_v2"
+problemTc4p_v2.name="Tc4p_v2"
+problemTc1t_v2.name="Tc1t_v2"
+problemTc3p_v2.name="Tc3p_v2"
+problemTc2t_v2.name="Tc2t_v2"
+problemTc2p_v2.name="Tc2p_v2"
+problemTc3t_v2.name="Tc3t_v2"
+problemTc1p_v2.name="Tc1p_v2"
+
+problemCc1t_v2.setInitialValues({"P1":7,"T1":16,"(T1+P1)":23,"zero":0,"d":4,"-d":-4})
+problemCc1p_v2.setInitialValues({"P1":7,"T1":16,"(T1+P1)":23,"zero":0,"d":4,"-d":-4})
+problemCc2t_v2.setInitialValues({"P1":9,"T1":15,"(T1+P1)":24,"zero":0,"d":4,"-d":-4})
+problemCc2p_v2.setInitialValues({"P1":9,"T1":15,"(T1+P1)":24,"zero":0,"d":4,"-d":-4})
+problemCc3t_v2.setInitialValues({"P1":9,"T1":17,"zero":0,"d":3,"-d":-3})
+problemCc3p_v2.setInitialValues({"P1":9,"T1":17,"zero":0,"d":3,"-d":-3})
+problemCc4t_v2.setInitialValues({"P1":7,"T1":15,"zero":0,"d":3,"-d":-3})
+problemCc4p_v2.setInitialValues({"P1":7,"T1":15,"zero":0,"d":3,"-d":-3})
+
+problemTc4t_v2.setInitialValues({"P1":7,"T1":12,"dEI":0,"d":3,"-d":-3})
+problemTc4p_v2.setInitialValues({"P1":7,"T1":12,"dEI":0,"d":3,"-d":-3})
+problemTc1t_v2.setInitialValues({"P1":6,"T1":15,"dEI":0,"d":4,"-d":-4})
+problemTc3p_v2.setInitialValues({"P1":6,"T1":13,"dEI":0,"d":2,"-d":-2})
+problemTc2t_v2.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+problemTc2p_v2.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+problemTc3t_v2.setInitialValues({"P1":6,"T1":13,"dEI":0,"d":2,"-d":-2})
+problemTc1p_v2.setInitialValues({"P1":6,"T1":15,"dEI":0,"d":4,"-d":-4})
 
 problemCc1t.setInitialValues({"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
 problemCc1p.setInitialValues({"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
@@ -423,25 +619,8 @@ problemTc2p.setInitialValues({"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
 problemTc3t.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 problemTc1p.setInitialValues({"P1":7,"T1":16,"dEI":0,"d":3,"-d":-3}) #TODO: vérifier avec les pbms de val
 
-problemCc1t.text.fullText=Cc1t
-problemCc1p.text.fullText=Cc1p
-problemCc2t.text.fullText=Cc2t
-problemCc2p.text.fullText=Cc2p
-problemCc3t.text.fullText=Cc3t
-problemCc3p.text.fullText=Cc3p
-problemCc4t.text.fullText=Cc4t
-problemCc4p.text.fullText=Cc4p
-problemTc4t.text.fullText=Tc4t
-problemTc4p.text.fullText=Tc4p
-problemTc1t.text.fullText=Tc1t
-problemTc3p.text.fullText=Tc3p
-problemTc2t.text.fullText=Tc2t
-problemTc2p.text.fullText=Tc2p
-problemTc3t.text.fullText=Tc3t
-problemTc1p.text.fullText=Tc1p
-
 bank=problemBank() # TODO: oh never used right ?
-bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, problemTc3p, problemTc4t, problemTc4p, problemCc1t, problemCc1p, problemCc2t, problemCc2p, problemCc3t, problemCc3p, problemCc4t, problemCc4p])
+bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, problemTc3p, problemTc4t, problemTc4p, problemCc1t, problemCc1p, problemCc2t, problemCc2p, problemCc3t, problemCc3p, problemCc4t, problemCc4p,problemTc1t_v2, problemTc1p_v2, problemTc2t_v2, problemTc2p_v2, problemTc3t_v2, problemTc3p_v2, problemTc4t_v2, problemTc4p_v2, problemCc1t_v2, problemCc1p_v2, problemCc2t_v2, problemCc2p_v2, problemCc3t_v2, problemCc3p_v2, problemCc4t_v2, problemCc4p_v2])
 
 # #=============================================================================
 # # STEP 2 : SIMULATIONS
@@ -449,7 +628,7 @@ bank.addPbms([ problemTc1t, problemTc1p, problemTc2t, problemTc2p, problemTc3t, 
 
 
 reinterpretationModel_extended=ReinterpretationModel(numberOfReinterpretation=2,dropToTest=False)
-reinterpretationModel=ReinterpretationModel(numberOfReinterpretation=1,dropToTest=True)
+reinterpretationModel=ReinterpretationModel(numberOfReinterpretation=1,dropToTest=False)
 reinterpretationModel_direct=ReinterpretationModel(numberOfReinterpretation=1,dropToTest=False,excludeLateReinterpretations=True)
                                 # Contains all the informations related to simulations
 
@@ -457,14 +636,14 @@ keywordSolver=KeywordSolver(extendedKeyWord=False)
 keywordSolver_extended=KeywordSolver(extendedKeyWord=True)
 
 if(alreadySimulated): # to avoid long time of computations, we can load and save a pickle file that can replace the simulation
-    reinterpretationModel.pickleLoad(pickleFile) # TODO no up to date
+    reinterpretationModel.pickleLoad(pickleFile) #TODO: no up to date at all
 else:
     for problem in bank.dicPbm.values():
-        #keywordSolver.generateKeyWordBehaviour(problem)
+        keywordSolver.generateKeyWordBehaviour(problem)
         keywordSolver_extended.generateKeyWordBehaviour(problem)
         reinterpretationModel.generateAllPossibilities(problem)
-        #reinterpretationModel_extended.generateAllPossibilities(problem)
-        #reinterpretationModel_direct.generateAllPossibilities(problem)
+        reinterpretationModel_extended.generateAllPossibilities(problem)
+        reinterpretationModel_direct.generateAllPossibilities(problem)
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')
 
@@ -482,6 +661,7 @@ reinterpretationModel.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"
 #===============================================================================
 
 predictionSpace=PredictionSpace()
+#TODO: These lines are ugly, it would have been better if process problem Banks
 predictionSpace.processProblem("Tc1p",["T1","P1","d"],{"P1":5,"T1":12,"dEI":0,"d":3,"-d":-3})
 predictionSpace.processProblem("Cc1t",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
 predictionSpace.processProblem("Cc1p",["T1","P1","d"],{"P1":5,"T1":12,"(T1+P1)":17,"zero":0,"d":3,"-d":-3})
@@ -500,13 +680,32 @@ predictionSpace.processProblem("Tc2p",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d
 predictionSpace.processProblem("Tc3t",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 predictionSpace.processProblem("Tc1p",["T1","P1","d"],{"P1":7,"T1":16,"dEI":0,"d":2,"-d":-2})
 
+
+predictionSpace.processProblem("Cc1t_v2",["T1","P1","d"],{"P1":7,"T1":16,"(T1+P1)":23,"zero":0,"d":4,"-d":-4})
+predictionSpace.processProblem("Cc1p_v2",["T1","P1","d"],{"P1":7,"T1":16,"(T1+P1)":23,"zero":0,"d":4,"-d":-4})
+predictionSpace.processProblem("Cc2t_v2",["T1","P1","d"],{"P1":9,"T1":15,"(T1+P1)":24,"zero":0,"d":4,"-d":-4})
+predictionSpace.processProblem("Cc2p_v2",["T1","P1","d"],{"P1":9,"T1":15,"(T1+P1)":24,"zero":0,"d":4,"-d":-4})
+predictionSpace.processProblem("Cc3t_v2",["T1","P1","d"],{"P1":9,"T1":17,"zero":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Cc3p_v2",["T1","P1","d"],{"P1":9,"T1":17,"zero":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Cc4t_v2",["T1","P1","d"],{"P1":7,"T1":15,"zero":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Cc4p_v2",["T1","P1","d"],{"P1":7,"T1":15,"zero":0,"d":3,"-d":-3})
+
+predictionSpace.processProblem("Tc4t_v2",["T1","P1","d"],{"P1":7,"T1":12,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Tc4p_v2",["T1","P1","d"],{"P1":7,"T1":12,"dEI":0,"d":3,"-d":-3})
+predictionSpace.processProblem("Tc1t_v2",["T1","P1","d"],{"P1":6,"T1":15,"dEI":0,"d":4,"-d":-4})
+predictionSpace.processProblem("Tc3p_v2",["T1","P1","d"],{"P1":6,"T1":13,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc2t_v2",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc2p_v2",["T1","P1","d"],{"P1":5,"T1":14,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc3t_v2",["T1","P1","d"],{"P1":6,"T1":13,"dEI":0,"d":2,"-d":-2})
+predictionSpace.processProblem("Tc1p_v2",["T1","P1","d"],{"P1":6,"T1":15,"dEI":0,"d":4,"-d":-4})
+
 #===============================================================================
 # STEP 4 : Read empiricical datas
 #===============================================================================
 
 ## We read the dataset of formulas (children answers)
 obsdic=globalEmpiricalDic()
-obsdic.readCsv("mergedDatas_final.csv")
+obsdic.readCsv("mergedDatas_final_separated.csv")
 
 
 # #=============================================================================
@@ -523,10 +722,10 @@ kModelPredictions_extended=keywordSolver_extended.extractPredictions(predictionS
 pm=predictionsManager()#pm.
 pm.addPredictionsSpace(predictionSpace)
 pm.addModelPredictions(rModelPredictions,"ReinterpretationModel")
-#pm.addModelPredictions(kModelPredictions,"KeywordModel")
-#pm.addModelPredictions(rModelPredictions_extended,"ReinterpretationModel_extended")
-#pm.addModelPredictions(kModelPredictions_extended,"KeywordModel_extended")
-#pm.addModelPredictions(rModelPredictions_direct,"ReinterpretationModel_direct")
+pm.addModelPredictions(kModelPredictions,"KeywordModel")
+pm.addModelPredictions(rModelPredictions_extended,"ReinterpretationModel_extended")
+pm.addModelPredictions(kModelPredictions_extended,"KeywordModel_extended")
+pm.addModelPredictions(rModelPredictions_direct,"ReinterpretationModel_direct")
 pm.addEmpiricalDatas(obsdic)
 
 formulasToExclude=reinterpretationModel.findFormulas(models=['goodAnswers'])
