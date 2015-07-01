@@ -2,6 +2,7 @@
 import operations
 import itertools
 import re
+import copy
 '''
 Created on 30 avr. 2015
 
@@ -22,7 +23,7 @@ class KeywordSolver :
     def __init__(self,directionnality=True,limitUncuedNumbers=True,extendedKeyWord=True):
         self.dicPbmsToconstraints={}
         self.rules={"directionnality":directionnality,"limitUncuedNumbers":limitUncuedNumbers}
-        self.dicSignKeyword=dicSignKeyword
+        self.dicSignKeyword=copy.deepcopy(dicSignKeyword) # make a copy to avoid changes to dicSignKeyword
         if(extendedKeyWord):
             self.dicSignKeyword.update(dicSignKeywordExtended)
 
@@ -62,6 +63,7 @@ class KeywordSolver :
                 if(untilNow_FormulaFilteredIn):
                     #print("come one "+formula)
                     output[problem].append(formula)
+        print(output)
         return output
 
     def generateKeyWordBehaviour(self,problem): # TODO: Simulation stuff must be in a class
