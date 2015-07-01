@@ -180,7 +180,6 @@ class ReinterpretationModel(): # gathering and printing informations accross the
         nbDiscoveries=str(len(solver.TreePaths.pathList))
         logging.info("DONE : model "+model)
         logging.info("Number of paths found : "+nbDiscoveries)
-
         optionsList=optionsFactory(unorderedSteps) # will generate all the options possible with 2 interpretations step randomly occuring
         for i,options in enumerate(optionsList) :
             if (not self.dropToTest) or (i%3==0): # [condition for debugging purpose]
