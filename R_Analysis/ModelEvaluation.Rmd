@@ -1,0 +1,77 @@
+## `r s`.2 Global analysis
+### `r s`.2.1 Global resampling
+```{r}
+inclusions=globalInclusions
+```
+
+```{r child = 'permutationTest.Rmd'}
+```
+### `r s`.2.2 Local resampling
+constraint resampling to preserve the same amount of predictions accross each set
+```{r}
+resamplingGroups=cbind(Lset0,Lset1,Lset2,Lset3)
+```
+
+```{r child = 'permutationTestStrat.Rmd'}
+```
+
+```{r}
+table=cbind("global",results)
+```
+## `r s`.3 Permutation test for the set0
+set 0 = one operation only
+(formulas like (T1-d), (P1-d), etc....)
+```{r}
+inclusions=Lset0 & globalInclusions
+```
+
+```{r child = 'permutationTest.Rmd'}
+```
+```{r}
+results=cbind("set0",results)
+table=rbind(table,results)
+```
+## `r s`.4  permutation test for the set1
+set 0 = one operation only
+(formulas like (T1-d)+P1, (P1+T1)-d, etc....)
+```{r}
+inclusions=Lset1 & globalInclusions
+```
+
+```{r child = 'permutationTest.Rmd'}
+```
+```{r}
+results=cbind("set1",results)
+table=rbind(table,results)
+```
+## `r s`.5 permutation test for the set2
+set 2 = two operation only, one operand used twice
+(formulas like (T1-d)+T1, (P1+T1)+P1, etc....)
+```{r}
+inclusions=Lset2 & globalInclusions
+```
+
+```{r child = 'permutationTest.Rmd'}
+```
+```{r}
+results=cbind("set2",results)
+table=rbind(table,results)
+```
+## `r s`.6 permutation test for the set3
+set 2 = two operation only, one operand used twice
+(formulas like (T1-d)+(P1-d), (P1+T1)+(P1+d), etc....)
+```{r}
+inclusions=Lset3 & globalInclusions
+```
+```{r child = 'permutationTest.Rmd'}
+```
+
+```{r}
+results=cbind("set3",results)
+table=rbind(table,results)
+table
+```
+
+```{r echo=FALSE, results='hide'}
+s=s+1
+```

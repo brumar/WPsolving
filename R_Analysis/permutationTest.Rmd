@@ -1,0 +1,49 @@
+```{r}
+datasTemp<-datas[inclusions,]
+predictionsTemp<-currentPredictions[inclusions]
+
+numberOfFormulas=nrow(datasTemp)
+numberOfSelectedFormulas=sum(predictionsTemp)
+numberOfOccurencesInSelectedFormulas=sum(datasTemp$occurrences[predictionsTemp])
+numberOfOccurences=sum(datasTemp$occurrences)
+results=NULL
+```
+
+A random model is better than our model if it captures    
+(1) more than numberOfOccurencesInSelectedFormulas=`r numberOfOccurencesInSelectedFormulas` amongst a total of numberOfOccurences=`r numberOfOccurences`    
+(2) by selecting numberOfSelectedFormulas=`r numberOfSelectedFormulas` formula 
+amongst numberOfFormulas=`r numberOfFormulas` possible formulas.
+
+Summary notation : `r numberOfSelectedFormulas` over `r numberOfFormulas` predictions which captures `r numberOfOccurencesInSelectedFormulas` over a total of `r numberOfOccurences` occurences
+```{r results='hide',echo=FALSE}
+Pv= numberOfOccurencesInSelectedFormulas/numberOfOccurences
+k=numberOfSelectedFormulas/numberOfFormulas
+Pcor=round((Pv-k)/(1-k),3)
+```
+Pcor : `r Pcor*100` % 
+
+```{r}
+
+count=0
+for ( i in 1:maxBootstrap) {
+  randomSelection=sample(predictionsTemp)
+  captures=sum(datasTemp$occurrences[randomSelection])
+  if (captures>=numberOfOccurencesInSelectedFormulas) {
+  count=count+1
+  }
+}
+pvalue=count/maxBootstrap
+```
+La p-value obtenue par permutation est égale à pvalue=`r pvalue`    
+```{r results='hide',echo=FALSE}
+proba=numberOfSelectedFormulas/numberOfFormulas
+b=binom.test(numberOfOccurencesInSelectedFormulas,numberOfOccurences, p = proba,alternative = "greater",conf.level = 0.95)
+```
+A titre indicatif un test binomial aurait donné une p-value de `r b$p.value` (Bloc de code non affiché pour ne pas surcharger)
+
+
+```{r}
+RatioPredictions=paste(numberOfSelectedFormulas,"/",numberOfFormulas) 
+RatioCaptures=paste(numberOfOccurencesInSelectedFormulas,"/",numberOfOccurences) 
+results=cbind(RatioPredictions,RatioCaptures,pvalue,Pcor)
+```
