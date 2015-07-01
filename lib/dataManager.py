@@ -7,7 +7,7 @@ import pickle
 
 
 class ReinterpretationModel(): # gathering and printing informations accross the different solving models
-    def __init__(self,numberOfReinterpretation=1,dropToTest=False,breakPreviousInterpretations="undefined"):
+    def __init__(self,numberOfReinterpretation=1,dropToTest=False,breakPreviousInterpretations="undefined",excludeLateReinterpretations=False):
         self.datas=[] #list of dictionnaries (selected datas)
         self.datasBrut=[] #list of dictionnaries (all the datas)
         self.datasDic={} # composite dictionnary to get better access to datas
@@ -16,6 +16,7 @@ class ReinterpretationModel(): # gathering and printing informations accross the
         self.maxNumberOfReinterpretation=numberOfReinterpretation
         self.dropToTest=dropToTest
         self.breakPreviousInterpretations=breakPreviousInterpretations
+        self.excludeLateReinterpretations=excludeLateReinterpretations
 
     def pickleSave(self,src):
         output = open(src, 'wb')
@@ -194,6 +195,10 @@ class ReinterpretationModel(): # gathering and printing informations accross the
                 logging.info("DONE : model "+model+"( "+str(i)+" )")
                 nbDiscoveries=str(len(solver.TreePaths.pathList))
                 logging.info("Number of paths found : "+nbDiscoveries)
+                if(self.excludeLateReinterpretations):
+                    # a bit dirty, the idea is that optionsFactory first element is specifically
+                    # the sole element to be tested when excludeLateReinterpretations
+                    break
 
 
 
