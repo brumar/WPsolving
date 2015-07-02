@@ -705,7 +705,7 @@ predictionSpace.processProblem("Tc1p_v2",["T1","P1","d"],{"P1":6,"T1":15,"dEI":0
 
 ## We read the dataset of formulas (children answers)
 obsdic=globalEmpiricalDic()
-obsdic.readCsv("mergedDatas_final_separated.csv")
+obsdic.readCsv("mergedDatas_final_separated_recoded.csv",recodeOneliner=True)
 
 
 # #=============================================================================
