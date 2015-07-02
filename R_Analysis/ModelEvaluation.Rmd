@@ -1,12 +1,7 @@
 ## `r s`.2 Global analysis
-### `r s`.2.1 Global resampling
 ```{r}
 inclusions=globalInclusions
 ```
-
-```{r child = 'permutationTest.Rmd'}
-```
-### `r s`.2.2 Local resampling
 constraint resampling to preserve the same amount of predictions accross each set
 ```{r}
 resamplingGroups=cbind(Lset0,Lset1,Lset2,Lset3)
@@ -65,11 +60,19 @@ inclusions=Lset3 & globalInclusions
 ```
 ```{r child = 'permutationTest.Rmd'}
 ```
-
+## `r s`.7 Table summarising the results
 ```{r}
 results=cbind("set3",results)
 table=rbind(table,results)
-table
+kable(table)
+```
+
+```{r}
+if(!exists("tables")){
+  tables=table
+}else{
+  tables=cbind(tables,table)
+}
 ```
 
 ```{r echo=FALSE, results='hide'}

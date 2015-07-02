@@ -18,21 +18,21 @@ Summary notation : `r numberOfSelectedFormulas` over `r numberOfFormulas` predic
 ```{r results='hide',echo=FALSE}
 Pv= numberOfOccurencesInSelectedFormulas/numberOfOccurences
 k=numberOfSelectedFormulas/numberOfFormulas
-Pcor=round((Pv-k)/(1-k),3)
+RelativeStrengh=round((numberOfOccurencesInSelectedFormulas/numberOfSelectedFormulas)/((numberOfOccurences-numberOfOccurencesInSelectedFormulas)/(numberOfFormulas-numberOfSelectedFormulas)),2)
 ```
-Pcor : `r Pcor*100` % 
+RelativeStrengh : predicted formulas get `r RelativeStrengh` times more occurences than non predicted formulas
 
 ```{r}
 
 count=0
-for ( i in 1:maxBootstrap) {
+for ( i in 1:maxResampling) {
   randomSelection=sample(predictionsTemp)
   captures=sum(datasTemp$occurrences[randomSelection])
   if (captures>=numberOfOccurencesInSelectedFormulas) {
   count=count+1
   }
 }
-pvalue=count/maxBootstrap
+pvalue=count/maxResampling
 ```
 La p-value obtenue par permutation est égale à pvalue=`r pvalue`    
 ```{r results='hide',echo=FALSE}
@@ -45,5 +45,5 @@ A titre indicatif un test binomial aurait donné une p-value de `r b$p.value` (B
 ```{r}
 RatioPredictions=paste(numberOfSelectedFormulas,"/",numberOfFormulas) 
 RatioCaptures=paste(numberOfOccurencesInSelectedFormulas,"/",numberOfOccurences) 
-results=cbind(RatioPredictions,RatioCaptures,pvalue,Pcor)
+results=cbind(RatioPredictions,RatioCaptures,pvalue,RelativeStrengh)
 ```
