@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import csv
 import logging
+import re
 
 class predictionsManager():
     """
@@ -119,12 +120,20 @@ class globalEmpiricalDic():
     def __init__(self):
         self.problemDic={}
 
-    def readCsv(self,filename):
+    def readCsv(self,filename,recodeOneliner=False):
+        """
+        read datas
+        recodeOneliner allows the integration of formulas like T1+P1-d which
+        signals that the student solved like that 5+8=13-2=12 or like that 5+8-2=12
+        """
         with open(filename, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
             for row in spamreader:
                 problem=row[0]
-                formula=row[1]
+                if(recodeOneliner):
+                    formula=self.recode(row[1])
+                else:
+                    formula=row[1]
                 self.addElement(problem,formula)
 
     def addElement(self,problem,formula):
@@ -135,8 +144,23 @@ class globalEmpiricalDic():
         else:
             self.problemDic[problem][formula]+=1
 
+    def recode(self,stri):
+        NbOp=len(re.findall("[-+]",stri))
+        NbPar=len(re.findall("[\(\)]",stri))
+        if(NbOp==2 and NbPar==0):
+            for i,m in enumerate(re.finditer(r"[-+]", "T1+P1-d")):
+                if(i==0):
+                    continue
+                pos=m.start()
+                stri="("+stri[:pos]+")"+stri[pos:]
+        return(stri)
 
 class problemEmpiricalDic():
     def __init__(self,dic):
         self.ObservationsDic=dic
+
+if __name__ == "__main__":
+    obsdic=globalEmpiricalDic()
+    obsdic.readCsv("../mergedDatas_final_separated_recoded.csv",recodeOneliner=True)
+    print(obsdic)
 
