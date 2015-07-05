@@ -18,6 +18,7 @@ import time
 import os
 import logging
 import re
+import pickle
 
 ## SIMULATION DIRECTORY
 simulationName=raw_input("simulation Name ? : ")
@@ -248,7 +249,7 @@ textCc1t.getTextInformation(1).addAlternativeRepresentation(Representation(Quant
 textCc1t.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("Jacques","d"),'Jacques a trois billes'))
 textCc1t.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("AntoineminusJacques","-d"),'Antoine a trois billes de plus'))
 #textCc1t.getTextInformation(2).addAlternativeRepresentation(Representation(Quantity("Antoine","T1"),'Antoine recoit des billes de Paul, maintenant il en a 3'))
-textCc1t.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("Paul","zero"),'Antoine recoit des billes de Paul....'))
+#textCc1t.getTextInformation(3).addAlternativeRepresentation(Representation(Quantity("Paul","zero"),'Antoine recoit des billes de Paul....'))
 
 problemCc1t=Problem(structCc1t,textCc1t)
 problemCc1t.name="Cc1t"
@@ -276,8 +277,8 @@ problemCc1p.name="Cc1p"
 infoCC1p_3=TextInformation(Representation(Quantity("AntoineETPaulminusJacquesETPaul","d"),'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de moins'))
 infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("AntoineETPaulminusJacquesETPaul","-d"),'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes de plus'))
 infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("JacquesETPaul","d"),'Quand Paul et Jacques réunissent leurs billes, cela fait 3 billes'))
-infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("Paul","zero"),'Paul donne ses billes à Jacques....'))
-infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("Jacques","zero"),'Paul donne ses billes à Jacques....'))
+#infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("Paul","zero"),'Paul donne ses billes à Jacques....'))
+#infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("Jacques","zero"),'Paul donne ses billes à Jacques....'))
 infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("Paul","d"),'d'))
 infoCC1p_3.addAlternativeRepresentation(Representation(Quantity("Jacques","d"),'d'))
 problemCc1p.text.textInformations[3]=infoCC1p_3
@@ -429,15 +430,15 @@ problemTc4p_v2=copy.deepcopy(problemTc1p)## IMPORTANT : ds la v2 les formulation
 problemCc1t_v2=copy.deepcopy(problemCc1t)
 problemCc2p_v2=copy.deepcopy(problemCc2p)
 problemCc3t_v2=copy.deepcopy(problemCc3t)
-problemCc4p_v2=copy.deepcopy(problemCc1p)
+problemCc4p_v2=copy.deepcopy(problemCc1p)## IMPORTANT : ds la v2 les formulations contexte 4 sont équivalents au contexte 1
 problemTc1p_v2=copy.deepcopy(problemTc1p)
 problemTc2t_v2=copy.deepcopy(problemTc2t)
 problemTc3p_v2=copy.deepcopy(problemTc3p)
-problemTc4t_v2=copy.deepcopy(problemTc1t)
+problemTc4t_v2=copy.deepcopy(problemTc1t)## IMPORTANT : ds la v2 les formulations contexte 4 sont équivalents au contexte 1
 problemCc1p_v2=copy.deepcopy(problemCc1p)
 problemCc2t_v2=copy.deepcopy(problemCc2t)
 problemCc3p_v2=copy.deepcopy(problemCc3p)
-problemCc4t_v2=copy.deepcopy(problemCc1t)
+problemCc4t_v2=copy.deepcopy(problemCc1t)## IMPORTANT : ds la v2 les formulations contexte 4 sont équivalents au contexte 1
 
 
 Cc4p_v2="""Jules achète un livre à 7 euros et une règle. Jules paie 15 euros.
@@ -641,20 +642,21 @@ else:
     for problem in bank.dicPbm.values():
         keywordSolver.generateKeyWordBehaviour(problem)
         keywordSolver_extended.generateKeyWordBehaviour(problem)
-        reinterpretationModel.generateAllPossibilities(problem)
-        reinterpretationModel_extended.generateAllPossibilities(problem)
+        #reinterpretationModel.generateAllPossibilities(problem)
+        #reinterpretationModel_extended.generateAllPossibilities(problem)
         reinterpretationModel_direct.generateAllPossibilities(problem)
 
     logging.info('The simulation took '+str(time.time()-start)+' seconds.')
-
-logging.info('keyword model : '+str(keywordSolver_extended))
-reinterpretationModel.pickleSave(newsimulation)
-reinterpretationModel.buildBigDic()
-reinterpretationModel.printCSV(csvFile=simulationDirectory+"simulation"+timestamp+".csv",hideUnsolved=True)
-reinterpretationModel.printCSV(csvFile=simulationDirectory+"simulationWithModel"+timestamp+".csv",hideModel=False,hideUnsolved=True)
-reinterpretationModel.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"+timestamp+".csv")
-
-
+#===============================================================================
+#
+# logging.info('keyword model : '+str(keywordSolver_extended))
+# reinterpretationModel.pickleSave(newsimulation)
+# reinterpretationModel.buildBigDic()
+# reinterpretationModel.printCSV(csvFile=simulationDirectory+"simulation"+timestamp+".csv",hideUnsolved=True)
+# reinterpretationModel.printCSV(csvFile=simulationDirectory+"simulationWithModel"+timestamp+".csv",hideModel=False,hideUnsolved=True)
+# reinterpretationModel.printMiniCSV(csvFile=simulationDirectory+"Mini_simulation"+timestamp+".csv")
+#===============================================================================
+reinterpretationModel_direct.buildBigDic()
 #===============================================================================
 # STEP 3 : A priori generator : find all the possible operations with numbers
 # being given
@@ -713,25 +715,29 @@ obsdic.readCsv("mergedDatas_final_separated_recoded.csv",recodeOneliner=True)
 # # using the a priori formula dataset
 # #=============================================================================
 
-rModelPredictions=reinterpretationModel.extractPredictions(excludeUnsolvingProcesses=True)
-kModelPredictions=keywordSolver.extractPredictions(predictionSpace)
-rModelPredictions_extended=reinterpretationModel_extended.extractPredictions(excludeUnsolvingProcesses=True)
+#===============================================================================
+# rModelPredictions=reinterpretationModel.extractPredictions(excludeUnsolvingProcesses=True)
+# rModelPredictions_extended=reinterpretationModel_extended.extractPredictions(excludeUnsolvingProcesses=True)
 rModelPredictions_direct=reinterpretationModel_direct.extractPredictions(predictionSpace)
+#===============================================================================
 kModelPredictions_extended=keywordSolver_extended.extractPredictions(predictionSpace)
+kModelPredictions=keywordSolver.extractPredictions(predictionSpace)
 
 pm=predictionsManager()#pm.
 pm.addPredictionsSpace(predictionSpace)
-pm.addModelPredictions(rModelPredictions,"ReinterpretationModel")
+#pm.addModelPredictions(rModelPredictions,"ReinterpretationModel")
 pm.addModelPredictions(kModelPredictions,"KeywordModel")
-pm.addModelPredictions(rModelPredictions_extended,"ReinterpretationModel_extended")
+#pm.addModelPredictions(rModelPredictions_extended,"ReinterpretationModel_extended")
 pm.addModelPredictions(kModelPredictions_extended,"KeywordModel_extended")
 pm.addModelPredictions(rModelPredictions_direct,"ReinterpretationModel_direct")
 pm.addEmpiricalDatas(obsdic)
 
-formulasToExclude=reinterpretationModel.findFormulas(models=['goodAnswers'])
+formulasToExclude=reinterpretationModel_direct.findFormulas(models=['goodAnswers'])
 logging.info(formulasToExclude)
 pm.printCSVModelComparison(simulationDirectory+"simulations_versus_observations_noExclusion"+timestamp+".csv",formulasToExclude) # print the csv which will be used for R analysis
 pm.listAndCompare(obsdic)
+with open(simulationDirectory+"pickle_DUMP",'wb') as f:
+    pickle.dump([pm,kModelPredictions,kModelPredictions_extended],f)
 
 
 #===============================================================================
