@@ -11,7 +11,7 @@ Created on 30 avr. 2015
 
 dicSignKeyword={"augment":operations.addition,"moins": operations.soustraction,
                 "plus": operations.addition,"dimin": operations.soustraction,
-                "gagne":operations.addition}
+                "gagne":operations.addition,"reçoit":operations.addition}
 
 
 dicSignKeywordExtended={ "pris": operations.addition,"ensemble": operations.addition,
