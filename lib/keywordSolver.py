@@ -11,7 +11,7 @@ Created on 30 avr. 2015
 
 dicSignKeyword={"augment":operations.addition,"moins": operations.soustraction,
                 "plus": operations.addition,"dimin": operations.soustraction,
-                "gagne":operations.addition,"reÃ§oit":operations.addition}
+                "gagne":operations.addition,"reçoit":operations.addition}
 
 
 dicSignKeywordExtended={ "pris": operations.addition,"ensemble": operations.addition,
@@ -131,12 +131,12 @@ class KeywordSolver :
             if (self.rules["directionnality"]):
                 # directionnality means that substraction or addition is applied to another number
                 # John lost 4 marbles => X-4, not 4-X
-                interdictions.append(numberWithKeyword + "-(")
-            if (operations.addition not in numberWithKeywordDic[numberWithKeyword]):
-                interdictions.append(numberWithKeyword + "+(")
-                interdictions.append(")+" + numberWithKeyword)
-            if (operations.soustraction not in numberWithKeywordDic[numberWithKeyword]):
-                interdictions.append(")-" + numberWithKeyword)
+                interdictions.append(numberWithKeyword + "-")
+            if (operations.addition not in numberWithKeywordDic[numberWithKeyword]):# means only substraction cued
+                interdictions.append(numberWithKeyword + "+")
+                interdictions.append("+" + numberWithKeyword)
+            if (operations.soustraction not in numberWithKeywordDic[numberWithKeyword]):# means only addition cued
+                interdictions.append("-" + numberWithKeyword)
             if (operations.addition in numberWithKeywordDic[numberWithKeyword]):
                 for item in listOfItems:
                     if (item != numberWithKeyword):
