@@ -15,18 +15,36 @@ A random model is better than our model if it captures
 amongst numberOfFormulas=`r numberOfFormulas` possible formulas.
 
 Summary notation : `r numberOfSelectedFormulas` over `r numberOfFormulas` predictions which captures `r numberOfOccurencesInSelectedFormulas` over a total of `r numberOfOccurences` occurences
-```{r results='hide',echo=FALSE}
+**Computation of RelativeStrengh**
+```{r}
 Pv= numberOfOccurencesInSelectedFormulas/numberOfOccurences
 k=numberOfSelectedFormulas/numberOfFormulas
 RelativeStrengh=round((numberOfOccurencesInSelectedFormulas/numberOfSelectedFormulas)/((numberOfOccurences-numberOfOccurencesInSelectedFormulas)/(numberOfFormulas-numberOfSelectedFormulas)),2)
 ```
 RelativeStrengh : predicted formulas get `r RelativeStrengh` times more occurences than non predicted formulas
+**Bootstraping confidence intervall of RelativeStrengh**
+```{r}
+FullDataTemp=cbind(predictionsTemp,datasTemp)
+boot=c()
+CI=c()
+for ( i in 1:maxResampling) {
+  cases=sample(numberOfFormulas,numberOfFormulas,replace=TRUE)#replace = TRUE for bootstraping
+  datasTemp2=FullDataTemp[cases,]
+  randomPredictions=datasTemp2$predictionsTemp
+  numberOfSelectedFormulas_rd=sum(randomPredictions)
+  numberOfOccurencesInSelectedFormulas_rd=sum(datasTemp2$occurrences[randomPredictions])
+  numberOfOccurences_rd=sum(datasTemp2$occurrences)
+  RelativeStrengh_i=round((numberOfOccurencesInSelectedFormulas_rd/numberOfSelectedFormulas_rd)/((numberOfOccurences_rd-numberOfOccurencesInSelectedFormulas_rd)/(numberOfFormulas-numberOfSelectedFormulas_rd)),2)
+  boot[i]<-RelativeStrengh_i
+}
+CI=round(quantile(boot,probs=c(0.025,0.975),na.rm=TRUE),2)
+```
 
 ```{r}
 
 count=0
 for ( i in 1:maxResampling) {
-  randomSelection=sample(predictionsTemp)
+  randomSelection=sample(predictionsTemp,replace=FALSE)
   captures=sum(datasTemp$occurrences[randomSelection])
   if (captures>=numberOfOccurencesInSelectedFormulas) {
   count=count+1
@@ -43,7 +61,7 @@ A titre indicatif un test binomial aurait donné une p-value de `r b$p.value` (B
 
 
 ```{r}
-RatioPredictions=paste(numberOfSelectedFormulas,"/",numberOfFormulas) 
-RatioCaptures=paste(numberOfOccurencesInSelectedFormulas,"/",numberOfOccurences) 
-results=cbind(RatioPredictions,RatioCaptures,pvalue,RelativeStrengh)
+RatioPredictions=paste0(numberOfSelectedFormulas,"/",numberOfFormulas) 
+RatioCaptures=paste0(numberOfOccurencesInSelectedFormulas,"/",numberOfOccurences) 
+results=cbind(RatioPredictions,RatioCaptures,pvalue,paste0(RelativeStrengh,"(",CI[1],"-",CI[2],")"))
 ```

@@ -64,7 +64,7 @@ inclusions=Lset3 & globalInclusions
 ```{r}
 results=cbind("set3",results)
 table=rbind(table,results)
-kable(table)
+knitr::kable(table)
 ```
 
 ```{r}
