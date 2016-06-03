@@ -55,7 +55,11 @@ pvalue=count/maxResampling
 La p-value obtenue par permutation est égale à pvalue=`r pvalue`    
 ```{r results='hide',echo=FALSE}
 proba=numberOfSelectedFormulas/numberOfFormulas
+if(numberOfOccurences!=0){
 b=binom.test(numberOfOccurencesInSelectedFormulas,numberOfOccurences, p = proba,alternative = "greater",conf.level = 0.95)
+}else{
+print("can't be computed")
+}
 ```
 A titre indicatif un test binomial aurait donné une p-value de `r b$p.value` (Bloc de code non affiché pour ne pas surcharger)
 
