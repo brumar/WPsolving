@@ -14,7 +14,7 @@ This work has been done during my PhD thesis. This is tied to one of my three "c
 Few Ipython notebooks (files with ipynb extension) are available at the root of this project. They illustrate how to use the library that has been built. A more massive file, main.py, can serve the same purpose as it is the script used to validate the models on the problems considerered.
 
 # Statistical Analysis
-Here again, notebooks play an important role. Knitr has been used to compare predictions of the models and generate nice html output. In order to let the user browse the huge file created, I insered some css/javascript in order to get a dynamic Table Of Content as a sidebar. The statistical Analysis has some subtleties as a stratified permutation test has been used and a specific methodology used to compare models is set up. Interesting results has been drawn frome these analysis.
+Here again, notebooks play an important role. Knitr has been used to compare predictions of the models and generate nice html output. Files are stored in R_Analysis subfolder. In order to let the user browse the huge file created, I inserted some css/javascript in order to get a dynamic Table Of Content as a sidebar. To visualize it, please use the tool htmlpreview.github.io. The statistical Analysis has some subtleties as a stratified permutation test has been used and a specific methodology used to compare models is set up. Interesting results has been drawn frome these analysis. Both models (keyword strategy and reinterpretations) seems to account for an important part of errors, but some questions remains.
 
 # Important note
 Please note I do not own the dataset used to evaluate the relevancy of the predictions of these models.
