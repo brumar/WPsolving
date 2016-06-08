@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.55170.svg)](http://dx.doi.org/10.5281/zenodo.55170)
+
 # Introduction  
 This repository aims the simulation of some human solving behavior in problem solving.
 There is a fair amount of scientific litterature on arithmetic word problem solving. If you are new to this field and want to dig it, I strongly recommend the book of Stephen K.Reed (Word Problems: Research and Curriculum Reform) which is a good read whatever the cognitive psychology background you have.
